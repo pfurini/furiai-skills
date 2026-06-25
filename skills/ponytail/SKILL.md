@@ -88,6 +88,42 @@ smallest thing that fails if the logic breaks: an `assert`-based
 fixtures, no per-function suites unless asked. Trivial one-liners need no
 test, YAGNI applies to tests too.
 
+## Brownfield hard stops
+
+The ladder never overrides project-level constraints. Before applying any rung, read the project's AGENTS.md / CLAUDE.md and its static-analysis config.
+
+**Validated env layers.** If the project wraps env access in a validated module, never bypass it with a direct read. The one-liner that skips validation fails at runtime instead of startup.
+- JS/TS: `@t3-oss/env`, `dotenv-safe` — never `process.env.X` directly
+- Laravel: `config('app.key')` only; `env()` belongs in config files, never in business logic
+- Python: `pydantic-settings`, `dynaconf`, `python-decouple` — never `os.environ['X']` directly
+
+**Static-analysis import boundaries.** "Already installed" ≠ "importable here." A dep may exist in the repo but be banned in the package or layer you're editing.
+- JS/TS: Biome / ESLint `noRestrictedImports`
+- PHP: PHPStan layer rules, Deptrac, or explicit DDD boundary enforcement (no Eloquent models in domain services)
+- Python: `pylint` import restrictions, `flake8-import-order`, or custom `mypy` plugins enforcing layer boundaries
+
+**Framework data-access contracts.** If the project routes all data through an established layer, don't shortcut to direct DB/storage access even when it's simpler. The contract is what keeps the architecture liftable or testable.
+- JS/TS: oRPC, tRPC, GraphQL — RSCs/actions go through the declared client, not raw queries
+- Laravel: repository or action pattern — no Eloquent calls directly in controllers or views
+- Python/Django: queryset managers and service layer — no raw ORM calls scattered in views or serializers; FastAPI: dependency injection for DB sessions, never a bare `SessionLocal()` inline
+
+**Port legitimacy test.** An interface with one production implementation is over-engineering — unless it has a test fake or in-memory adapter alongside it. If it does, it's a port; leave it alone.
+- JS/TS: TypeScript interface + in-memory class in `test-utils/`
+- Laravel: `Contracts` interface bound in the service container + a `Fake` class used in tests
+- Python: `ABC` or `Protocol` + an in-memory implementation used in unit tests
+
+**Mid-migration pattern selection.** In a project actively migrating from a legacy stack, follow the *target* pattern, not the most-common one. Reusing the legacy pattern because it outnumbers the new one is technical debt wearing a laziness mask.
+
+**Package / dep conventions.** "Already installed" does not mean "correctly declared here." Check the project's dep management rules before adding or using anything.
+- JS/TS monorepo: check whether the dep belongs in the shared `catalog:`, the consuming package's own `package.json`, or is banned from that package
+- PHP: `require` vs `require-dev` boundary; `composer.json` path repositories in a monorepo; don't add a package that's already a transitive dep without making it explicit
+- Python: `uv` workspaces — check `pyproject.toml` `[project.dependencies]` vs `[dependency-groups]` (dev-only); promote to a workspace dep the moment a second member needs it
+
+**File structure rules.** Framework-mandated naming and placement override "fewest files possible."
+- JS/TS: one-component-per-file (React convention); explicit placement tiers (e.g. `packages/ui/components/` vs `apps/web/components/`)
+- Laravel: PSR-4 autoloading enforces one class per file, namespace mirrors path — never collapse two classes into one file for brevity
+- Python/Django: one model per `models/` module, one view class per file when using class-based views; `__init__.py` barrel exports are a deliberate choice, not a default shortcut
+
 ## Boundaries
 
 Ponytail governs what you build, not how you talk (pair with caveman-lite skill for
