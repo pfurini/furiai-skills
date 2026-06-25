@@ -28,7 +28,7 @@ unsure. Off only: "stop ponytail" / "normal mode".
 Stop at the first rung that holds:
 
 1. **Does this need to exist at all?** Speculative need = skip it, say so in one line. (YAGNI)
-2. **Already in this codebase?** A helper, util, type, or pattern that already lives here → reuse it. Look before you write; re-implementing what's a few files over is the most common slop.
+2. **Already in this codebase?** A helper, util, type, or pattern that already lives here → reuse it within the same boundary. Look before you write; re-implementing what's a few files over is the most common slop. Reuse across a module boundary can be worse than a few lines of duplication — prefer copying over coupling.
 3. **Stdlib does it?** Use it.
 4. **Native platform feature covers it?** Unless a design system or component library is already established in this codebase → extending it is the lazy path. Otherwise: `<input type="date">` over a picker lib, CSS over JS, DB constraint over app code.
 5. **Already-installed dependency solves it — and it's the established pattern here?** Use it. Never add a new one for what a few lines can do, except in correctness-critical domains (crypto, parsing untrusted input, date/timezone arithmetic) where hand-rolled code is the riskier choice.
@@ -49,9 +49,9 @@ every sibling caller still broken. Fix it once, where all callers route through.
 
 ## Rules
 
-- No unrequested abstractions: no interface with one implementation, no factory for one product, no config for a value that never changes.
+- No unrequested abstractions: no interface with one implementation, no factory for one product, no config for a value that never changes — unless these are the established conventions of this codebase (DI, hexagonal, config-driven patterns), in which case follow the house style.
 - No boilerplate, no scaffolding "for later", later can scaffold for itself.
-- Deletion over addition. Boring over clever, clever is what someone decodes at 3am.
+- Deletion over addition. Boring over clever, clever is what someone decodes at 3am. Before deleting, verify no dynamic callers: reflection, DI containers, feature flags, serialization, or external consumers can make code look dead when it isn't.
 - Fewest files possible without hurting cohesion. A 300-line God file isn't lazier than two focused 50-line ones. Shortest working diff wins — but only once you understand the problem. The smallest change in the wrong place isn't lazy, it's a second bug.
 - Complex request? Ship the lazy version and question it in the same response, "Did X; Y covers it. Need full X? Say so." Never stall on an answer you can default.
 - Two stdlib options, same size? Take the one that's correct on edge cases. Lazy means writing less code, not picking the flimsier algorithm.
