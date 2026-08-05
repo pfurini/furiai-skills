@@ -1,15 +1,23 @@
 ---
 name: resolving-merge-conflicts
-description: Resolve Git merge or rebase conflicts through evidence-backed intent decisions. Use before starting the operation or when conflicts are already in progress.
+description: Start, preflight, or recover a Git branch merge/rebase through evidence-backed conflict decisions.
 ---
 
-## 1. Confirm the operation
+## 1. Bootstrap and confirm the operation
 
-Fetch the relevant remotes without changing the working tree. Inspect the repository state, tracking branches, worktrees, local changes, history, and any in-progress merge/rebase metadata.
+Invoking this skill is a request to begin its workflow, even without accompanying instructions. Anchor the response in Git operation discovery; use prior commands and output only when they identify the branch integration.
 
-State the exact operation as explicit branch/commit identities—never rely on the ambiguous words “ours” and “theirs”—and ask one question: is this source-to-target direction and current target branch correct? Include a recommendation based on the user's stated goal. Wait for confirmation before proceeding.
+Fetch the configured remotes without changing the working tree. Inspect the repository state, tracking and recently used branches, worktrees, local changes, history, and any in-progress merge/rebase metadata.
 
-If the operation is already in progress, use its actual state. If its direction or branch is wrong, propose aborting and restarting; execute an abort only after explicit approval.
+- If an operation is active, derive its source, target, and operation from Git's metadata.
+- Otherwise, use any intent stated with the invocation. Gather missing decisions one question at a time:
+  1. Ask for the target branch; recommend the current branch when the evidence makes it appropriate.
+  2. Ask for the source branch; show relevant local and remote candidates, recommending one only when evidence supports it.
+  3. Ask whether to merge or rebase when unspecified, with a recommendation based on history and repository policy.
+
+State the exact operation as explicit branch/commit identities—never rely on the ambiguous words “ours” and “theirs”—and ask whether this source-to-target direction, operation, and current target branch are correct. Wait for confirmation before proceeding.
+
+If an active operation's direction or branch is wrong, propose aborting and restarting; execute an abort only after explicit approval. The bootstrap is complete only when source, target, and operation are explicitly confirmed.
 
 ## 2. Preflight the conflicts
 
