@@ -18,7 +18,7 @@ All `python -m scripts.<name>` commands run from this skill's directory. Exact J
 
 ## Setup: evals and workspace
 
-Save the test prompts to `evals/evals.json` inside the skill directory (schema in schemas.md) — prompts first, assertions later. Results live in `<skill-name>-workspace/`, kept outside the skill and outside any directory that holds only deliverable skills (project root works well), organized as `iteration-N/<eval-name>/` with one directory per test case, named for what it tests (not `eval-0`). Create directories as you go, not upfront.
+Save the test prompts to `evals/evals.json` inside the skill directory (schema in schemas.md) — prompts first, assertions later. Results live in `.skill-creator/<skill-name>/` at the project root (the same workspace container as testing.md; one `.gitignore` line covers it), organized as `iteration-N/<eval-name>/` with one directory per test case, named for what it tests (not `eval-0`). Create directories as you go, not upfront.
 
 ## Running a benchmark iteration
 

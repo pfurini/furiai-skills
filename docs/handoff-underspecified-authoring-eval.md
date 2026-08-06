@@ -10,7 +10,7 @@
 
 ## 1. One-paragraph context
 
-`skills/pi-skill-creator` is a skill-creation skill merged from four sources (Anthropic's skill-creator, writing-great-skills, superpowers' writing-skills, codex-skill-creator). It was eval-tested through four in-session iterations, two pre-registered clean-slate producer pilots, one distribution test, and one feature A/B (all summarized in the skill's `README.md`, raw records in `pi-skill-creator-workspace/` at the repo root). The pilots left exactly one first-order question unanswered, and it is the most important one: **does the skill's process advantage convert into a measurable artifact advantage on authoring tasks where the knowledge is not handed to the author?** This campaign exists to answer that.
+`skills/pi-skill-creator` is a skill-creation skill merged from four sources (Anthropic's skill-creator, writing-great-skills, superpowers' writing-skills, codex-skill-creator). It was eval-tested through four in-session iterations, two pre-registered clean-slate producer pilots, one distribution test, and one feature A/B (all summarized in the skill's `README.md`, raw records in `.skill-creator/pi-skill-creator/` at the repo root). The pilots left exactly one first-order question unanswered, and it is the most important one: **does the skill's process advantage convert into a measurable artifact advantage on authoring tasks where the knowledge is not handed to the author?** This campaign exists to answer that.
 
 ## 2. Why this question survived everything we ran
 
@@ -90,7 +90,7 @@ Cost calibration from this session: a Fable full-loop producer run (spawns its o
 
 - Skill under test: `skills/pi-skill-creator`. The four parent skills, pinned at their benchmarked versions for the 5-way treatment option: `vendor/{skill-creator,writing-skills,codex-skill-creator,writing-great-skills}` (commits `fcd3709`, `ea1e5a0`, `c1fdb7a`, `84536ac`).
 - Eval summary and honest caveats: `skills/pi-skill-creator/README.md`.
-- Raw records: `pi-skill-creator-workspace/` (iterations 1 to 4) at this repo's root; pilot artifacts and runner scripts in the originating session's scratchpad (ephemeral; treat the workspace and README as the durable record).
+- Raw records: `.skill-creator/pi-skill-creator/` (iterations 1 to 4) at this repo's root; pilot artifacts and runner scripts in the originating session's scratchpad (ephemeral; treat the workspace and README as the durable record).
 - Testing doctrine to follow while testing (hygiene, environment fidelity, manual-read rule): `skills/pi-skill-creator/references/testing.md` and `references/benchmarking.md`. The campaign should eat this cooking; deviations are findings about the doctrine.
 
 ## 8. Definition of done for the planning session

@@ -2,3 +2,4 @@ wip/
 .pi/tasks
 .claude/worktrees
 __pycache__/
+.skill-creator/
