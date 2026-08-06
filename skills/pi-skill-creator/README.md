@@ -51,7 +51,7 @@ Supporting references load only when a step points at them:
 
 - **On fully-specified tasks with a strong authoring model, the creator skill does not measurably improve the artifact.** Our own clean-slate pilot shows all four creator skills and a no-skill control tying at 5/5 when the user's conventions are fully enumerated in the prompt. What the skill measurably adds at strong tiers is process evidence: baseline transcripts proving the skill is needed, forward-test results proving it works, snapshots making edits comparable, and a validator pass. The artifact-quality gap appears at weaker authoring tiers and (untested so far) on underspecified authoring tasks where knowledge must be mined rather than transcribed.
 - The full loop spawns subagents (baselines, forward-tests, graders). Without subagent capability the loop degrades to self-testing, which is weaker evidence.
-- The benchmarking branch requires Python 3 plus `pyyaml`, and description-trigger optimization requires the `claude` CLI.
+- The bundled scripts are zero-dependency (Python 3 standard library only); description-trigger optimization additionally requires the `claude` CLI.
 - The clean-slate recipe in `benchmarking.md` (scrubbed `CLAUDE_CONFIG_DIR` profile) is verified on macOS with Keychain-stored credentials; on other platforms the credential file location may differ. Do not use `--bare` (it breaks credential discovery on current builds).
 - A README inside a skill folder contradicts the skill's own "ship only what the executing agent needs" rule. This file is deliberately exempt as distribution documentation: it is never loaded into an agent's context at runtime.
 

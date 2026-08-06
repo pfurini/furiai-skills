@@ -1,13 +1,60 @@
 #!/usr/bin/env python3
 """
-Quick validation script for skills - minimal version
+Quick validation script for skills - minimal version.
+
+Zero-dependency by design: frontmatter is parsed with a small line-based
+parser instead of pyyaml, because a bundled validator must not fail on
+first use in an environment that never installed anything. The parser
+covers what skill frontmatter actually uses: top-level scalar keys
+(plain, quoted, or booleans-as-text), nested blocks (e.g. `metadata:`,
+whose inner keys are ignored, matching the previous behaviour), and
+multiline scalars (`>`, `|`, `>-`, `|-`).
 """
 
 import sys
-import os
 import re
-import yaml
 from pathlib import Path
+
+
+def parse_frontmatter(frontmatter_text):
+    """Parse top-level frontmatter keys into a dict of strings.
+
+    Returns (dict, None) on success or (None, error_message) on failure.
+    Indented lines belong to the preceding top-level key and are ignored,
+    except as the body of a multiline scalar.
+    """
+    keys = {}
+    lines = frontmatter_text.split("\n")
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if not line.strip() or line.lstrip().startswith("#"):
+            i += 1
+            continue
+        if line[0] in " \t":
+            # Nested content under the previous key (e.g. metadata entries).
+            i += 1
+            continue
+        m = re.match(r"^([A-Za-z0-9_-]+):(.*)$", line)
+        if not m:
+            return None, f"Invalid frontmatter line: {line.strip()!r}"
+        key, raw = m.group(1), m.group(2).strip()
+        if raw in (">", "|", ">-", "|-"):
+            continuation = []
+            i += 1
+            while i < len(lines) and (lines[i].startswith("  ") or lines[i].startswith("\t")):
+                continuation.append(lines[i].strip())
+                i += 1
+            keys[key] = " ".join(continuation)
+            continue
+        if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "\"'":
+            raw = raw[1:-1]
+        keys[key] = raw
+        i += 1
+    if not keys:
+        return None, "Frontmatter must be a YAML dictionary"
+    return keys, None
+
 
 def validate_skill(skill_path):
     """Basic validation of a skill"""
@@ -28,15 +75,9 @@ def validate_skill(skill_path):
     if not match:
         return False, "Invalid frontmatter format"
 
-    frontmatter_text = match.group(1)
-
-    # Parse YAML frontmatter
-    try:
-        frontmatter = yaml.safe_load(frontmatter_text)
-        if not isinstance(frontmatter, dict):
-            return False, "Frontmatter must be a YAML dictionary"
-    except yaml.YAMLError as e:
-        return False, f"Invalid YAML in frontmatter: {e}"
+    frontmatter, err = parse_frontmatter(match.group(1))
+    if err:
+        return False, err
 
     # Define allowed properties
     ALLOWED_PROPERTIES = {'name', 'description', 'license', 'allowed-tools', 'metadata', 'compatibility', 'disable-model-invocation'}
@@ -55,11 +96,8 @@ def validate_skill(skill_path):
     if 'description' not in frontmatter:
         return False, "Missing 'description' in frontmatter"
 
-    # Extract name for validation
-    name = frontmatter.get('name', '')
-    if not isinstance(name, str):
-        return False, f"Name must be a string, got {type(name).__name__}"
-    name = name.strip()
+    # Validate name
+    name = frontmatter['name'].strip()
     if name:
         # Check naming convention (kebab-case: lowercase with hyphens)
         if not re.match(r'^[a-z0-9-]+$', name):
@@ -70,11 +108,8 @@ def validate_skill(skill_path):
         if len(name) > 64:
             return False, f"Name is too long ({len(name)} characters). Maximum is 64 characters."
 
-    # Extract and validate description
-    description = frontmatter.get('description', '')
-    if not isinstance(description, str):
-        return False, f"Description must be a string, got {type(description).__name__}"
-    description = description.strip()
+    # Validate description
+    description = frontmatter['description'].strip()
     if description:
         # Check for angle brackets
         if '<' in description or '>' in description:
@@ -85,11 +120,8 @@ def validate_skill(skill_path):
 
     # Validate compatibility field if present (optional)
     compatibility = frontmatter.get('compatibility', '')
-    if compatibility:
-        if not isinstance(compatibility, str):
-            return False, f"Compatibility must be a string, got {type(compatibility).__name__}"
-        if len(compatibility) > 500:
-            return False, f"Compatibility is too long ({len(compatibility)} characters). Maximum is 500 characters."
+    if compatibility and len(compatibility) > 500:
+        return False, f"Compatibility is too long ({len(compatibility)} characters). Maximum is 500 characters."
 
     return True, "Skill is valid!"
 
@@ -97,7 +129,7 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python quick_validate.py <skill_directory>")
         sys.exit(1)
-    
+
     valid, message = validate_skill(sys.argv[1])
     print(message)
     sys.exit(0 if valid else 1)
