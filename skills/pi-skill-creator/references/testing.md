@@ -37,7 +37,7 @@ A test only measures generalization if the subagent can't reconstruct the answer
 - **Clean up between iterations.** Outputs a previous run left on disk are leaked context for the next one — remove them before re-dispatching.
 - **Keep control copies and planted fixtures in paths the subagent has no reason to visit.** A subject that can see the `baseline/` twin of its own input has learned it is inside a harness.
 - **Run test subagents in a working directory that contains neither the skill corpus nor its authoring guides.** A baseline that can read the doctrine under test isn't a baseline.
-- Tell each run where to save outputs, and keep a simple workspace beside the skill: `<skill-name>-workspace/iteration-N/<eval-name>/{with_skill,baseline}/outputs/`.
+- Tell each run where to save outputs, and keep a simple workspace outside the skill and outside any directory that holds only deliverable skills — e.g. at the project root: `<skill-name>-workspace/iteration-N/<eval-name>/{with_skill,baseline}/outputs/`.
 
 If a forward-test only succeeds when the subagent sees leaked context, tighten the skill or the test setup before trusting the result.
 
