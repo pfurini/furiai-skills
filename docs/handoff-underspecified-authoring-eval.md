@@ -1,6 +1,8 @@
-# Handoff: the underspecified-authoring eval campaign
+# Handoff: hardening the testing process, on an underspecified-authoring test bed
 
 **For**: a fresh session (likely a fresh project) whose first job is to grill this document with the user and produce a concrete experiment plan. Nothing here is a finished design; section 6 lists the decisions deliberately left open.
+
+**Priority ordering (deliberate)**: the primary objective is the process hardening in section 2b, because it improves the *products* (every skill authored from then on). The discovery-gap measurement and the creator-vs-parents comparison are the campaign's instrument and its secondary outputs, not its point.
 
 **Date**: 2026-08-06. **Author**: the session that built and eval-tested `skills/pi-skill-creator` (session records referenced below).
 
@@ -21,6 +23,21 @@ Every authoring eval so far was *fully specified*: the producer prompt enumerate
 The one thing with-skill runs did at every tier that baselines never did: **process** (baseline runs before drafting, forward-tests, snapshots, audits). On fully-specified tasks that process produced evidence but no output delta. The untested hypothesis: on tasks where correct content must be *discovered or induced*, process is the only path to correct content, so the output delta should appear at the strong-author tier, which is the tier real users author on.
 
 If the hypothesis fails there too, the honest conclusion is that pi-skill-creator's value is evidence and regression protection only, and the README should say so even more bluntly. Either result is publishable.
+
+## 2b. The primary objective: fix the testing process itself
+
+The testing/benchmarking process the skill inherited (largely from Anthropic's skill-creator) is, on this session's evidence, a *verification* process wearing the name of a *testing* process. It reliably confirms the skill does what its author imagined; it has almost no machinery for finding what the author did not imagine. Three structural gaps, each observed live:
+
+1. **The eval author is the skill author.** Eval prompts and assertions are written by the same agent and session that wrote the skill, from the same example distribution, so skill and evals co-evolve and share blind spots (one audit run caught itself building a worked example out of its own test prompt).
+2. **No adversarial input generation.** The one consumer-breaking defect found this session (a rule saying "every column alias is snake_case" that literal readers extended to renaming source columns) survived every self-generated eval and fell only to an externally designed trap input. Nothing in the encoded process would ever construct that trap. Superpowers' pressure scenarios are adversarial, but only for discipline skills.
+3. **Test consumers are gentler than deployment consumers.** Attentive in-session forward-test subagents passed an artifact that a single-pass `claude -p` consumer immediately exposed. (Partially patched already via the executor-floor wiring.)
+
+The proposed treatment, shaped by this session's clearest meta-finding (doctrine additions failed their A/B; process-wiring additions all changed behavior): two structurally independent steps added to the skill's test loop, both cheap, both A/B-testable:
+
+- **Spec-blind eval generation**: a fresh subagent that has read only the captured intent from Step 1 (never the draft) writes the eval prompts and expected behaviors. Restores independence between test and implementation.
+- **Red-team input generation**: a fresh subagent that reads the *draft skill* with the instruction to construct inputs a literal, single-pass reader of these rules would get wrong, with expected correct behavior pre-registered from the spec, not the skill. This automates exactly the manual step that caught the alias-renaming defect.
+
+The underspecified-authoring fixture (sections 3 and 5) is the test bed that can measure whether these steps work: arms with and without the wiring, graded on planted-knowledge coverage and floor-consumer effectiveness. That gives the campaign double duty: it measures the discovery gap and it validates the fix in the same runs.
 
 ## 3. The three candidate eval families
 
@@ -59,6 +76,7 @@ Cost calibration from this session: a Fable full-loop producer run (spawns its o
 
 ## 6. Open decisions for the planning session to grill
 
+0. **The treatment design (top priority, from section 2b)**: are spec-blind eval generation and red-team input generation two steps or one; where do they sit in the loop (after the draft, before iteration); what exactly does the red-teamer receive (draft only? draft plus spec?); how is contamination between the red-teamer and the forward-test consumers prevented; and what is the A/B (current loop vs loop-with-wiring, same fixture, same graded outcomes)? Note the asymmetry with the failed floor-doctrine A/B: these are process steps, not prose, and process wiring is the intervention class that has worked every time this session.
 1. **Fixture realism vs cost**: how big must the fixture be before discovery is "real"? A 10-file toy may let baselines stumble on everything; a 200-file repo raises authoring cost per rep. What is the smallest fixture where baseline coverage plausibly drops below ~50%?
 2. **Does the producer get subagents?** Full-loop pi-skill-creator spawns its own test agents. In `claude -p` they are available; decide whether the control arm's prompt should mention testing at all, or stay strictly naturalistic.
 3. **Treatments**: pi vs control only (cheapest, answers the headline claim), or the full 5-way (answers "better than parents" on the class that matters, at roughly 2.5x cost)?
@@ -77,4 +95,4 @@ Cost calibration from this session: a Fable full-loop producer run (spawns its o
 
 ## 8. Definition of done for the planning session
 
-A written plan containing: the chosen eval family and fixture spec with its planted-knowledge key, pre-registered assertions and consumer questions, treatments, rep counts and budget, the decision rule tying each outcome to a concrete README/skill change, and the run schedule. Only then run producers.
+A written plan containing: the treatment design for the two test-loop wiring steps (section 2b) and their A/B arms; the chosen eval family and fixture spec with its planted-knowledge key; pre-registered assertions and consumer questions; treatments, rep counts and budget; the decision rule tying each outcome to a concrete README/skill change (including the wiring's ship/no-ship criterion); and the run schedule. Only then run producers.
