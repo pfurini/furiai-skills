@@ -28,9 +28,10 @@ Establish, asking the most important questions first rather than all at once:
 1. The capability, stated in one sentence.
 2. The **branches** — each distinct way the skill will be invoked — with a realistic example prompt per branch: real file names, real phrasing, the kind of thing the user would actually type.
 3. The **invocation choice**: model-invoked (the agent can fire it; its description occupies context every turn) or user-invoked (only the human can fire it; zero context cost, but the human must remember it exists). Pick model-invocation only when the agent must reach the skill on its own, or another skill must.
-4. Where the skill will live.
+4. The **executor floor** — the weakest model class that must follow the skill reliably: a reasoning model, or a fast executor (the cheap verifier-agent case). When unknown, assume a fast executor if the output has a required shape, and a reasoning model if the work is judgment-shaped. The floor sets the forward-test model (testing.md) and the default benchmark consumer.
+5. Where the skill will live.
 
-Done when: the user has confirmed the capability sentence, one example prompt per branch, and the invocation choice.
+Done when: the user has confirmed the capability sentence, one example prompt per branch, the invocation choice, and the executor floor.
 
 ## Step 2 — Baseline
 

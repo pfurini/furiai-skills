@@ -51,7 +51,7 @@ Match the test environment to the deployment claim:
 
 ## The test loop
 
-1. **Dispatch all runs for the iteration in one turn** — with-skill and baseline for each example prompt — so they finish together and neither waits on the other.
+1. **Dispatch all runs for the iteration in one turn** — with-skill and baseline for each example prompt — so they finish together and neither waits on the other. Run forward-tests on the executor floor from Step 1 (compliance by a model stronger than the floor is not evidence), and include at least one single-pass consumer when the output has a required shape.
 2. **Read the transcripts, not just the outputs.** The output shows whether it worked; the transcript shows _how_, and the how is what you're iterating on.
 3. **Compare each with-skill transcript to its baseline** and collect three kinds of signal:
    - **Baseline failures now fixed** — the evidence the skill works. Quote it.

@@ -38,7 +38,7 @@ CLAUDE_CONFIG_DIR=<scrubbed-profile> claude -p "<eval prompt>" --model <model-id
 - The scrubbed profile is a directory (mode 700) holding only auth: a `.credentials.json` (on macOS, export it once with `security find-generic-password -s 'Claude Code-credentials' -w`, mode 600) and a copy of the `.claude.json` state file. No CLAUDE.md, no `skills/`, no settings — so global instructions and installed skills do not load. Verify the profile before trusting a benchmark: probe for a rule distinctive to the real config ("what tool must replace pip per your instructions?") and require the scrubbed answer to be "none".
 - Do not reach for `--bare`: on current builds it also skips credential discovery and every run dies with "Not logged in".
 - Run from an empty scratch directory outside any repo — project CLAUDE.md files are discovered by walking up parent directories, so ancestry must be clean too.
-- `--model` pins the executor; record it as `executor_model` in the benchmark metadata — a pass rate without its model is not a result.
+- `--model` pins the executor; record it as `executor_model` in the benchmark metadata — a pass rate without its model is not a result. Default it to the skill's declared executor floor.
 - `--add-dir` exposes only the skill under test, and the prompt names its path and says to read SKILL.md and follow it (nothing auto-loads under the scrubbed profile). Baseline runs drop both.
 - Each `-p` invocation is a fresh context: the clean-slate equivalent of the fresh-subagent dispatch in testing.md. No further per-run isolation is needed.
 - Managed/policy-level instructions still load and cannot be excluded — record them in the benchmark metadata if present. Delete the exported credentials file when the benchmark campaign ends.
