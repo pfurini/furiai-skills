@@ -1,3 +1,4 @@
 wip/
 .pi/tasks
 .claude/worktrees
+__pycache__/

@@ -59,7 +59,7 @@ Mechanics that work, with sources in this repo:
 
 Known contamination traps, all observed live:
 
-- In-repo baselines read the vendored skill-writing doctrine (`skills/writing-skills/...`) when unhurried; a cwd anchor in the prompt does not stop them. In-session subagents cannot be environment-isolated at all (they inherit harness and global CLAUDE.md). Only the `claude -p` scrubbed-profile route is clean.
+- In-repo baselines read the vendored skill-writing doctrine (now under `vendor/writing-skills/`, moved out of `skills/` for exactly this reason) when unhurried; a cwd anchor in the prompt does not stop them. In-session subagents cannot be environment-isolated at all (they inherit harness and global CLAUDE.md). Only the `claude -p` scrubbed-profile route is clean.
 - Test subjects notice sibling `baseline/` fixtures and infer they are in a harness. Keep control copies and grading keys outside any path the subject can reach.
 - The user's global CLAUDE.md leaks useful behavior into subagents (date-fetching rules, emoji bans) and biases baselines upward. Bias direction matters: contamination that helps the baseline understates the treatment lift (tolerable); contamination that helps the treatment invalidates it.
 - Ceiling effects: before funding an A/B, confirm the control arm actually fails somewhere. The floor-doctrine A/B was nearly doomed by this; it was saved by moving to the untested pressure branch.
@@ -88,7 +88,7 @@ Cost calibration from this session: a Fable full-loop producer run (spawns its o
 
 ## 7. Pointers
 
-- Skill under test: `skills/pi-skill-creator` (commits `fcd3709`, `ea1e5a0`, `c1fdb7a`, `84536ac`).
+- Skill under test: `skills/pi-skill-creator`. The four parent skills, pinned at their benchmarked versions for the 5-way treatment option: `vendor/{skill-creator,writing-skills,codex-skill-creator,writing-great-skills}` (commits `fcd3709`, `ea1e5a0`, `c1fdb7a`, `84536ac`).
 - Eval summary and honest caveats: `skills/pi-skill-creator/README.md`.
 - Raw records: `pi-skill-creator-workspace/` (iterations 1 to 4) at this repo's root; pilot artifacts and runner scripts in the originating session's scratchpad (ephemeral; treat the workspace and README as the durable record).
 - Testing doctrine to follow while testing (hygiene, environment fidelity, manual-read rule): `skills/pi-skill-creator/references/testing.md` and `references/benchmarking.md`. The campaign should eat this cooking; deviations are findings about the doctrine.
