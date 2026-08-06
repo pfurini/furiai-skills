@@ -6,6 +6,7 @@ The procedure behind Steps 2, 5, and 6 of the spine: baseline runs, forward-test
 
 - Why baseline first
 - Hygiene: keeping tests uncontaminated
+- Environment fidelity
 - The test loop
 - What to test, by skill type
 - Pressure scenarios (discipline skills)
@@ -39,6 +40,14 @@ A test only measures generalization if the subagent can't reconstruct the answer
 - Tell each run where to save outputs, and keep a simple workspace beside the skill: `<skill-name>-workspace/iteration-N/<eval-name>/{with_skill,baseline}/outputs/`.
 
 If a forward-test only succeeds when the subagent sees leaked context, tighten the skill or the test setup before trusting the result.
+
+## Environment fidelity
+
+Match the test environment to the deployment claim:
+
+- **A personal skill is tested in-situ.** The user's global instructions, memory, and installed skills are part of the environment the skill will really run in — leave them in place. A behaviour those rules already enforce is a no-op *for this user*: cut the line from the skill rather than crediting the skill for it.
+- **A skill meant for distribution is tested clean-slate.** Its lift must survive an environment without the author's rules or guidance docs. Subagents dispatched in-session inherit the harness and the user's global instructions and cannot be sterilized; use the subprocess route in [benchmarking.md](benchmarking.md).
+- **When contamination is unavoidable, note which way it biases.** A baseline that benefits from the environment understates the skill's lift — safe to report. A with-skill run that benefits from material a stranger won't have overstates it — invalid; fix before trusting.
 
 ## The test loop
 

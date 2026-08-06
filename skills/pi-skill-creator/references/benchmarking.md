@@ -8,6 +8,7 @@ All `python -m scripts.<name>` commands run from this skill's directory. Exact J
 
 - Setup: evals and workspace
 - Running a benchmark iteration
+- Clean-slate runs (distribution claims)
 - Grading
 - Aggregating, analyzing, and the viewer
 - Reading feedback and iterating
@@ -25,6 +26,24 @@ Save the test prompts to `evals/evals.json` inside the skill directory (schema i
 2. **Write `eval_metadata.json`** per test case (`eval_id`, `eval_name`, `prompt`, `assertions` — empty for now). Re-create these whenever prompts change; don't assume they carry over between iterations.
 3. **While runs execute, draft assertions.** Good assertions are objectively verifiable, discriminating (pass when the skill genuinely succeeds, fail when it doesn't — "file exists" discriminates nothing), and named descriptively so the benchmark reads at a glance. Don't force assertions onto subjective qualities; those stay in the human review. Update the metadata files and `evals/evals.json` once drafted.
 4. **Capture timing as each task-completion notification arrives**: save its `total_tokens` and `duration_ms` immediately to `timing.json` in the run directory — the notification is the only place this data exists.
+
+## Clean-slate runs (distribution claims)
+
+Numbers meant to travel — "this skill raises pass rate by X" for a skill others will install — must come from an environment a stranger would have. In-session subagents can't provide it; run executors as subprocesses:
+
+```bash
+CLAUDE_CONFIG_DIR=<scrubbed-profile> claude -p "<eval prompt>" --model <model-id> --add-dir <path/to/skill-under-test>
+```
+
+- The scrubbed profile is a directory (mode 700) holding only auth: a `.credentials.json` (on macOS, export it once with `security find-generic-password -s 'Claude Code-credentials' -w`, mode 600) and a copy of the `.claude.json` state file. No CLAUDE.md, no `skills/`, no settings — so global instructions and installed skills do not load. Verify the profile before trusting a benchmark: probe for a rule distinctive to the real config ("what tool must replace pip per your instructions?") and require the scrubbed answer to be "none".
+- Do not reach for `--bare`: on current builds it also skips credential discovery and every run dies with "Not logged in".
+- Run from an empty scratch directory outside any repo — project CLAUDE.md files are discovered by walking up parent directories, so ancestry must be clean too.
+- `--model` pins the executor; record it as `executor_model` in the benchmark metadata — a pass rate without its model is not a result.
+- `--add-dir` exposes only the skill under test, and the prompt names its path and says to read SKILL.md and follow it (nothing auto-loads under the scrubbed profile). Baseline runs drop both.
+- Each `-p` invocation is a fresh context: the clean-slate equivalent of the fresh-subagent dispatch in testing.md. No further per-run isolation is needed.
+- Managed/policy-level instructions still load and cannot be excluded — record them in the benchmark metadata if present. Delete the exported credentials file when the benchmark campaign ends.
+
+Label each benchmark.json with the mode that produced it (in-situ or clean-slate); the two aren't comparable to each other. Description-trigger optimization stays in-situ: whether a skill fires depends on the competing skills around it, so the real environment is the correct test bed there.
 
 ## Grading
 
