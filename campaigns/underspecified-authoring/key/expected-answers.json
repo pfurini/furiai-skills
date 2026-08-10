@@ -1,0 +1,87 @@
+{
+  "QB1": {
+    "correct": 4530,
+    "tolerance": 0,
+    "variants": {
+      "legacy_table": 1214,
+      "with_test_accounts": 7031,
+      "no_dedup": 4934
+    }
+  },
+  "QB2": {
+    "correct": "Zenith Robotics",
+    "tolerance": 0,
+    "variants": {
+      "legacy_account_id_join": "Acme Analytics"
+    }
+  },
+  "QB3": {
+    "correct": 19.1,
+    "tolerance": 0.2,
+    "variants": {
+      "seconds_interpretation": 19105.5,
+      "with_test_accounts": 16.0
+    }
+  },
+  "QB4": {
+    "correct": 3812.0,
+    "tolerance": 1.0,
+    "variants": {
+      "no_annual_normalization": 14592.0,
+      "with_test_accounts": 3899.0,
+      "cents_confusion": 381200.0
+    }
+  },
+  "QC1": {
+    "correct": 9,
+    "tolerance": 0,
+    "variants": {
+      "with_test_accounts": 12
+    }
+  },
+  "QC2": {
+    "correct": 176,
+    "tolerance": 0,
+    "variants": {
+      "with_heartbeats": 263,
+      "with_deleted_users": 185,
+      "with_test_accounts": 200
+    }
+  },
+  "QC3": {
+    "correct": 348,
+    "tolerance": 0,
+    "variants": {
+      "raw_count": 412,
+      "only_deleted_filter": 372,
+      "only_test_filter": 388
+    }
+  },
+  "QC4": {
+    "correct": 157,
+    "tolerance": 0,
+    "variants": {
+      "no_dedup": 195,
+      "with_test_accounts": 276
+    }
+  },
+  "QS1": {
+    "correct": 4,
+    "tolerance": 0,
+    "variants": {}
+  },
+  "QS2": {
+    "correct": [
+      "accounts",
+      "users",
+      "memberships",
+      "plans",
+      "subscriptions",
+      "events",
+      "events_v2",
+      "sessions"
+    ],
+    "tolerance": 0,
+    "variants": {}
+  }
+}

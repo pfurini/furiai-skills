@@ -1,0 +1,17 @@
+{
+  "consumer_prompt_template": "You're working in our analytics repo (your current directory). The SQLite database is at db/analytics.sqlite and the sqlite3 CLI is available.{SKILL_SENTENCE}\n\nQuestion: {QUESTION}\n\nWork it out from the repo, and end your reply with a single line in exactly this form:\nANSWER: <value>",
+  "skill_sentence_with_artifact": " Use the skill at {ARTIFACT_PATH} (read its SKILL.md and follow it) when answering.",
+  "skill_sentence_baseline": "",
+  "questions": {
+    "QB1": "How many events were recorded in July 2026? Give a single number.",
+    "QB2": "Which account (by name) generated the most events in June 2026?",
+    "QB3": "What was our average session duration in minutes in July 2026? Round to one decimal.",
+    "QB4": "What is our current total MRR in dollars from active subscriptions? Give a single number.",
+    "QC1": "How many accounts signed up in Q2 2026 (April through June)? Give a single number.",
+    "QC2": "How many monthly active users did we have in July 2026? Give a single number.",
+    "QC3": "How many registered users do we have right now? Give a single number.",
+    "QC4": "How many export events occurred in July 2026? Give a single number.",
+    "QS1": "How many pricing plans do we offer? Give a single number.",
+    "QS2": "Which tables does the analytics database contain? List their names."
+  }
+}

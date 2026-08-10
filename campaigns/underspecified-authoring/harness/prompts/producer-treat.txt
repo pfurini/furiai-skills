@@ -1,0 +1,5 @@
+I'm away from my keyboard for the rest of the day, so make reasonable assumptions and don't wait for me to confirm anything.
+
+Make a skill for querying our analytics data so agents get correct numbers out of it. Put it at ./skills/analytics-queries/ in this repo. Cheap haiku-class agents will be using the skill to answer questions about our data.
+
+Use the skill at SKILL_PATH (read its SKILL.md and follow it) to do this.

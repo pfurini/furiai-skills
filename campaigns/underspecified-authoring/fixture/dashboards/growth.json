@@ -1,0 +1,11 @@
+{
+  "name": "Growth",
+  "refresh": "nightly",
+  "tiles": [
+    {"title": "MAU", "query": "queries/monthly_active_users.sql"},
+    {"title": "WAU", "query": "queries/weekly_active_users.sql"},
+    {"title": "Daily events", "query": "queries/daily_event_volume.sql"},
+    {"title": "Signups", "query": "queries/signups_by_quarter.sql"},
+    {"title": "Avg session (min)", "query": "queries/avg_session_minutes.sql"}
+  ]
+}

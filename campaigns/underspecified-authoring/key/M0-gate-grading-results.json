@@ -1,0 +1,242 @@
+[
+  {
+    "run": "QB1-r1",
+    "qid": "QB1",
+    "rep": "1",
+    "answer": "1214",
+    "correct": false,
+    "matched_variant": "legacy_table"
+  },
+  {
+    "run": "QB1-r2",
+    "qid": "QB1",
+    "rep": "2",
+    "answer": "7650",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QB1-r3",
+    "qid": "QB1",
+    "rep": "3",
+    "answer": "8864",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QB2-r1",
+    "qid": "QB2",
+    "rep": "1",
+    "answer": "E2E Bot Farm",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QB2-r2",
+    "qid": "QB2",
+    "rep": "2",
+    "answer": "Acme Analytics",
+    "correct": false,
+    "matched_variant": "legacy_account_id_join"
+  },
+  {
+    "run": "QB2-r3",
+    "qid": "QB2",
+    "rep": "3",
+    "answer": "Acme Analytics",
+    "correct": false,
+    "matched_variant": "legacy_account_id_join"
+  },
+  {
+    "run": "QB3-r1",
+    "qid": "QB3",
+    "rep": "1",
+    "answer": "16104.3",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QB3-r2",
+    "qid": "QB3",
+    "rep": "2",
+    "answer": "16.1",
+    "correct": false,
+    "matched_variant": "with_test_accounts"
+  },
+  {
+    "run": "QB3-r3",
+    "qid": "QB3",
+    "rep": "3",
+    "answer": "16.1",
+    "correct": false,
+    "matched_variant": "with_test_accounts"
+  },
+  {
+    "run": "QB4-r1",
+    "qid": "QB4",
+    "rep": "1",
+    "answer": "3899",
+    "correct": false,
+    "matched_variant": "with_test_accounts"
+  },
+  {
+    "run": "QB4-r2",
+    "qid": "QB4",
+    "rep": "2",
+    "answer": "$3899.00",
+    "correct": false,
+    "matched_variant": "with_test_accounts"
+  },
+  {
+    "run": "QB4-r3",
+    "qid": "QB4",
+    "rep": "3",
+    "answer": "3899.0",
+    "correct": false,
+    "matched_variant": "with_test_accounts"
+  },
+  {
+    "run": "QC1-r1",
+    "qid": "QC1",
+    "rep": "1",
+    "answer": "9",
+    "correct": true,
+    "matched_variant": ""
+  },
+  {
+    "run": "QC1-r2",
+    "qid": "QC1",
+    "rep": "2",
+    "answer": "12",
+    "correct": false,
+    "matched_variant": "with_test_accounts"
+  },
+  {
+    "run": "QC1-r3",
+    "qid": "QC1",
+    "rep": "3",
+    "answer": "12",
+    "correct": false,
+    "matched_variant": "with_test_accounts"
+  },
+  {
+    "run": "QC2-r1",
+    "qid": "QC2",
+    "rep": "1",
+    "answer": "204",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QC2-r2",
+    "qid": "QC2",
+    "rep": "2",
+    "answer": "296",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QC2-r3",
+    "qid": "QC2",
+    "rep": "3",
+    "answer": "296",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QC3-r1",
+    "qid": "QC3",
+    "rep": "1",
+    "answer": "372",
+    "correct": false,
+    "matched_variant": "only_deleted_filter"
+  },
+  {
+    "run": "QC3-r2",
+    "qid": "QC3",
+    "rep": "2",
+    "answer": "412",
+    "correct": false,
+    "matched_variant": "raw_count"
+  },
+  {
+    "run": "QC3-r3",
+    "qid": "QC3",
+    "rep": "3",
+    "answer": "372",
+    "correct": false,
+    "matched_variant": "only_deleted_filter"
+  },
+  {
+    "run": "QC4-r1",
+    "qid": "QC4",
+    "rep": "1",
+    "answer": "345",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QC4-r2",
+    "qid": "QC4",
+    "rep": "2",
+    "answer": "279",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QC4-r3",
+    "qid": "QC4",
+    "rep": "3",
+    "answer": "325",
+    "correct": false,
+    "matched_variant": ""
+  },
+  {
+    "run": "QS1-r1",
+    "qid": "QS1",
+    "rep": "1",
+    "answer": "4",
+    "correct": true,
+    "matched_variant": ""
+  },
+  {
+    "run": "QS1-r2",
+    "qid": "QS1",
+    "rep": "2",
+    "answer": "4",
+    "correct": true,
+    "matched_variant": ""
+  },
+  {
+    "run": "QS1-r3",
+    "qid": "QS1",
+    "rep": "3",
+    "answer": "4",
+    "correct": true,
+    "matched_variant": ""
+  },
+  {
+    "run": "QS2-r1",
+    "qid": "QS2",
+    "rep": "1",
+    "answer": "accounts, events, events_v2, memberships, plans, sessions, subscriptions, users",
+    "correct": true,
+    "matched_variant": ""
+  },
+  {
+    "run": "QS2-r2",
+    "qid": "QS2",
+    "rep": "2",
+    "answer": "accounts",
+    "correct": true,
+    "matched_variant": ""
+  },
+  {
+    "run": "QS2-r3",
+    "qid": "QS2",
+    "rep": "3",
+    "answer": "accounts",
+    "correct": true,
+    "matched_variant": ""
+  }
+]

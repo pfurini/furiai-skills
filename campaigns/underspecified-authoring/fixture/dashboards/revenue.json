@@ -1,0 +1,9 @@
+{
+  "name": "Revenue",
+  "refresh": "nightly",
+  "tiles": [
+    {"title": "MRR", "query": "queries/mrr.sql"},
+    {"title": "Account health", "query": "queries/account_health.sql"},
+    {"title": "Export usage", "query": "queries/export_usage_monthly.sql"}
+  ]
+}

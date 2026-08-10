@@ -292,6 +292,28 @@ would default working cheap wiring to no-ship.
   starting with the grader-agent bypass); evaluate the parent-escalation clause;
   ephemeral run records to `.skill-creator/`, durable results committed here.
 
+## 6b. M0 amendments (2026-08-10, recorded before wave 1)
+
+M0 completed with the question gate **passing for all 8 keyed questions**
+(details and evidence: `key/M0-gate-results.md`). Two revisions, both via
+pre-registered fallback paths:
+
+1. **Consumer visibility**: consumer-staged fixture copies exclude `queries/`
+   (bare consumers ran the canonical queries verbatim — transcript-verified
+   pre-cooked answers). Producers keep the full repo. This sharpens the
+   deployment story: consumers get data plus docs; the conventions must come
+   from the skill.
+2. **Execution mode**: all subprocess batches run sequentially with a fresh
+   pre-batch credential export (upstream OAuth race, claude-code #24317 and
+   #20553; see `harness/README.md` note 4). Wave-1 wall-clock estimates in
+   section 4 are superseded: ~10 producer runs remain hours-scale, but the
+   ~300-run wave-1 consumer batch is now an overnight-scale sequential job
+   unless the upstream fix lands or the user opts into `ANTHROPIC_API_KEY`
+   auth (billing change, user decision, out of M0 scope).
+
+Grader iterations at M0: 2 (QS2 multi-line answers), consistent with pilot
+history; the mandatory-manual-read rule caught it.
+
 ## 7. Contamination checklist (applied, from established harness facts)
 
 Per-run scrubbed profile copies; subjects run from temp-staged fixture copies outside
