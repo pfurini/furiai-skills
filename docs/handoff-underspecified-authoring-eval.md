@@ -1,16 +1,16 @@
 # Handoff: hardening the testing process, on an underspecified-authoring test bed
 
-**For**: a fresh session (likely a fresh project) whose first job is to grill this document with the user and produce a concrete experiment plan. Nothing here is a finished design; section 6 lists the decisions deliberately left open.
+**For**: a fresh session, opened in this repo (decision 9), whose first job is to grill this document with the user and produce a concrete experiment plan. Nothing here is a finished design; section 6 lists the decisions deliberately left open.
 
 **Priority ordering (deliberate)**: the primary objective is the process hardening in section 2b, because it improves the *products* (every skill authored from then on). The discovery-gap measurement and the creator-vs-parents comparison are the campaign's instrument and its secondary outputs, not its point.
 
-**Date**: 2026-08-06. **Author**: the session that built and eval-tested `skills/pi-skill-creator` (session records referenced below).
+**Date**: 2026-08-06, amended 2026-08-10. **Author**: the session that built and eval-tested `skills/pi-skill-creator` (session records referenced below).
 
 ---
 
 ## 1. One-paragraph context
 
-`skills/pi-skill-creator` is a skill-creation skill merged from four sources (Anthropic's skill-creator, writing-great-skills, superpowers' writing-skills, codex-skill-creator). It was eval-tested through four in-session iterations, two pre-registered clean-slate producer pilots, one distribution test, and one feature A/B (all summarized in the skill's `README.md`, raw records in `.skill-creator/pi-skill-creator/` at the repo root). The pilots left exactly one first-order question unanswered, and it is the most important one: **does the skill's process advantage convert into a measurable artifact advantage on authoring tasks where the knowledge is not handed to the author?** This campaign exists to answer that.
+`skills/pi-skill-creator` is a skill-creation skill merged from four sources (Anthropic's skill-creator, writing-great-skills, superpowers' writing-skills, codex-skill-creator). It was eval-tested through four in-session iterations, two pre-registered clean-slate producer pilots, one distribution test, one feature A/B, and a consumer-tier masking check (all summarized in the skill's `README.md`, raw records in `.skill-creator/pi-skill-creator/` at the repo root). The pilots left exactly one first-order question unanswered, and it is the most important one: **does the skill's process advantage convert into a measurable artifact advantage on authoring tasks where the knowledge is not handed to the author?** This campaign exists to answer that.
 
 ## 2. Why this question survived everything we ran
 
@@ -53,9 +53,10 @@ Mechanics that work, with sources in this repo:
 
 - **Clean-slate execution**: `CLAUDE_CONFIG_DIR=<scrubbed-profile> claude -p "..." --model <id> [--add-dir <skill>]`. The scrubbed profile needs only `.credentials.json` (export: `security find-generic-password -s 'Claude Code-credentials' -w`, macOS) and a copy of `~/.claude.json`. **Do not use `--bare`**: it breaks credential discovery. Verify a profile with a probe for a distinctive global rule (expected answer: "none"). Full recipe: `skills/pi-skill-creator/references/benchmarking.md`.
 - **Producer runs need `--dangerously-skip-permissions`** (they write files and spawn subagents) and their own per-run profile copy (concurrent runs sharing one profile race on the state file). Producer transcripts land inside each run profile under `projects/.../*.jsonl`; that is where you verify process claims (baseline-before-draft ordering, which files were read).
-- **Parallel batches**: a jobs file plus `xargs -n2 -P6 runner.sh`, one background task per batch. Runner scripts from this session are in the session scratchpad (`pilot/producer-*.sh`, `pilot/consumer-one.sh`, `pilot/grade.py`) and are trivial to recreate from the patterns in the workspace records.
+- **Parallel batches**: a jobs file plus `xargs -n2 -P6 runner.sh`, one background task per batch. Reference implementations of the runner scripts and grader are committed at `campaigns/underspecified-authoring/harness/` (session-specific paths inside; see its README).
 - **Deterministic grading with mandatory manual reads**. Pre-register assertions before any run exists. Expect the grader itself to need iterations: in pilot 1, three grader revisions were needed and *every* non-baseline "failure" was a grader parsing artifact; in pilot 2 the failures were real. The rule that catches this: manually read every flagged run before believing it, and when the failure pattern moves after a grader fix, re-read everything newly flagged.
 - **Assertion tiers**: prompt-contract assertions (from the user's stated requirements, valid for every artifact) vs artifact-contract assertions (from each artifact's own documented choices, generated per artifact at grading time). Conflating them caused this session's one major grading error (documented in the README's method section).
+- **Consumer-tier masking is measured, not hypothetical**: re-consuming the frozen pilot artifacts with Sonnet showed structural and semantic defect classes are consumer-tier-invariant (identical failures at both tiers), while silently-dropped-content defects improve at Sonnet only via disclosure notes, not repair. Consequence for consumer design: floor-tier (Haiku) consumers are mandatory because the silent-drop class is visible only there; a Sonnet pass adds little beyond confirmation.
 
 Known contamination traps, all observed live:
 
@@ -64,7 +65,7 @@ Known contamination traps, all observed live:
 - The user's global CLAUDE.md leaks useful behavior into subagents (date-fetching rules, emoji bans) and biases baselines upward. Bias direction matters: contamination that helps the baseline understates the treatment lift (tolerable); contamination that helps the treatment invalidates it.
 - Ceiling effects: before funding an A/B, confirm the control arm actually fails somewhere. The floor-doctrine A/B was nearly doomed by this; it was saved by moving to the untested pressure branch.
 
-Cost calibration from this session: a Fable full-loop producer run (spawns its own baselines and forward-tests) takes roughly 10 to 20 minutes headless; Haiku consumer runs take under a minute; the 33-run consumer batch at parallelism 6 finished in a few minutes. The two pilots plus the A/B totaled roughly 60 producer/consumer subprocess runs plus about 40 in-session subagents.
+Cost calibration from this session: a Fable full-loop producer run (spawns its own baselines and forward-tests) takes roughly 10 to 20 minutes headless; Haiku consumer runs take under a minute; the 33-run consumer batch at parallelism 6 finished in a few minutes. The pilots, the A/B, and the masking check totaled roughly 140 producer/consumer subprocess runs plus about 40 in-session subagents.
 
 ## 5. Sketch of the campaign (to be grilled, not executed as-is)
 
@@ -81,7 +82,7 @@ Cost calibration from this session: a Fable full-loop producer run (spawns its o
 2. **Does the producer get subagents?** Full-loop pi-skill-creator spawns its own test agents. In `claude -p` they are available; decide whether the control arm's prompt should mention testing at all, or stay strictly naturalistic.
 3. **Treatments**: pi vs control only (cheapest, answers the headline claim), or the full 5-way (answers "better than parents" on the class that matters, at roughly 2.5x cost)?
 4. **Reps and power**: coverage rates are per-item binomials across P reps; with 10 planted items and P=3, arm-level coverage differences of ~20 points are visible. Is that the effect size worth detecting, or does the user want finer?
-5. **Consumer questions**: how many, and how to grade free-form answers deterministically (expected-value strings vs a grader agent with the key). Model scoping is already decided by the user, not open: authors are Fable/Opus only (weak-author testing is done and will not be repeated); consumers are Haiku (the floor) plus Sonnet (the one missing tier, added to measure whether a mid-tier consumer masks floor-fragile artifacts); the full producer-times-consumer grid is explicitly dead.
+5. **Consumer questions**: how many, and how to grade free-form answers deterministically (expected-value strings vs a grader agent with the key). Model scoping is already decided by the user, not open: authors are Fable/Opus only (weak-author testing is done and will not be repeated); consumers are Haiku, the floor, which the masking check (section 4) proved mandatory, with a Sonnet pass optional as confirmation; the full producer-times-consumer grid is explicitly dead.
 6. **What result changes what**: pre-commit the interpretations. Example: pi wins coverage and consumer accuracy -> README gains the discovery claim; tie on coverage but pi wins consumer accuracy -> the skill's value is in how knowledge is *encoded*, not found; full tie -> README states the limitation and the skill's pitch narrows to regression protection and evidence.
 7. **Family 2 and 3**: in scope for this campaign or explicitly deferred?
 8. **Future thread, out of scope here but on the roadmap**: once the skill is made Pi-compatible, re-run the consumer side across the models Pi routes to. The grading pipeline and the executor-floor concept carry over unchanged (the floor becomes "the cheapest model class on Pi"); the clean-slate recipe does not (it is Claude Code specific) and needs a Pi-equivalent headless runner, and frontmatter like `disable-model-invocation` needs a per-runtime metadata mapping (the vendored codex-skill-creator's `agents/openai.yaml` is prior art).
@@ -89,9 +90,9 @@ Cost calibration from this session: a Fable full-loop producer run (spawns its o
 
 ## 7. Pointers
 
-- Skill under test: `skills/pi-skill-creator`. The four parent skills, pinned at their benchmarked versions for the 5-way treatment option: `vendor/{skill-creator,writing-skills,codex-skill-creator,writing-great-skills}` (commits `fcd3709`, `ea1e5a0`, `c1fdb7a`, `84536ac`).
+- Skill under test: `skills/pi-skill-creator` (history: commits `fcd3709` through `f7d7f66` and later; see git log). The four parent skills, pinned at their benchmarked versions for the 5-way treatment option: `vendor/{skill-creator,writing-skills,codex-skill-creator,writing-great-skills}`.
 - Eval summary and honest caveats: `skills/pi-skill-creator/README.md`.
-- Raw records: `.skill-creator/pi-skill-creator/` (iterations 1 to 4) at this repo's root; pilot artifacts and runner scripts in the originating session's scratchpad (ephemeral; treat the workspace and README as the durable record).
+- Raw records: `.skill-creator/pi-skill-creator/` at this repo's root (iterations 1 to 4 plus the masking-check runs and grading results under `masking-check/`); remaining pilot artifacts sit in the originating session's scratchpad (ephemeral; treat the workspace, the committed harness, and the README as the durable record).
 - Testing doctrine to follow while testing (hygiene, environment fidelity, manual-read rule): `skills/pi-skill-creator/references/testing.md` and `references/benchmarking.md`. The campaign should eat this cooking; deviations are findings about the doctrine.
 
 ## 8. Definition of done for the planning session
