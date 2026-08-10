@@ -306,10 +306,12 @@ pre-registered fallback paths:
 2. **Execution mode**: all subprocess batches run sequentially with a fresh
    pre-batch credential export (upstream OAuth race, claude-code #24317 and
    #20553; see `harness/README.md` note 4). Wave-1 wall-clock estimates in
-   section 4 are superseded: ~10 producer runs remain hours-scale, but the
-   ~300-run wave-1 consumer batch is now an overnight-scale sequential job
-   unless the upstream fix lands or the user opts into `ANTHROPIC_API_KEY`
-   auth (billing change, user decision, out of M0 scope).
+   section 4 are superseded: ~10 producer runs remain hours-scale, and the
+   ~300-run wave-1 consumer batch is an overnight-scale sequential job until
+   the CLI ships a fix. **Closed by user decision (2026-08-10): all test
+   runs use the Max-subscription OAuth login; `ANTHROPIC_API_KEY` auth is
+   excluded (cost). Do not propose it again; plan schedules around
+   sequential execution.**
 
 Grader iterations at M0: 2 (QS2 multi-line answers), consistent with pilot
 history; the mandatory-manual-read rule caught it.

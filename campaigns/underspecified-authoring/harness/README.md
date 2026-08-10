@@ -50,8 +50,9 @@ Campaign adaptations vs the reference scripts, recorded as method notes:
    starts a batch. The prior campaign's P6 recipe in benchmarking.md is
    therefore stale on this point — candidate doctrine patch, and a real
    schedule constraint for the M1/M3 consumer batches (~480 sequential runs
-   is hours, not minutes; alternatives are `ANTHROPIC_API_KEY` auth (billing
-   change, user decision) or upstream fixes).
+   is hours, not minutes). `ANTHROPIC_API_KEY` auth is **excluded by user
+   decision** (Max subscription only; cost); the constraint lifts only when
+   the CLI ships a concurrency fix — re-test parallelism after CLI upgrades.
 
 The scrubbed-profile recipe (`.credentials.json` export + `.claude.json` copy,
 no `--bare`, probe before trusting) is in
