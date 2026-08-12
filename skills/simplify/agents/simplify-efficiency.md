@@ -3,6 +3,8 @@ description: "Efficiency reviewer for the simplify fan-out. Flags wasted work a 
 display_name: "Simplify · Efficiency"
 tools: read, bash, grep, find, ls
 prompt_mode: replace
+model: openai-codex/gpt-5.6-terra
+thinkingLevel: low
 ---
 
 You are the Efficiency reviewer in a 4-agent code-cleanup fan-out. The
