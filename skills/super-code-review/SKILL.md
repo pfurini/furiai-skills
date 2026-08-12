@@ -65,23 +65,23 @@ A 20-line change to an auth guard, a SQL query, a payment path, or a migration i
 
 ## Step 2 — The dimensions (the roster, 13 lenses)
 
-Each is a focused reviewer. Read the matching specialist file (`references/specialists/<file>`) for its full checklist, anti-patterns, severity rubric, and output shape. Run the lenses the diff needs (see *applies-when*); lenses 1-4 run on virtually every review.
+Each is a focused reviewer, defined in one agent file (`agents/<file>`, paths relative to this skill's directory): subagent frontmatter plus the full checklist, anti-patterns, severity rubric, and output shape. In fan-out mode the file IS the subagent's system prompt (`subagent_type` = filename without `.md`); in inline mode read the body below the frontmatter and apply it yourself. Run the lenses the diff needs (see *applies-when*); lenses 1-4 run on virtually every review.
 
 | # | Lens | File | Applies when |
 |---|---|---|---|
-| 1 | Requirements & spec | `requirements.md` | always — does it fulfill the task; scope drift; deviations |
-| 2 | Correctness & bugs | `correctness.md` | always — logic, null/async, races, off-by-one, leaks |
-| 3 | Guidelines & conventions | `guidelines.md` | always — AGENTS.md/CLAUDE.md rules, enums/barrels/circular, naming |
-| 4 | Security | `security.md` | any input/auth/data/secret/SQL/HTML/upload path; always for user-facing writes |
-| 5 | Error handling | `error-handling.md` | try/catch, fallbacks, callbacks, optional chaining touched |
-| 6 | Type design | `type-design.md` | new/changed types, interfaces, enums, constructors |
-| 7 | Test coverage | `test-coverage.md` | behavior changed; test files touched |
-| 8 | Architecture & deps | `architecture.md` | new modules, cross-module imports, dependency direction, god files |
-| 9 | Evolvability | `evolvability.md` | boolean-flag parades, feature isolation, premature abstraction |
-| 10 | Performance | `performance.md` | loops/queries/allocations/render paths; N+1, hot paths |
-| 11 | Simplification | `simplify.md` | dense/nested/duplicated code (advisory polish; opt-in) |
-| 12 | Comments | `comments.md` | comments/docstrings added or changed |
-| 13 | Docs impact | `docs-impact.md` | user-facing / config / API / env change |
+| 1 | Requirements & spec | `scr-requirements.md` | always — does it fulfill the task; scope drift; deviations |
+| 2 | Correctness & bugs | `scr-correctness.md` | always — logic, null/async, races, off-by-one, leaks |
+| 3 | Guidelines & conventions | `scr-guidelines.md` | always — AGENTS.md/CLAUDE.md rules, enums/barrels/circular, naming |
+| 4 | Security | `scr-security.md` | any input/auth/data/secret/SQL/HTML/upload path; always for user-facing writes |
+| 5 | Error handling | `scr-error-handling.md` | try/catch, fallbacks, callbacks, optional chaining touched |
+| 6 | Type design | `scr-type-design.md` | new/changed types, interfaces, enums, constructors |
+| 7 | Test coverage | `scr-test-coverage.md` | behavior changed; test files touched |
+| 8 | Architecture & deps | `scr-architecture.md` | new modules, cross-module imports, dependency direction, god files |
+| 9 | Evolvability | `scr-evolvability.md` | boolean-flag parades, feature isolation, premature abstraction |
+| 10 | Performance | `scr-performance.md` | loops/queries/allocations/render paths; N+1, hot paths |
+| 11 | Simplification | `scr-simplification.md` | dense/nested/duplicated code (advisory polish; opt-in) |
+| 12 | Comments | `scr-comments.md` | comments/docstrings added or changed |
+| 13 | Docs impact | `scr-docs-impact.md` | user-facing / config / API / env change |
 
 Step-1 historical context is shared input, not a lens.
 
@@ -89,24 +89,31 @@ Step-1 historical context is shared input, not a lens.
 
 ## Step 3A — Inline review (small/medium)
 
-Run the selected lenses yourself, one context. For each: read its specialist file, apply the checklist to the diff, collect findings (`file:line` + severity + why + fix). Then Step 4 — you ARE the synthesizer (easy here: full shared context).
+Run the selected lenses yourself, one context. For each: read its agent file (`agents/<file>`, the body below the frontmatter), apply the checklist to the diff, collect findings (`file:line` + severity + why + fix). Then Step 4 — you ARE the synthesizer (easy here: full shared context).
 
 ## Step 3B — Fan-out review (large/critical)
 
 1. Build the lens list from Step 2 (drop the inapplicable).
-2. **Dispatch every selected specialist in ONE message, multiple Task calls** (they share no state, same diff, no ordering). Use the Workflow tool only if the user opted into orchestration; else plain Task subagents.
+2. **Dispatch every selected specialist in ONE message, one `Agent` call per lens, each with `run_in_background: true`** (foreground `Agent` calls run sequentially; the lenses share no state, same diff, no ordering). The agent types are this skill's `agents/` files:
 
-   Per lens, the subagent prompt =
    ```
-   <full contents of references/specialists/<file>>
+   Agent({ subagent_type: "scr-security", description: "Security review", run_in_background: true, prompt: ... })
+   ```
 
+   Each agent's system prompt already carries its lens. The per-agent prompt is scope + context only:
+   ```
    SCOPE: base=<sha> head=<sha> · changed files=<list> · guidelines=<AGENTS.md/CLAUDE.md paths>
    CONTEXT: <Step-1 historical notes: blame findings, prior-PR comments worth knowing>
-   Return findings as: file:line · severity · what · why it matters · fix.
+   Review this scope for your lens and return your findings. Do not edit any files.
    You have repo + git/gh access — run your own `git blame` / `gh pr view` if you need more context.
    ```
    If subagents lack repo access, pre-bundle the diff text into the prompt.
-3. Wait for ALL. Then Step 4 — **mandatory synthesis** (do NOT concatenate reports).
+
+   **Fallbacks:**
+   - `scr-*` agent types not registered (the harness doesn't load this skill's `agents/` folder — e.g. Claude Code): dispatch generic subagents (`general-purpose` / Task) instead, prefixing each prompt with the full body of the lens's `agents/<file>` (everything below the frontmatter).
+   - No subagent mechanism at all: fall back to Step 3A inline.
+   - Use the Workflow tool only if the user explicitly opted into orchestration.
+3. Completion notifications arrive as each agent finishes — do not poll. Wait for ALL. Then Step 4 — **mandatory synthesis** (do NOT concatenate reports).
 
 ---
 
