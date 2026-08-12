@@ -67,8 +67,4 @@ strengths: <n>
 ---
 
 ## Rules
-- **Verdict is never optional.** End with one.
-- **Every finding has `file:line`.** No vague advice.
-- **Bucket by real severity.** Not everything is Critical.
-- **Praise before problems.** Specific, not performative.
 - **If clean:** say `PASS — no findings ≥ 80 confidence`, list what you checked, done.

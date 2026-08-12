@@ -1,71 +1,69 @@
 ---
 name: super-code-review
 description: >-
-  Comprehensive multi-dimension code review for any diff, branch, or PR. Fire whenever the user
-  asks to review code, audit a change, check a PR/diff/branch before merge, find bugs/security/perf
-  issues, assess test coverage, verify a change matches its spec/requirements, or asks "is this ready
-  to merge" / "review my changes" / "look over this" — even if they don't say the word "review".
-  Covers 13 lenses (requirements, correctness, guidelines, security, error-handling, type-design,
-  tests, architecture, evolvability, performance, simplification, comments, docs-impact) and routes
-  between fast inline review and deep parallel specialist fan-out, then synthesizes ONE calibrated
-  verdict. Use instead of an ad-hoc read-through; prefer it for any non-trivial review or when
-  comparing two implementations.
+  Comprehensive multi-dimension code review of a diff, branch, or PR, ending in one calibrated
+  merge verdict. Fire whenever the user asks to review code, audit a change, check a PR/diff/branch
+  before merge, find bugs/security/performance issues, assess test coverage, verify a change
+  against its spec or plan, or asks "is this ready to merge" / "review my changes" / "look over
+  this" — even if they don't say the word "review". Also fires to compare two implementations,
+  branches, or worktrees of the same change.
 ---
 
 # Super Code Review
 
-One review skill. Covers every dimension 5 review skills + 7 specialist agents cover. Routes effort to the change. Ends with ONE synthesized, calibrated verdict.
-
-**Core principle:** breadth from many lenses, depth from focused specialists, truth from ONE synthesizer. Fan-out finds; synthesis decides. Never ship raw per-lens dumps — reconcile them.
-
-**Why a synthesizer is mandatory:** cross-cutting truths live between lenses. (Real case: a server sanitizer that "fails open" looks like a security bug to the security lens — but is harmless because the *render* layer re-sanitizes. Only a mind holding security + frontend + architecture together sees that.) Fan-out alone loses this. The synthesis pass rebuilds it.
+Breadth comes from many lenses, depth from focused specialists, and truth from one synthesizer: fan-out finds, synthesis decides. Cross-cutting truths live between lenses, so per-lens findings are raw material — the synthesis pass in Step 4 is the product.
 
 ---
 
 ## Step 0 — Triage (always, cheap)
 
-Decide eligibility, scope, effort. Skip review when pointless.
+Decide eligibility, scope, and effort before reviewing anything.
 
-**Eligibility** — skip / warn if: PR closed/draft, automated/bot PR, trivially-ok (typo/formatting), already-reviewed-by-you. Say so, stop.
+**Eligibility.** Skip the review, and say why, when the PR is closed or a draft, comes from a bot, is trivially fine (typo, formatting), or you already reviewed it.
 
-**Scope** — pin what you review, then state it out loud before reviewing:
+**Scope.** Pin what you review:
+
 | Scope | Get diff |
 |---|---|
 | Unstaged | `git diff` |
 | Staged | `git diff --staged` |
 | Branch / PR | `git diff <base>...HEAD` or `gh pr diff <n>` |
-| Files | read named files |
+| Files | read the named files |
 
-Single-PR review is the default shape. **Comparing 2+ implementations / branches / worktrees? Read `references/compare-mode.md` first** — it changes scope, routing, and the report.
+Single-PR review is the default shape. Comparing 2+ implementations, branches, or worktrees of the same change? **Read `references/compare-mode.md` now** — it changes scope, routing, and the report.
 
-**Effort routing** — scale to size × stakes. **Stakes beat size.** Pick ONE mode:
+**Effort routing.** Scale to size × stakes — stakes beat size. Pick ONE mode:
+
 | If the change is… | Mode | Lenses to run |
 |---|---|---|
-| ≤ ~50 LoC, single concern, AND NOT touching security·auth·payments·migration·data-integrity | **Express** (Step 3A, lean) | requirements + correctness + the one obviously-relevant lens (bugfix → usually test-coverage: is there a regression test?) |
+| ≤ ~50 LoC, single concern, AND NOT touching security·auth·payments·migration·data-integrity | **Express** (Step 3A, lean) | requirements + correctness + the one obviously-relevant lens (for a bugfix, usually test-coverage: is there a regression test?) |
 | Small/medium (≤ ~400 LoC), low stakes | **Inline** (Step 3A) | the applicable lenses — feature PR ≈ 6-8, bugfix ≈ 3-4 |
 | Large / many files / pre-merge / touches security·auth·payments·migration / "thorough"·"audit"·"comprehensive" asked | **Fan-out** (Step 3B) | all applicable, in parallel |
 | No subagents available (e.g. Claude.ai) | **Inline / Express** | as above, one context |
 
-A 20-line change to an auth guard, a SQL query, a payment path, or a migration is **NOT Express** — the security/correctness lens is exactly what catches the dangerous thing. When unsure, go up a tier; escalate Inline→Fan-out if findings deepen.
+When unsure, go up a tier; escalate Inline → Fan-out if findings deepen.
+
+Done when: scope and mode are stated out loud.
 
 ---
 
 ## Step 1 — Gather context (both modes)
 
-1. **Guidelines.** Find the guideline file — **AGENTS.md** (or **CLAUDE.md** if there's no AGENTS.md) — at the repo root + every dir the diff touches. The rule source; cite it on violations. It guides code-writing, so not every line applies at review. ("AGENTS.md/CLAUDE.md" below = whichever this repo has.)
-2. **Intent.** Find the stated target — the issue, PR description, spec/plan, or acceptance criteria (e.g. an OpenSpec change, an RFC, a ticket, a design doc). Feeds the requirements lens. If none, infer it and say so.
-3. **Diff + map.** Read the change. Identify langs/frameworks, entry points, blast radius.
-4. **Historical context** (unique, high-value — from `/code-review`):
-   - `git blame` / `git log -p` on touched lines → judge bugs in light of *why* the code is shaped this way. A "bug" git history shows is intentional = false positive.
-   - Prior PRs touching these files + their review comments (`gh pr list`, `gh pr view`) → institutional memory, repeated mistakes.
-   - In-code comments in modified files → does the change honor the guidance written there?
-   This context feeds EVERY lens.
+1. **Guidelines.** Find the guideline file — AGENTS.md, or CLAUDE.md if there is no AGENTS.md — at the repo root and in every directory the diff touches. ("AGENTS.md/CLAUDE.md" below means whichever this repo has.) It guides code-writing, so not every line applies at review time.
+2. **Intent.** Find the stated target: the issue, PR description, spec/plan, or acceptance criteria (an OpenSpec change, an RFC, a ticket, a design doc). This feeds the requirements lens. If none exists, infer the intent and say so.
+3. **Diff + map.** Read the change. Identify languages/frameworks, entry points, blast radius.
+4. **Historical context.**
+   - `git blame` / `git log -p` on touched lines — judge findings in light of *why* the code is shaped this way; a "bug" that git history shows is intentional is a false positive.
+   - Prior PRs touching these files and their review comments (`gh pr list`, `gh pr view`) — institutional memory, repeated mistakes.
+   - In-code comments in modified files — does the change honor the guidance written there?
+
+This context feeds every lens. Done when: all four items are gathered, or their absence is noted.
 
 ---
 
-## Step 2 — The dimensions (the roster, 13 lenses)
+## Step 2 — The dimensions (13 lenses)
 
-Each is a focused reviewer, defined in one agent file (`agents/<file>`, paths relative to this skill's directory): subagent frontmatter plus the full checklist, anti-patterns, severity rubric, and output shape. In fan-out mode the file IS the subagent's system prompt (`subagent_type` = filename without `.md`); in inline mode read the body below the frontmatter and apply it yourself. Run the lenses the diff needs (see *applies-when*); lenses 1-4 run on virtually every review.
+Each lens is a focused reviewer defined in one agent file (`agents/<file>`, paths relative to this skill's directory): subagent frontmatter plus the full checklist, anti-patterns, severity rubric, and output shape. In fan-out mode the file IS the subagent's system prompt (`subagent_type` = filename without `.md`); in inline mode, read the body below the frontmatter and apply it yourself. Run the lenses the diff needs (see *applies when*); lenses 1-4 apply to virtually every review.
 
 | # | Lens | File | Applies when |
 |---|---|---|---|
@@ -83,37 +81,35 @@ Each is a focused reviewer, defined in one agent file (`agents/<file>`, paths re
 | 12 | Comments | `scr-comments.md` | comments/docstrings added or changed |
 | 13 | Docs impact | `scr-docs-impact.md` | user-facing / config / API / env change |
 
-Step-1 historical context is shared input, not a lens.
-
 ---
 
 ## Step 3A — Inline review (small/medium)
 
-Run the selected lenses yourself, one context. For each: read its agent file (`agents/<file>`, the body below the frontmatter), apply the checklist to the diff, collect findings (`file:line` + severity + why + fix). Then Step 4 — you ARE the synthesizer (easy here: full shared context).
+Run the selected lenses yourself, in one context. For each: read its agent file (`agents/<file>`, the body below the frontmatter), apply the checklist to the diff, and collect findings (`file:line` + severity + why + fix). Then go to Step 4 — you are the synthesizer, with full shared context.
 
 ## Step 3B — Fan-out review (large/critical)
 
-1. Build the lens list from Step 2 (drop the inapplicable).
-2. **Dispatch every selected specialist in ONE message, one `Agent` call per lens, each with `run_in_background: true`** (foreground `Agent` calls run sequentially; the lenses share no state, same diff, no ordering). The agent types are this skill's `agents/` files:
+1. Build the lens list from Step 2, dropping the inapplicable.
+2. **Dispatch every selected specialist in ONE message, one `Agent` call per lens, each with `run_in_background: true`** (foreground `Agent` calls run sequentially; the lenses share no state and need no ordering):
 
    ```
    Agent({ subagent_type: "scr-security", description: "Security review", run_in_background: true, prompt: ... })
    ```
 
-   Each agent's system prompt already carries its lens. The per-agent prompt is scope + context only:
+   Each agent's system prompt already carries its lens; the per-agent prompt is scope + context only:
    ```
    SCOPE: base=<sha> head=<sha> · changed files=<list> · guidelines=<AGENTS.md/CLAUDE.md paths>
    CONTEXT: <Step-1 historical notes: blame findings, prior-PR comments worth knowing>
    Review this scope for your lens and return your findings. Do not edit any files.
    You have repo + git/gh access — run your own `git blame` / `gh pr view` if you need more context.
    ```
-   If subagents lack repo access, pre-bundle the diff text into the prompt.
+   If subagents lack repo access, bundle the diff text into the prompt.
 
    **Fallbacks:**
    - `scr-*` agent types not registered (the harness doesn't load this skill's `agents/` folder — e.g. Claude Code): dispatch generic subagents (`general-purpose` / Task) instead, prefixing each prompt with the full body of the lens's `agents/<file>` (everything below the frontmatter).
    - No subagent mechanism at all: fall back to Step 3A inline.
    - Use the Workflow tool only if the user explicitly opted into orchestration.
-3. Completion notifications arrive as each agent finishes — do not poll. Wait for ALL. Then Step 4 — **mandatory synthesis** (do NOT concatenate reports).
+3. Completion notifications arrive as each agent finishes — do not poll. Wait for ALL, then go to Step 4.
 
 ---
 
@@ -121,8 +117,8 @@ Run the selected lenses yourself, one context. For each: read its agent file (`a
 
 Turn raw lens output into ONE verdict.
 
-1. **Dedup.** Same `file:line` flagged by N lenses → one finding; note the angles.
-2. **Reconcile cross-cutting.** For each finding ask: does another layer/lens neutralize or amplify it? (server sanitize ↔ render sanitize; client validation ↔ server Zod; a "missing test" already covered by an integration test.) **Verify the other layer** (grep/read it) before adjusting — don't assume. Severity comes from the WHOLE picture.
+1. **Dedup.** The same `file:line` flagged by N lenses becomes one finding; note the angles.
+2. **Reconcile cross-cutting.** For each finding ask: does another layer or lens neutralize or amplify it? (Server sanitize ↔ render sanitize; client validation ↔ server schema; a "missing test" already covered by an integration test. Real case: a server sanitizer that "fails open" looks like a security bug to the security lens — but is harmless because the *render* layer re-sanitizes.) **Verify the other layer** (grep or read it) before adjusting — don't assume. Severity comes from the WHOLE picture.
 3. **Score two SEPARATE axes per finding:**
    - **Confidence = is it real?** (0-100). `0` false-positive/pre-existing · `25` maybe, unverified · `50` real but couldn't confirm it triggers · `75` verified, evidence supports · `100` certain, evidence confirms. **Drop everything < 80.** This axis is realness, NOT importance.
    - **Severity = impact if real.** Normalize each specialist's scale into one bucket:
@@ -134,8 +130,8 @@ Turn raw lens output into ONE verdict.
      | Low / rating < 5 | drop (unless the fix is trivial) |
      Critical = bug · security exploit · data-loss · broken behavior. Important = arch problem · missing feature · unmet requirement · poor error handling · real test gap. Minor = style · polish · docs · micro-perf.
 4. **False-positive filter** (discard): pre-existing issues outside the diff; lint/typecheck/compiler-catchable (assume CI runs); pedantic nits a senior wouldn't raise; issues on lines the change didn't touch; intentional changes; AGENTS.md/CLAUDE.md issues explicitly silenced in code.
-5. **Acknowledge strengths** — accurate praise makes the rest trusted.
-6. **Write the report** → `references/report-skeleton.md`. Clear verdict: Ready to merge — Yes / No / With fixes.
+5. **Acknowledge strengths** — accurate, specific praise makes the rest trusted.
+6. **Write the report** using the template in `references/report-skeleton.md`. It ends with a clear verdict: Ready to merge — Yes / No / With fixes.
 
 ---
 
@@ -151,12 +147,11 @@ Cite findings with full-SHA permalinks: `https://github.com/<owner>/<repo>/blob/
 
 ## Calibration rules (non-negotiable)
 
-- **Evidence or it didn't happen.** Every finding: `file:line`, what's wrong, WHY it matters, how to fix. No vague "improve error handling".
-- **Cite the rule.** Guideline violation → quote the AGENTS.md/CLAUDE.md line.
-- **Confidence ≠ severity.** A certain-but-trivial finding is high-confidence/Minor; an unverified-but-scary one gets dropped (< 80 confidence) until you verify it.
+- **Evidence or it didn't happen.** Every finding carries `file:line`, what's wrong, WHY it matters, and how to fix it. No vague "improve error handling".
+- **Cite the rule.** A guideline violation quotes the AGENTS.md/CLAUDE.md line.
+- **Confidence ≠ severity.** A certain-but-trivial finding is high-confidence Minor; an unverified-but-scary one gets dropped until you verify it.
 - **Severity = actual impact**, not effort to fix. Don't inflate.
-- **Verify the cross-layer claim** (the render-sanitize lesson) before grading a finding low OR high.
-- **Advisory lenses** (simplify, comments, docs) never modify files unless the user said `--fix`.
+- **Advisory lenses** (simplification, comments, docs) never modify files unless the user said `--fix`.
 
 ## Red flags (stop, you're rationalizing)
 
@@ -167,7 +162,3 @@ Cite findings with full-SHA permalinks: `https://github.com/<owner>/<repo>/blob/
 | "Security lens flagged it → Critical" | Check if another layer neutralizes it first. |
 | "Report every issue I found" | Drop < 80 confidence. Noise kills trust. |
 | "≤50 lines, ship it" | Stakes beat size — auth/SQL/payment/migration is never Express. |
-
-## Output
-
-The synthesized report (`references/report-skeleton.md`) is the deliverable — not the per-lens dumps, not the diff. Always end with a verdict.
