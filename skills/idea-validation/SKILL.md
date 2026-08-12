@@ -31,8 +31,11 @@ Read the user's message. Load the matching workflow from `references/workflows/`
 | Has a specific idea / "validate this" | `references/workflows/idea-validation.md` | `.idea-validation/ideas/<slug>/decision_memo.md` |
 | Idea scored poorly / "should I pivot?" | `references/workflows/pivot-optimization.md` | `.idea-validation/ideas/<slug>/pivot_options.json` + `pivot_report.md` |
 | Market research / "tell me about X market" | `references/workflows/market-deep-dive.md` | `.idea-validation/market_insights/` + market-slug dimension files |
+| Founder profile / "build/update my profile" | `references/interview.md`, then `references/segmentation.md` (both main thread) | `.idea-validation/user_profile.md` |
 
-If the user asks for a **single dimension** (e.g. "who are the competitors of X?", "what's trending in journaling apps?", "how big is this market?"), skip the workflow table and dispatch that one specialist (or run the matching main-thread reference). Still bootstrap `.idea-validation/` first, and present the result from the written file.
+The profile row is also a preparation step: its output personalizes every later workflow, so offer idea-generation when it completes.
+
+If the user asks for a **single dimension** (e.g. "who are the competitors of X?", "what's trending in journaling apps?", "how big is this market?"), skip the workflow table and dispatch that one specialist. Still bootstrap `.idea-validation/` first, and present the result from the written file.
 
 If intent is ambiguous, ask one clarifying question, then route.
 
