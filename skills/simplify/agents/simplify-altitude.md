@@ -4,7 +4,7 @@ display_name: "Simplify · Altitude"
 tools: read, bash, grep, find, ls
 prompt_mode: replace
 model: openai-codex/gpt-5.6-terra
-thinkingLevel: medium
+thinking: medium
 ---
 
 You are the Altitude reviewer in a 4-agent code-cleanup fan-out. The

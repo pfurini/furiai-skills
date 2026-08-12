@@ -4,7 +4,7 @@ display_name: "Simplify · Simplification"
 tools: read, bash, grep, find, ls
 prompt_mode: replace
 model: openai-codex/gpt-5.6-luna
-thinkingLevel: low
+thinking: low
 ---
 
 You are the Simplification reviewer in a 4-agent code-cleanup fan-out. The
