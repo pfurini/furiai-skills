@@ -237,8 +237,10 @@ Ask each question one at a time. Show the counter format **[X/10]** at the start
 > What industry or professional domain have you spent the most time in? What do you understand about this space that most outsiders wouldn't?
 >
 > Also — think about your close friends, family members, or relatives. What do they do for work? Are any of them in industries you find interesting, and would they be willing to give you honest feedback, test an early version of an app, or help you understand their daily problems? (Even one person who'd answer your questions regularly is a massive advantage.)
+>
+> And specifically for business tools: do you know operators or professionals who serve many businesses — a commercialista, a consulente del lavoro, a lawyer, an agency owner, a reseller? Could any of them introduce you to their peers or their clients? (In the Italian B2B market these intermediaries are both the research access and often the distribution channel.)
 
-*Covers: industry experience, domain access through personal network*
+*Covers: industry experience, domain access through personal network, intermediary access for B2B (feeds founder-fit scoring and the intermediary channel)*
 
 **[3/10] — Past Projects**
 
@@ -261,8 +263,10 @@ Ask each question one at a time. Show the counter format **[X/10]** at the start
 **[6/10] — Communities**
 
 > What online or offline communities are you part of — subreddits, Discord servers, forums, professional groups, local clubs? Which ones do you actively participate in vs. just observe?
+>
+> Include professional ones: are you enrolled in an ordine/albo, a category association, or active in any Italian business community (forums, Facebook/Telegram groups, local sections)? Membership you already have is distribution you don't have to earn.
 
-*Covers: social patterns (communities)*
+*Covers: social patterns (communities), professional-lattice standing for B2B*
 
 **[7/10] — Content You Consume**
 
@@ -327,6 +331,7 @@ Write to `.idea-validation/user_profile.md`:
   "distribution_advantages": [],
   "inner_circle_domains": [],
   "inner_circle_testers_available": false,
+  "b2b_intermediary_access": [],
   "selected_interest_domains": [],
   "technical_level": "",
   "fit_score_by_niche": {},
@@ -339,5 +344,6 @@ Write to `.idea-validation/user_profile.md`:
 ## Notes
 
 - The `inner_circle_domains` field captures industries accessible through the user's personal network. This is a high-signal input for idea mapping — domain access through a friend or relative who'd give honest feedback is nearly as valuable as direct experience.
+- The `b2b_intermediary_access` field lists named intermediary/operator relationships (commercialisti, consulenti, lawyers, agencies, resellers) with a word on what they'd plausibly do (feedback / introductions / channel). It feeds B2B founder-market fit, the intermediary-referral channel, and interview-kit recruiting routes. Empty list = no access (a real B2B handicap; score it honestly).
 - When `interview_mode` = "skipped", downstream analysis treats all profile-dependent adjustments as neutral (no domain fit bonus, no distribution advantage, no tier adjustment).
 - When `interview_mode` = "browse", the `selected_interest_domains` field drives niche selection in trend research and idea filtering in idea mapping. The system trades domain-fit precision for user engagement — a user who actively chose "Personal Finance" and "Side Hustles" is more motivated than one assigned those niches by an algorithm.

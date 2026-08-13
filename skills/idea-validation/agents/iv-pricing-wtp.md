@@ -34,6 +34,14 @@ on unit economics: a $1/mo difference at 1,000 users is $12K/year.
 
 ### Using market insights
 
+> **B2B target note:** for `TARGET: b2b` the platform files are
+> `<niche>-incumbents|communities|linkedin|g2-capterra|web-search-*.md`
+> (Italy-first evidence). Read the same signal classes from them — buyer
+> complaints and tool-seeking threads play the Reddit role, marketplace/
+> review listings play the App Store role, practitioner posts play the
+> TikTok-narrative role — and prefer findings labeled as Italian sources
+> over `geography: global` ones.
+
 Trend research files provide monetization reality-checks that desk research alone cannot:
 
 | Field | How it informs pricing |

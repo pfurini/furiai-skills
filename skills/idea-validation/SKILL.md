@@ -1,8 +1,9 @@
 ---
 name: idea-validation
 description: >-
-  Validates indie app and micro-SaaS ideas (consumer apps and self-serve B2B tools) with a scored
-  verdict, and orchestrates the full venture-analysis toolkit. Fire when the user states an idea
+  Validates indie app and micro-SaaS ideas (consumer apps, and self-serve B2B tools calibrated for
+  Italian micro/small businesses and professional firms) with a scored verdict, and orchestrates
+  the full venture-analysis toolkit. Fire when the user states an idea
   and asks if it's worth building, scoring, or validating; when they want app or SaaS idea
   suggestions or don't know what to build; when they ask about a market — what's trending, who the
   competitors are, how big it is, or what an indie product could realistically earn; when a scored
@@ -42,9 +43,21 @@ If intent is ambiguous, ask one clarifying question, then route.
 
 ## Target (b2c vs b2b)
 
-Every idea and market carries `target: b2c | b2b` (see `references/memory.md`). Infer it from the wording — consumer apps, habits, and personal life → `b2c`; tools sold to businesses and operators (merchants, agencies, practices, dev teams) → `b2b` — state your inference in the workflow announcement so the user can correct it, and default to `b2c` when genuinely unclear. Write it into `idea.md` frontmatter at entry and pass `TARGET:` plus the matching `CALIBRATION:` paths in every dispatch.
+Every idea and market carries `target: b2c | b2b` (see `references/memory.md`). Infer it from the wording — consumer apps, habits, and personal life → `b2c`; tools sold to businesses and operators (merchants, agencies, practices, studi, dev teams) → `b2b` — state your inference in the workflow announcement so the user can correct it, and default to `b2c` when genuinely unclear. Write it into `idea.md` frontmatter at entry and pass `TARGET:` plus the matching `CALIBRATION:` paths in every dispatch.
 
-`b2b` here means **self-serve / PLG micro-SaaS**: credit-card signup, no sales team. If the idea implies a sales-led motion — procurement, security reviews, custom contracts, demos required to buy — say plainly that this desk-research validation doesn't fit: that segment is validated through customer-discovery interviews, not market signals. Offer to proceed anyway, and if the user does, carry the caveat into every verdict artifact (scores, memo).
+### B2B target = Italian micro/small businesses, self-serve
+
+`b2b` here means **self-serve / PLG micro-SaaS sold Italy-first**: buyers are Italian micro (<10 employees) and small (10–49) businesses and professional firms (studi commercialisti, studi legali, consulenti del lavoro, agencies, merchants). Research runs on Italian sources and the B2B calibration packs carry Italian benchmarks. B2B ideas also carry `segment_size: micro | small | medium` in `idea.md` (absent → micro/small). `medium` (50–249 employees) is edge scope: always run the sales-motion check below and carry its outcome into the verdict artifacts.
+
+**Sales-motion bands** — infer the band, state it in the announcement, and record it in scores and memo:
+
+1. **Self-serve** — online signup and payment, no human required to buy. In scope.
+2. **Assisted self-serve** — self-serve pricing (entry ≲ €50/mo ex-VAT) but Italian buyers typically arrive through assisted onboarding or an intermediary's referral (commercialista, consulente, reseller). In scope; flag the band in every verdict artifact and model the intermediary as a distribution channel, not as sales-led drift.
+3. **Sales-led** — demos required to buy, procurement, security reviews, custom contracts; in Italy this reliably starts above ~€50/mo entry pricing, where buyers expect a demo/contract/dealer motion. Out of scope for desk-research validation: say plainly that this segment is validated through customer-discovery interviews, not market signals. Offer to proceed anyway, and if the user does, carry the caveat into every verdict artifact (scores, memo).
+
+### B2B research language
+
+Run B2B searches Italian-first (buyer vocabulary is Italian: "gestionale", "fatturazione elettronica"), English second. Dispatch NICHE bilingually — `NICHE: <Italian wording> / <English wording>` — and keep both wordings identical across every researcher in the run. Artifacts are written in English; Italian quotes stay verbatim with a translation.
 
 ## How to run a workflow
 
@@ -73,10 +86,11 @@ The agent's system prompt already carries its rubrics; the per-agent prompt is c
 PROJECT ROOT: <absolute path — all .idea-validation/ paths resolve against this>
 DATE: <today, YYYY-MM-DD — run `date '+%Y-%m-%d'`, never assume>
 TARGET: <b2c | b2b — from idea.md frontmatter; absent → b2c>
-SLUG: <idea slug or market- slug>   NICHE: <exact niche wording to use everywhere>
+SEGMENT: <b2b only — segment_size from idea.md; absent → micro/small>
+SLUG: <idea slug or market- slug>   NICHE: <exact niche wording to use everywhere; b2b: Italian / English>
 READ: <input paths for this step, per the workflow>
 CALIBRATION: <absolute path to references/calibration/<target>/<pack>.md — for agents whose brief asks for one>
-EXTRA: <platform + prompt template path for trend researchers; other reference paths where the agent file asks for them>
+EXTRA: <platform + prompt template path for trend researchers; other reference paths where the agent file asks for them. For b2b dispatches include the tooling reference path (references/tooling.md) for trend researchers and the market sizer>
 Run your analysis and write your artifact. Return only the summary your brief asks for.
 ```
 
@@ -135,18 +149,18 @@ Workflows that research trends ask the user this before dispatching Wave 1. Show
 
 Templates: `tiktok.md`, `reddit.md`, `apps.md`, `web-search.md`, `x-twitter.md`.
 
-**b2b** (new templates in `references/prompts/b2b/`, reusing two b2c ones):
+**b2b** (Italy-first templates in `references/prompts/b2b/`, reusing one b2c template):
 
 > Which sources would you like to include in this analysis? (select one or more)
 >
-> 1. **G2 / Capterra & marketplaces** — category landscape, buyer complaints, pricing in use
-> 2. **Operator communities** — HN, Indie Hackers, professional subreddits: pains, spreadsheet workflows, budget signals
-> 3. **LinkedIn / professional web** — practitioner posts, job postings as software-gap signals, vendor activity
-> 4. **Web Search (Google)** — search volume trends, rising queries, SEO demand
-> 5. **X/Twitter** — public builder and buyer conversations, switching complaints
+> 1. **Incumbent ecosystems** — the Italian vertical-software incumbents (TeamSystem, Zucchetti, Wolters Kluwer class): release notes, support forums, pricing, integration gaps
+> 2. **Italian operator communities** — verified-active forums, Facebook/Telegram groups, ordini and association research; HN/Indie Hackers for dev tools
+> 3. **Professional web & jobs (Italy)** — LinkedIn posts, job postings as software-gap signals, Italian trade press, tenders as market-language
+> 4. **Review platforms & marketplaces** — Capterra.it first, G2 as directional; buyer complaints, pricing in use
+> 5. **Web Search (Google.it)** — Italian-language query demand first, English second
 > 6. **All of the above** — full multi-platform analysis (recommended for a new niche)
 
-Templates: `b2b/g2-capterra.md`, `b2b/communities.md`, `b2b/linkedin.md`, `web-search.md`, `x-twitter.md`.
+Templates: `b2b/incumbents.md`, `b2b/communities.md`, `b2b/linkedin.md`, `b2b/g2-capterra.md`, `web-search.md` (run with the bilingual rule from the Target section). `x-twitter.md` stays available on request only — Italian professional signal on X is thin, so it is off the default menu.
 
 Dispatch one `iv-trend-researcher` per selected platform, passing the template path and the platform slug for the output filename.
 

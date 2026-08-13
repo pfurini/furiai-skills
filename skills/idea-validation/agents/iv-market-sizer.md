@@ -33,6 +33,14 @@ other — anchored to real signals from the market_insights trend data.
 
 ### Using market insights
 
+> **B2B target note:** for `TARGET: b2b` the platform files are
+> `<niche>-incumbents|communities|linkedin|g2-capterra|web-search-*.md`
+> (Italy-first evidence). Read the same signal classes from them — buyer
+> complaints and tool-seeking threads play the Reddit role, marketplace/
+> review listings play the App Store role, practitioner posts play the
+> TikTok-narrative role — and prefer findings labeled as Italian sources
+> over `geography: global` ones.
+
 Extract the following from each available file's YAML frontmatter and narrative:
 
 | Field | How it informs TAM/SAM/SOM |

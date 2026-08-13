@@ -46,7 +46,7 @@ If the tree exists, leave it in place and update files in situ.
 
 - Idea slugs: kebab-case, max 40 characters, from the idea name (`habit-tracker-climbers`).
 - Market-only research slugs: `market-` prefix (`market-nutrition-2026`).
-- Trend files: `<niche>-<platform>-<YYYY>-<MM>.md` with `platform` one of `tiktok | reddit | apps | web-search | x-twitter` (b2c) or `g2-capterra | communities | linkedin | web-search | x-twitter` (b2b). Combined file only if the user asks: `<niche>-multi-<YYYY>-<MM>.md`.
+- Trend files: `<niche>-<platform>-<YYYY>-<MM>.md` with `platform` one of `tiktok | reddit | apps | web-search | x-twitter` (b2c) or `incumbents | communities | linkedin | g2-capterra | web-search` (b2b; `x-twitter` on explicit request). Combined file only if the user asks: `<niche>-multi-<YYYY>-<MM>.md`.
 
 ## Protocol
 
@@ -60,7 +60,7 @@ If the tree exists, leave it in place and update files in situ.
 
 ## Target (`idea.md` frontmatter)
 
-Each idea carries `target: b2c | b2b` in its `idea.md` frontmatter, set once at workflow entry. It selects the calibration packs (`references/calibration/<target>/`) every specialist and the scoring step load. Absent → `b2c`. The artifact schemas are identical for both targets — only the rubrics and benchmarks behind them differ.
+Each idea carries `target: b2c | b2b` in its `idea.md` frontmatter, set once at workflow entry. It selects the calibration packs (`references/calibration/<target>/`) every specialist and the scoring step load. Absent → `b2c`. B2B ideas also carry `segment_size: micro | small | medium` (absent → micro/small; `medium` always triggers the sales-motion check in SKILL.md). The artifact schemas are identical for both targets — only the rubrics and benchmarks behind them differ.
 
 ## Idea lifecycle (`idea.md` status)
 

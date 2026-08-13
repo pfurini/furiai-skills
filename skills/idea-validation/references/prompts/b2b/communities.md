@@ -1,146 +1,91 @@
 ---
 prompt_for: communities
 placeholder: "[NICHE]"
-usage: Replace [NICHE] with the target topic (e.g., "agency reporting", "dental practice management", "Shopify inventory") before invoking.
+usage: Replace [NICHE] with the bilingual niche wording ("<Italian> / <English>", e.g. "fatturazione per artigiani / invoicing for tradespeople") before invoking. Search Italian-first.
 ---
 
 **Objective:**
-Identify and analyze **what practitioners and operators are discussing, complaining about, and paying for in [NICHE]** across builder and professional communities, using **credible, recent sources (published within the last 6 months)**.
+Identify and analyze **what Italian operators and practitioners are discussing, complaining about, and paying for in [NICHE]** across Italian communities and their few relevant international counterparts, using **credible, recent sources (published within the last 6 months where the surface allows)**.
 
 ---
 
 **Instructions:**
 
-1. **Source Criteria**
+1. **Source status discipline (read first)**
 
-   * Use only **credible and recent sources (≤ 6 months old)**
-   * At the beginning of the response, clearly state:
-     **"Data observed as of [month/year]"**
+   Italian community surfaces die, degrade, and hide behind login walls. Label every surface you use with one of:
+   * **Active** — you observed a dated artifact within ~90 days (post, thread, timestamp).
+   * **Degraded** — the surface exists but last activity is months/years old. Say so; do not mine it as live signal.
+   * **Unverifiable** — login wall or bot block prevented observation. This is NOT evidence of death; report it as unverifiable and move on.
+   * Never invent member counts or activity levels. If the platform hides them, write "not visible".
+
+   Known state as of 2026-08 (re-verify, do not assume): **Forum GT is dead** (parked domain); its successor connect.gt is a degraded archive; **InfoJobs Italia shut down 2025-12-31**; the Telegram channel @commercialistatelematico is dead. **ItaliaOggi is still publishing.** There is **no open Italian forum for avvocati** — for legal niches, lean on Tier 3 sources and expect the evidence-sufficiency gate to fire.
+
+2. **Source Criteria**
+
+   * Search **Italian-first**; use only sources you can date. Write the report in English; keep Italian quotes verbatim with a translation.
+   * At the beginning of the response, clearly state: **"Data observed as of [month/year]"**
    * Prioritize sources in this order:
 
-     **Tier 1 — Practitioner communities (highest signal fidelity)**
-     * Niche-professional subreddits (r/agency, r/smallbusiness, r/shopify, r/webdev, r/Dentistry, vertical equivalents) — top posts of the past 6 months, recurring complaint and "what do you use for X" threads
-     * Hacker News — Ask HN / Show HN / launch threads touching the niche; comment sentiment on tools in the space
-     * Indie Hackers — products in the niche with public revenue, milestone posts, "building in public" threads
-     * Niche Slack/Discord communities and professional forums (name them; use whatever is publicly indexed or reported about them)
+     **Tier 1 — Readable Italian practitioner surfaces (highest pain-mining value)**
+     * **Fisco Forum (fiscoetasse.com/forum)** — the anchor surface for commercialisti/fiscal niches: tens of thousands of public threads, per-board last-post dates visible. Mine recurring complaint and "che software usate per X" threads.
+     * **r/commercialisti**, **r/ItalyInformatica**, **r/partitaiva** and other Italian subreddits with observed recent posts (subscriber counts often not visible — don't invent).
+     * Public Facebook groups for the vertical (some are readable without login — check; e.g. small open groups like "Commercialisti del Lavoro HUB"). Big private groups (e.g. "Fatti di E-Commerce", ~22K members) are **existence signals only**: note them, don't claim their content.
+     * Vertical portals with comment/QA sections (CommercialistaTelematico, AteneoWeb-class) — verify activity first.
 
-     **Tier 2 — Aggregated community signal**
-     * GummySearch or similar pain-point aggregation across business subreddits
-     * "Best tools for X" threads and their comment consensus (which tools practitioners actually endorse vs. which get pushback)
-     * Facebook/LinkedIn groups for the vertical where publicly reported
+     **Tier 2 — Structured community signal**
+     * Association working groups and event calendars as leading indicators (Netcomm working groups for e-commerce, 4eCom, local ordini events): session titles = the vertical's current pains.
+     * Annual community reports (Casaleggio "Ecommerce Italia", association surveys) for trend corroboration.
+     * YouTube webinar comments and Italian podcast episodes for the vertical.
 
-     **Tier 3 — Corroborating sources**
-     * Blog posts and newsletters by practitioners in the niche describing their stack and its gaps
-     * Podcast episodes / MicroConf or vertical-conference talks naming recurring operational pains
+     **Tier 3 — International, ONLY where the niche warrants it**
+     * HN / Indie Hackers / English subreddits: for dev tools and globally-uniform workflows only. Label these findings `geography: non-IT` — they prove the pain class exists, not that Italian buyers have it.
 
----
+     **Opt-in (off by default):** member-assisted collection from private groups the user personally belongs to (via an Apify group-posts actor with the user's own session). Only if the orchestrator's dispatch explicitly enables it; output must be pain-themes only, never contact data, and findings get `evidence type: member-assisted (private group)`.
 
-2. **Trend Identification**
+3. **Trend Identification**
    Identify both:
+   * **Established pains** — recurring high-engagement complaint themes, mature "che software usate" threads with consistent answers.
+   * **Emerging / rising pains** — new recurring question types tied to regulation (new obblighi, scadenze), platform changes, or AI adoption debates.
 
-   * **Established pains** (recurring high-engagement complaint themes, mature "what do you use" threads with consistent answers)
-   * **Emerging / rising pains** (new recurring question types, workflow shifts, new-tool adoption debates, regulation or platform changes creating fresh problems)
+   For each theme, note whether it is **single-surface** or **cross-surface** (2+ distinct communities — stronger), and whether answers are "use tool X" (competitive), "arrangiarsi con Excel" (gap — the classic micro-SaaS entry), or "lo fa il commercialista / lo faccio fare" (delegated — the buyer may be the intermediary, not the firm).
 
-   For each theme, note whether it is **community-specific** or **cross-community** (appearing in 2+ distinct communities — stronger signal).
+4. **For EACH pain or discussion theme, provide:**
 
----
+**A. Basic Information** — theme name; surfaces where it appears (with status labels); type (recurring complaint, tool-seeking, workflow question, pricing rant, regulatory scramble, incumbent backlash).
 
-3. **For EACH pain or discussion theme, provide:**
+**B. Description** — what posts look like, quoting the operators' own Italian vocabulary (+ translation); the underlying business pain (hours/week, lost revenue, compliance risk) and who feels it; whether the complainer can buy software alone (owner/titolare) or must go through someone.
 
-**A. Basic Information**
+**C. Quantitative Metrics** — thread/message counts and last-post dates where visible; representative engagement; frequency ("appears weekly on Fisco Forum"); cross-surface reach. Write "not visible" where the platform hides numbers.
 
-* Theme name
-* Communities where it appears
-* Type (recurring complaint, tool-seeking, workflow question, pricing rant, incumbent backlash, regulatory scramble, etc.)
+**D. Growth Analysis** — for rising themes only: growth evidence (post-frequency change, new groups forming, spikes tied to a scadenza or platform change), timeframe, velocity (slow / moderate / explosive).
 
-**B. Description**
+**E. Evidence labels** (mandatory) — **region** · **segment** (commercialista, avvocato, consulente del lavoro, merchant, agency, artigiano, generic PMI) · **firm-size proxy** · **stack named** (incumbent software mentioned) · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** · **confidence** (high only if cross-surface in Italian sources or interview-confirmed).
 
-* What posts look like, quoting the operators' own vocabulary
-* The underlying business pain: what it costs (hours/week, lost revenue, risk) and who feels it
-* Whether current answers are "use tool X" (competitive), "cobble spreadsheets" (gap), or "hire someone" (service-replacement opportunity)
-
-**C. Quantitative Metrics**
-
-* Community sizes (subscribers/members) and activity levels
-* Representative engagement (upvotes, comment counts) on the theme
-* Frequency ("appears weekly in r/X")
-* Cross-community reach
-
-**D. Growth Analysis**
-
-* For **rising themes only**: growth evidence (post-frequency increase, new communities forming, sudden spikes tied to platform/regulation changes), timeframe, and velocity classification (slow / moderate / explosive)
-
----
-
-4. **Structure the Output**
-   Organize findings into clearly separated sections:
+5. **Structure the Output**
 
 * **1. Executive Summary (Key Insights)**
 * **2. Established Pains**
 * **3. Emerging / Rising Pains**
-* **4. Key Communities & Theme Clusters**
-* **5. Strategic Insights (positioning & distribution takeaways)**
+* **4. Surface Inventory** (every surface used, with status label and pain-mining value)
+* **5. Strategic Insights (positioning & distribution takeaways — incl. which communities tolerate founder participation)**
 * **6. Financial Opportunities** (per instruction 6 below)
 * **7. Niche Risks** (per instruction 7 below)
-* **8. Sources** (per instruction 8 below)
-
----
-
-5. **Additional Analysis (Value Add)**
-   Include:
-
-* **Spreadsheet signal**: workflows operators run in spreadsheets/manual processes while complaining about it — the classic micro-SaaS entry point
-* **Budget authority signal**: whether the person complaining can buy software themselves (owner/solo operator) or must ask someone (weaker self-serve fit)
-* Tool-stack patterns: what the community's standard stack is, and which slot in it draws the most complaints
-* Public revenue proof: Indie Hackers / building-in-public posts showing products in this niche earning real MRR
-* Distribution note: which of these communities tolerate founder participation vs. ban promotion (matters for the go-to-market later)
-
----
+* **8. Disconfirming Evidence** (per instruction 8 below)
+* **9. Sources**
 
 6. **Financial Opportunities**
-   Identify the **most monetarily interesting, not yet saturated problems** that operators in this niche are **already paying to solve** — with money or with hours of manual work. Base conclusions on realistic data (stated tool spend, community size, public revenue posts) — avoid speculative sizing.
-
-   For each opportunity, provide:
-
-   * **Problem**: What specifically are operators paying (or burning hours) to solve?
-   * **Community signal**: Specific threads/patterns confirming real, recurring demand
-   * **Evidence of willingness to pay**: Tools with adoption in the community, stated budgets, public MRR of comparable products, cost of the manual alternative
-   * **Saturation assessment**: Crowded, or underserved segments / verticals / price tiers open to a new entrant?
-   * **Realistic revenue math**: Bottoms-up (e.g., "community of N operators, X% report this pain monthly, comparable tools charge $Y/mo → addressable pool of $..."). Cite what it rests on.
-   * **Why now**: The platform change, regulation, or workflow shift making this timely.
-
-   Prioritize opportunities backed by **existing spending or time-burn**, **specific enough to be actionable**, and **not owned by an entrenched default**.
-
----
+   Identify the most monetarily interesting, not yet saturated problems Italian operators **already pay to solve** — with money or with hours. For each: **Problem** · **Community signal** (specific threads/patterns) · **Evidence of willingness to pay** (tools adopted, stated budgets, cost of the manual alternative in hours × loaded wage) · **Saturation assessment** · **Realistic revenue math** (bottoms-up; cite what it rests on; never present the 4.27M Italian micro-firm count as an addressable pool) · **Why now**.
 
 7. **Niche Risks**
-   Identify the **most significant risks** observable from community signals.
+   For each: **Risk** · **Community signal** · **Severity (Low/Medium/High)** · **Mitigation angle**. Consider at least: **anti-subscription sentiment** (strong in Italian micro-business culture — preference for one-time/local); **DIY-Excel culture**; **trust barrier** (business data with a small unknown vendor); **seasonality** (scadenze fiscali cycles); **delegation** (the pain is felt by the firm but solved by the commercialista — the apparent buyer isn't the buyer); **community unreachability** (the segment's discussion happens in private/offline spaces you cannot mine — this inflates false negatives).
 
-   For each risk, provide: **Risk** (short label) · **Community signal** (specific evidence) · **Severity** (Low / Medium / High) · **Mitigation angle**.
+8. **Disconfirming Evidence** (mandatory)
+   What argues AGAINST the niche: threads showing tolerance without budget, free tools praised as sufficient, declining post frequency, communities that exist but never discuss the pain.
 
-   Risk types to consider:
-   * **Anti-subscription sentiment** — operators in this vertical resent recurring software costs; prefer one-time or free tools
-   * **DIY culture** — the community celebrates spreadsheet/self-built solutions; buying software is low-status
-   * **Trust barrier** — operators won't put business data in a small vendor's tool (backup/security anxiety threads)
-   * **Seasonal/cyclical demand** — the pain spikes seasonally (tax season, holiday commerce) creating boom-bust revenue
-   * **Platform dependence** — the pain exists only inside one platform whose owner may fix it natively
-   * **Sales-led drift** — buyers in this niche expect demos, contracts, onboarding calls — signals poor self-serve fit
-
----
-
-8. **Sources**
-   At the end of the document, include a **"Sources" section** listing all URLs referenced during research as markdown hyperlinks:
-
-   ```
-   ## Sources
-   - [Publication / Page Title](https://url.com)
-   - [Publication / Page Title](https://url.com)
-   ```
-
-   * Include every source consulted, even if not directly quoted
-   * Use the actual page title or publication name as the link label
+9. **Sources** — end with a `## Sources` section listing every URL consulted as markdown links.
 
 ---
 
 **Goal:**
-Deliver a **data-backed, structured analysis** that surfaces **what operators in this niche actually struggle with, what they already pay for, and where a self-serve product could replace a spreadsheet, a manual process, or a resented incumbent**.
+Deliver a **data-backed, honestly-labeled analysis** of what Italian operators in [NICHE] struggle with, what they already pay for, and where a self-serve product could replace a spreadsheet, a manual process, or a resented incumbent — with every claim carrying its surface status, segment, and confidence, and with unreadable surfaces reported as unreadable rather than silently skipped.

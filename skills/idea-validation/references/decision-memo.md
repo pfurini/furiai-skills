@@ -41,8 +41,34 @@ The memo must be **scannable in under 2 minutes**. Follow these rules:
 | Recommended Next Step | 2–4 sentences with specifics | What to do this week |
 | Kill criteria | 1–2 sentences | When to walk away |
 | Alternative Path | 1–2 sentences | Plan B |
+| Interview kit | 10 questions + 2–3 recruiting routes | Only when required (see below) — the desk-research escape hatch |
 
-Total memo length: **~400–600 words**. If it's longer, cut. Brevity is a feature.
+Total memo length: **~400–600 words** (+ the interview kit when required). If it's longer, cut. Brevity is a feature.
+
+## Interview Kit (conditional section)
+
+Include the kit when EITHER: (a) `scores.json.evidence_gate.triggered` is
+true, or (b) `target` = b2b and the verdict is **pursue** or **test** for a
+professional-firm niche (commercialisti, avvocati, consulenti del lavoro
+and similar) — these markets under-produce public evidence, so even a
+passing desk verdict should be interview-confirmed before building.
+
+The kit contains:
+1. **10 interview questions in Italian**, tailored to this idea's riskiest
+   assumptions (not a generic script): current workflow and its cost in
+   hours; the incumbent stack and what's tolerated about it; who decides
+   and signs; budget norms ("quanto spendete oggi per..."); the specific
+   pain's frequency/severity; reaction to the price band from
+   `pricing.json`. Follow Mom-Test discipline: past behavior, not
+   hypotheticals — "com'è andata l'ultima volta che...", never "lo
+   usereste?".
+2. **Recruiting routes** (2–3, concrete for this niche): ordine/association
+   events and local sections, the verified-active communities from
+   market_insights, the founder's named contacts from `user_profile.md`,
+   LinkedIn direct engagement (public commenting → conversation — NOT cold
+   email; the CAC pack's legal exclusion applies to outreach here too).
+3. **A target**: 10–15 interviews, separating "has the pain" from "would
+   pay/replace/integrate" — the interview outcomes become the RAT evidence.
 
 ## Process
 
@@ -59,7 +85,8 @@ Total memo length: **~400–600 words**. If it's longer, cut. Brevity is a featu
    - If verdict = **drop**: the next step is to archive and move on. Name one thing learned from the analysis that applies to future ideas.
 8. Define **kill criteria**: the specific outcome that means "stop and move on." This is the inverse of the RAT pass threshold.
 9. Write the alternative path — what to do if the recommended step fails or the kill criteria is met.
-10. Write the memo following the template below.
+10. Check the interview-kit condition (gate triggered, or b2b pursue/test in a professional-firm niche). If it applies, compose the kit: 10 Italian questions tailored to the RAT and the lowest-scoring dimensions, recruiting routes from market_insights + user_profile, and the interview target.
+11. Write the memo following the template below.
 
 ### Validation Watermark
 
@@ -69,6 +96,11 @@ If `score_confidence` from `scores.json` is not "high", insert a watermark immed
 |---|---|
 | **medium** | "This score is based on incomplete data. {list missing dimensions}. Run these analyses before making a build/no-build decision." |
 | **low** | "LOW CONFIDENCE — Only {N} of 6 dimensions scored. This verdict is directional, not conclusive. Required before acting: {list mandatory missing analyses}." |
+
+If `evidence_gate.triggered` is true, the watermark must additionally say:
+"DESK-LIMITED — only {observations_counted} in-market observations found
+(threshold {threshold}). This market under-produces public evidence; the
+score is capped and the interview kit below is the required next step."
 
 ### Pre-mortem Method
 
@@ -143,6 +175,20 @@ The assumption most likely to kill this idea:
 ## If That Doesn't Work
 
 <Alternative path — one sentence. What to do if the recommended step fails or kill criteria is met.>
+
+<!-- Only when the interview-kit condition applies (see Interview Kit section): -->
+
+## Interview Kit
+
+<1–2 sentences: why interviews are required for this verdict (gate fired / professional-firm niche).>
+
+**Domande (10):**
+1. <question in Italian, tailored to this idea's riskiest assumptions>
+...
+
+**Dove trovare gli intervistati:** <2–3 concrete recruiting routes for this niche>
+
+**Target:** 10–15 interviste. Separate "ha il problema" da "pagherebbe / sostituirebbe / integrerebbe". <Tie to the RAT pass threshold.>
 ```
 
 ## Notes

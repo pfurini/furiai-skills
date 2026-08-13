@@ -29,6 +29,14 @@ position that incumbents can't easily copy.
 
 ### Using market insights
 
+> **B2B target note:** for `TARGET: b2b` the platform files are
+> `<niche>-incumbents|communities|linkedin|g2-capterra|web-search-*.md`
+> (Italy-first evidence). Read the same signal classes from them — buyer
+> complaints and tool-seeking threads play the Reddit role, marketplace/
+> review listings play the App Store role, practitioner posts play the
+> TikTok-narrative role — and prefer findings labeled as Italian sources
+> over `geography: global` ones.
+
 Trend analysis files are a primary research source for competitor mapping. Extract the following:
 
 | Platform file | What to extract for competitor mapping |

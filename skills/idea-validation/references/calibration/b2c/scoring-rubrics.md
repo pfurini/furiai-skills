@@ -5,6 +5,11 @@ Loaded by the orchestrator (main thread) when scoring, per
 the B2C target. The algorithm — weights, floor penalty, missing-input
 discount, verdict bands, RAT, screening — lives in `references/scoring.md`.
 
+## Evidence-sufficiency gate
+
+This target defines **no evidence gate** (scoring.md Step 5b is skipped;
+`evidence_gate.triggered` = false, rule = "none defined").
+
 Each dimension maps source data to a 0–100 sub-score. When source data uses qualitative labels, apply these conversions.
 
 ## Demand (0–100)

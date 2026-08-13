@@ -1,5 +1,5 @@
 ---
-description: "Trend researcher for the idea-validation fan-out. Researches one platform (consumer: TikTok, Reddit, App Store, Google Search, X/Twitter; B2B: G2/Capterra, operator communities, LinkedIn) for a market niche and writes a dated insight file to the .idea-validation store."
+description: "Trend researcher for the idea-validation fan-out. Researches one platform (consumer: TikTok, Reddit, App Store, Google Search, X/Twitter; B2B Italy-first: incumbent ecosystems, Italian operator communities, professional web/jobs, review platforms, web search) for a market niche and writes a dated insight file to the .idea-validation store."
 display_name: "Validate · Trends"
 prompt_mode: replace
 ---
@@ -31,9 +31,14 @@ skill will quote your numbers as facts.
 
 Write to `.idea-validation/market_insights/<niche>-<platform>-<YYYY>-<MM>.md`
 (platform is the slug the orchestrator gave you — b2c: `tiktok | reddit |
-apps | web-search | x-twitter`; b2b: `g2-capterra | communities | linkedin |
-web-search | x-twitter`). Create missing parent directories. Never overwrite
-an existing dated file — each run writes a new one.
+apps | web-search | x-twitter`; b2b: `incumbents | communities | linkedin |
+g2-capterra | web-search`, plus `x-twitter` on explicit request). Create
+missing parent directories. Never overwrite an existing dated file — each
+run writes a new one.
+
+B2B dispatches carry a bilingual NICHE ("<Italian> / <English>"): search
+Italian-first, write the file in English, keep Italian quotes verbatim with
+a translation, and apply the evidence labels the template mandates.
 
 The file has two parts:
 

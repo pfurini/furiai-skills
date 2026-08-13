@@ -96,6 +96,24 @@ The missing-input discount ensures that ideas scored on only 3 of 6 dimensions c
 | 4–5 of 6 | medium |
 | 3 of 6 (minimum) | low |
 
+### Step 5b — Evidence-sufficiency gate
+
+Some target markets under-produce public evidence (thin review culture,
+private communities), which makes thin-data scores read stronger than they
+are. The target's rubric pack (`references/calibration/<target>/scoring-rubrics.md`)
+may define an **evidence gate**: a rule for counting in-market observations
+across this niche's `market_insights/` files, and a threshold.
+
+- If the pack defines no gate, skip this step (`evidence_gate.triggered` = false).
+- If it does: count the observations per the pack's rule. Below the
+  threshold, the gate fires: **cap `final_score` at 74** (verdict can be at
+  most "test"), set `score_confidence` to "low", and record the gate block
+  in the output. The decision memo MUST then state that the verdict is
+  desk-limited and include the interview kit (see
+  `references/decision-memo.md`).
+
+The gate caps, it never boosts — abundant evidence earns nothing extra here.
+
 ### Step 6 — Issue verdict
 
 | Score | Verdict | Meaning |
@@ -197,6 +215,7 @@ Define the threshold **before** running the experiment. The threshold is written
 5. Compute `base_score` using weighted sum.
 6. Apply `floor_penalty` and `missing_discount` to get `final_score`.
 7. Determine `score_confidence`.
+7b. Apply the evidence-sufficiency gate if the target's rubric pack defines one (cap at 74 + confidence "low" when it fires).
 8. Issue `verdict` from threshold table.
 9. Identify `top_strengths` (top 2 dimensions) and `top_weaknesses` (bottom 2 dimensions).
 10. Run RAT identification: list assumptions, score criticality × uncertainty, select the riskiest.
@@ -228,6 +247,12 @@ Write to `.idea-validation/ideas/<slug>/scores.json` (or `pivot_scores.json` for
   "floor_penalty": 1.0,
   "base_score": 0,
   "missing_discount": 1.0,
+  "evidence_gate": {
+    "triggered": false,
+    "observations_counted": 0,
+    "threshold": 0,
+    "rule": "<the counting rule applied, from the target's rubric pack — or 'none defined'>"
+  },
   "final_score": 0,
   "verdict": "pursue | test | pivot | drop",
   "score_confidence": "high | medium | low",
