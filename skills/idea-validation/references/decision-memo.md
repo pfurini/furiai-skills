@@ -33,7 +33,7 @@ Follow these rules:
 |---|---|---|
 | Verdict line | 1 sentence | Instant signal |
 | Score + confidence | 1 line | Quantitative anchor |
-| Validation watermark | 1–3 lines (both sentences when both low-confidence causes fire) | Trust calibration (only if confidence < high) |
+| Validation watermark | 1–3 lines (every applicable cause's sentence when several fire) | Trust calibration (confidence < high, or ring_coverage.IT = 0) |
 | Top 3 Strengths | 1 sentence each, with one data point | What's working |
 | Top 3 Risks | 2 sentences each: the risk + what happens if ignored | What kills it |
 | Riskiest Assumption | 3–5 sentences | The one thing to test before building anything |
@@ -76,7 +76,7 @@ The kit contains:
 ## Process
 
 1. Load `scores.json` and all available dimension files.
-2. Check `score_confidence`. If not "high", compose a validation watermark (see below).
+2. Check `score_confidence`. If not "high", compose a validation watermark (see below). Independently: if `ring_coverage` exists and its `IT` count is 0, the NO-RING-1 watermark row applies regardless of confidence.
 3. Identify the 3 highest-scoring dimensions → strengths. For each, pull one concrete data point from the source file (e.g., "k-factor estimated at 0.6" not "good viral potential").
 4. Identify the 3 lowest-scoring dimensions → risks. For each, describe what goes wrong if ignored. If `weaknesses.json` exists, use its `root_cause_type` and `failure_mode` to add specificity.
 5. Extract the RAT from `scores.json.riskiest_assumption_test`. Frame it as the one question to answer before writing a line of code.
@@ -100,8 +100,9 @@ If `score_confidence` from `scores.json` is not "high", insert a watermark immed
 | **medium** | "This score is based on incomplete data. {list missing dimensions}. Run these analyses before making a build/no-build decision." |
 | **low** (missing dimensions) | "LOW CONFIDENCE — Only {N} of 6 dimensions scored. This verdict is directional, not conclusive. Required before acting: {list mandatory missing analyses}." |
 | **low** (`evidence_gate.triggered`) | "DESK-LIMITED — only {observations_counted} in-market observations found (threshold {threshold}). This market under-produces public evidence; the score is capped and the interview kit below is the required next step." |
+| **any** (`ring_coverage.IT` = 0, b2c) | "RING-1 BLIND — zero Italy-ring findings were labeled for this Italy-first idea; every signal is EU-EN/Western. Ring-1 demand is unvalidated: treat Italian sizing, pricing, and channel assumptions as untested until an Italian surface is checked." |
 
-If both causes apply, emit both rows' sentences.
+If several causes apply, emit every applicable row's sentence.
 
 ### Pre-mortem Method
 

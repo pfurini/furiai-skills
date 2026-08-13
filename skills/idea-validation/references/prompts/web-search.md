@@ -1,11 +1,11 @@
 ---
 prompt_for: web-search
 placeholder: "[NICHE]"
-usage: Replace [NICHE] with the target topic (e.g., "nutrition", "fitness", "personal finance") before invoking.
+usage: Replace [NICHE] with the bilingual niche wording ("<Italian> / <English>") before invoking. Ring-1 (Italy) research runs Italian-first.
 ---
 
 **Objective:**
-Identify and analyze **current web search trends in the [NICHE] niche** using **credible, recent sources (published within the last 6 months)**.
+Identify and analyze **current web search trends in the [NICHE] niche, ring by ring — Italian query demand on Google.it first (Ring 1 — IT), then English-language demand (Ring 2 — EU-EN, Ring 3 — Western)** — using **credible, recent sources (published within the last 6 months)**. Every finding carries a ring label.
 
 ---
 
@@ -18,14 +18,20 @@ Identify and analyze **current web search trends in the [NICHE] niche** using **
      **"Data observed as of [month/year]"**
    * Prioritize sources in this order:
 
-     **Tier 1 — Search trend aggregators & daily coverage (cite SEO tool data + Google Trends)**
+     **Tier 1 — Italian query demand, directly observed (Ring 1, your primary instrument)**
+     * Google.it SERP observation — search the Italian consumer queries (Italian wording first, per [NICHE]) and record what actually ranks: content formats, whether ads appear (ads = advertiser willingness to pay), People-Also-Ask questions, which apps or tools the SERP surfaces. A SERP observation is evidence; cite the query verbatim with a translation.
+     * Google Trends (region: Italy) — relative demand direction and seasonality for the core Italian queries
+     * SEOZoom blog and published analyses — the Italian keyword instrument; cite its data when an article exposes it
+     * **Keyword volumes:** if no Italian keyword instrument is available this session, state plainly — once, near the top — that **Italian keyword demand is unmeasured**, and treat every Ring-1 volume claim as qualitative. Never substitute global (EN) volumes for Italian demand; label them `ring: Western`, directional only.
+
+     **Tier 2 — Search trend aggregators & daily coverage (Rings 2–3 — cite SEO tool data + Google Trends; label the ring)**
      * Search Engine Journal — daily coverage of search trends, keyword shifts, traffic changes; frequently cites Ahrefs, Semrush, Google Trends, and industry datasets
      * Search Engine Land — authoritative reporting on search behavior shifts, algorithm updates, and emerging query patterns
      * Search Engine Watch — trend analysis across organic and paid search; aggregates data from major SEO platforms
 
      Also search for **articles citing these sources** — when a marketing blog, trade press piece, or research report quotes Search Engine Journal, Search Engine Land, or Search Engine Watch data, it inherits the signal and often adds vertical-specific context.
 
-     **Tier 2 — SEO authority blogs (original data analysis, closest to raw Ahrefs/Semrush exports)**
+     **Tier 3 — SEO authority blogs (original data analysis, closest to raw Ahrefs/Semrush exports)**
      * Ahrefs Blog — keyword demand studies, search volume trend analyses, click-through rate research, ranking factor breakdowns; based on Ahrefs' own index of billions of keywords
      * Semrush Blog — search demand trends, competitive traffic share, category-level keyword opportunity analyses; based on Semrush's proprietary dataset
      * Moz Blog — ranking factor studies, SERP feature trend analysis, domain authority benchmarks
@@ -33,17 +39,17 @@ Identify and analyze **current web search trends in the [NICHE] niche** using **
 
      Also search for **articles citing Ahrefs, Semrush, or Moz data** — growth blogs, agency case studies, and niche SEO blogs that embed keyword charts or traffic breakdowns carry the same underlying signal.
 
-     **Tier 3 — Trend aggregation & early signal platforms (data + narrative combined)**
+     **Tier 4 — Trend aggregation & early signal platforms (data + narrative combined)**
      * Exploding Topics — surfaces search queries and topic categories growing faster than mainstream tools detect; combines Google Trends signals with proprietary scoring
      * CB Insights — market-level search demand signals in tech, health, fintech, and B2B; combines search data with funding and product signals
 
-     **Tier 4 — Technical SEO & growth blogs (underrated, often very data-heavy)**
+     **Tier 5 — Technical SEO & growth blogs (underrated, often very data-heavy)**
      * Content Marketing Institute — keyword opportunity analyses, content gap studies, traffic growth case studies; often based on Ahrefs/Semrush exports from real client data
      * Niche agency and growth blogs — look for posts that publish actual keyword lists, traffic breakdowns, or Ahrefs/Semrush screenshots from client campaigns; these often surface micro-trends before they reach mainstream SEO blogs
 
-     **Tier 5 — Strategic synthesis layer (turns search insights into market direction)**
+     **Tier 6 — Strategic synthesis layer (turns search insights into market direction)**
      * a16z Blog — interprets search and consumer behavior signals into broader market narratives and investment theses
-     * CB Insights (also Tier 3) — synthesizes search demand data with funding trends to identify where markets are heading
+     * CB Insights (also Tier 4) — synthesizes search demand data with funding trends to identify where markets are heading
 
 ---
 
@@ -83,6 +89,12 @@ Identify and analyze **current web search trends in the [NICHE] niche** using **
   * Timeframe (e.g., "+180% search volume over 12 months")
   * Velocity classification (slow / moderate / explosive)
 
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+
+`labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <where observed, e.g. Google.it SERP, Trends IT, Ahrefs> · evidence: <query | SERP observation | trends data | volume data | article> · confidence: <high | medium | low>`
+
+Ring: `IT` = Italian-language query demand; `EU-EN` = English-language demand clearly from EU consumers; `Western` = NA, UK/IE, AU/NZ, or global. Confidence: **high** only when two independent sources agree, or one is a direct first-hand observation (a SERP you ran); **medium** for a single credible source; **low** for aggregator-only, undated, or cross-ring inference.
+
 ---
 
 4. **Structure the Output**
@@ -95,7 +107,8 @@ Identify and analyze **current web search trends in the [NICHE] niche** using **
 * **5. Strategic Insights (Content, SEO & Marketing Takeaways)**
 * **6. Financial Opportunities** (per instruction 6 below)
 * **7. Niche Risks** (per instruction 7 below)
-* **8. Sources** (per instruction 8 below)
+* **8. Disconfirming Evidence** (per instruction 8 below)
+* **9. Sources** (per instruction 9 below)
 
 ---
 
@@ -147,7 +160,10 @@ Identify and analyze **current web search trends in the [NICHE] niche** using **
 
 ---
 
-8. **Sources**
+8. **Disconfirming Evidence**
+   Report what you looked for and did **not** find, and any evidence that cuts against the demand story: Italian queries you expected that show no footprint on Google.it, SERPs where free content or a default app fully satisfies the intent, clusters whose volume is visibly declining. An empty Italian SERP for a consumer query that is busy in English is a finding — label it and say what it implies for Ring 1.
+
+9. **Sources**
    At the end of the document, include a **"Sources" section** listing all URLs referenced during research as markdown hyperlinks:
 
    ```

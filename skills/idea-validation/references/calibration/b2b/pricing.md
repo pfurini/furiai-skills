@@ -15,6 +15,17 @@ are quoted "+ IVA"; consumer-style VAT-inclusive display reads B2C).
 > using them. Driver premium multipliers remain provisional constructs
 > (`confidence: low`).
 
+## Contents
+
+- The €50/month line (governs model choice and the guardrail)
+- Pricing Models
+- Driver-Premium Multipliers
+- WTP Benchmarks by Category (EUR ex-VAT, Italian market)
+- Entry-Model Conversion Benchmarks (fills `freemium_conversion_estimate`)
+- Plan Structure
+- Secondary Revenue Path (self-serve → expansion)
+- Notes
+
 ## The €50/month line (governs model choice and the guardrail)
 
 Across the Italian pricing research, self-serve purchasing visibly thins out

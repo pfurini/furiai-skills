@@ -16,6 +16,15 @@ cancelling it would break something.
 > global tables apply. `confidence: high` on the churn-by-ARPA table;
 > `medium` on activation (Lenny's 2022 — stale, directional).
 
+## Contents
+
+- Stickiness Factor Anchors (workflow embedding)
+- Churn Benchmarks by Price Band
+- Filling the Schema's `estimated_retention` Block
+- Expansion Note (feeds LTV downstream)
+- Churn Risk Factor Library
+- Verdict Thresholds
+
 ## Stickiness Factor Anchors (workflow embedding)
 
 Score each schema factor 1–5 against these B2B interpretations:

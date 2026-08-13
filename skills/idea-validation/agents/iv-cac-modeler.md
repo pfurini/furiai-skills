@@ -164,8 +164,11 @@ If market_insights show `trend_velocity` = "rising-fast", add a note that organi
 
 Write to `.idea-validation/ideas/<slug>/cac.json` (create missing parent directories):
 
+The top-level `confidence` field is the artifact's evidence confidence: **high** = the load-bearing figures are corroborated by two independent sources or direct observation; **medium** = single-source coverage; **low** = mostly constructs, pack defaults, or acknowledged gaps.
+
 ```json
 {
+  "confidence": "high | medium | low",
   "ltv": {
     "estimated_ltv": 0,
     "arpu_monthly": 0,

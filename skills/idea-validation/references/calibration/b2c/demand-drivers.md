@@ -6,15 +6,20 @@ rules for the B2C target. The scoring mechanism lives in the agent brief.
 
 ## Driver Set
 
+> **Driver names are load-bearing.** The five dimension names — survival,
+> status, belonging, control, curiosity — are the keys of the pricing
+> pack's premium-multiplier table and the values of `primary_driver` in
+> `desire_scores.json`. Never rename them; the coupling breaks silently.
+
 Read `core-human-desires.md` (in this same directory) before scoring — it
 defines the ten underlying desires the five dimensions aggregate.
 
 | Dimension | Description | Aggregates (from core-human-desires.md) | Example App |
 |---|---|---|---|
-| Survival | Health, safety, financial security | 1 Survival & Physical Security, 2 Pain Avoidance | Calorie tracker, budgeting app |
+| Survival | Health, safety, financial security | 1 Survival & Physical Security, 2 Pleasure & Pain Avoidance | Calorie tracker, budgeting app |
 | Status | Looking good, achieving, being seen | 4 Status & Recognition, 8 Identity & Self-Consistency | Fitness leaderboard, portfolio tracker |
 | Belonging | Community, connection, not being alone | 3 Social Belonging | Group savings, running clubs |
-| Control | Mastery, autonomy, reducing chaos | 5 Control & Autonomy, 6 Competence & Progress | Task manager, habit tracker |
+| Control | Mastery, autonomy, reducing chaos | 5 Control & Autonomy, 6 Competence & Progress, 10 Fairness & Justice | Task manager, habit tracker, bill splitter |
 | Curiosity | Learning, discovery, novelty | 9 Novelty & Curiosity, 7 Meaning & Purpose | Language app, quiz game |
 
 ## Derived Signals

@@ -20,6 +20,18 @@ thresholds live in the agent brief.
 >    count as a TAM**: the plausibly-paying-for-SaaS population is in the
 >    hundreds of thousands, not millions.
 
+## Contents
+
+- Step 0 — Buyer redirection (mandatory, before any sizing)
+- Business-Count Anchors (Approach A-bis — population × ACV; the primary approach)
+- Intent Conversion Benchmarks (Approach A — search volume)
+- Community & Review Proxies (Approach B — weakest in Italy)
+- Platform Filter
+- SOM Capture Rates
+- Outcome Reality Check (mandatory)
+- Reality-check thresholds and SOM verdict bands (read by the market-sizer brief)
+- Fallback Price (when pricing.json is absent)
+
 ## Step 0 — Buyer redirection (mandatory, before any sizing)
 
 Decide **who the buyer is** for this category. In Italy, ~75% of taxpayers

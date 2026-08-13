@@ -15,6 +15,15 @@ the agent brief.
 > review→customer proxy is `confidence: low` (worse in Italy — Italians
 > under-review).
 
+## Contents
+
+- Direct Competitor Sources (search in order; queries Italian-first)
+- User-Base Estimation (Italy recalibration)
+- Primary Search Surface Methodology — bilingual keyword sets
+- Substitutes — Italian B2B specifics
+- Emerging Threat Sources
+- Saturation Factor Anchors (Italy-recalibrated)
+
 ## Direct Competitor Sources (search in order; queries Italian-first)
 
 1. **Incumbent suite check** (before anything else): does a TeamSystem /

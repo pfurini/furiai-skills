@@ -1,11 +1,11 @@
 ---
 prompt_for: tiktok
 placeholder: "[NICHE]"
-usage: Replace [NICHE] with the target topic (e.g., "nutrition", "fitness", "personal finance") before invoking.
+usage: Replace [NICHE] with the bilingual niche wording ("<Italian> / <English>") before invoking. Ring-1 (Italy) research runs Italian-first.
 ---
 
 **Objective:**
-Identify and analyze **current TikTok trends in the [NICHE] niche** using **credible, recent sources (published within the last 6 months)**.
+Identify and analyze **current TikTok trends in the [NICHE] niche, ring by ring — TikTok Italy first (Ring 1 — IT), then European-English and Western signal (Ring 2 — EU-EN, Ring 3 — Western)** — using **credible, recent sources (published within the last 6 months)**. Every finding carries a ring label.
 
 ---
 
@@ -16,11 +16,20 @@ Identify and analyze **current TikTok trends in the [NICHE] niche** using **cred
    * Use only **credible and recent sources (≤ 6 months old)**
    * At the beginning of the response, clearly state:
      **"Data observed as of [month/year]"**
-   * Prioritize sources such as:
+   * Prioritize sources in this order:
 
-     * TikTok Creative Center
-     * Industry reports (e.g., marketing, social media analytics platforms)
-     * Reputable media (e.g., industry-relevant publications, trade press, tech/media outlets)
+     **Tier 1 — TikTok Italy direct observation (Ring 1, your primary instrument)**
+     * TikTok Creative Center with the country filter set to Italy — trending hashtags, songs, and creators for the Italian market
+     * Italian-language hashtag and content observation for the [NICHE] queries (search the Italian wording first): what Italian creators post, what engagement it draws, which formats repeat
+
+     **Tier 2 — Italian TikTok market reports (Ring 1, secondary)**
+     * ONIM monthly sponsored-content reports (onim.it) — measured Italian TikTok activation volumes by sector
+     * IAB Italia AdReport influencer editions and DeRev listino press coverage — Italian creator-market structure
+
+     **Tier 3 — Global TikTok trend coverage (Rings 2–3 — label the ring)**
+     * TikTok Creative Center without the Italy filter, industry reports (marketing and social-media analytics platforms), reputable media (industry-relevant publications, trade press, tech/media outlets)
+
+     Also search for **articles and reports that cite these sources** — coverage quoting Creative Center, ONIM, or analytics-platform data inherits their fidelity and often adds interpretive context.
 
 ---
 
@@ -56,7 +65,13 @@ Identify and analyze **current TikTok trends in the [NICHE] niche** using **cred
 
   * Growth rate (% increase over time OR absolute increase in views/posts)
   * Timeframe of growth (e.g., "+120% in 30 days")
-  * Velocity classification (e.g., slow, moderate, explosive)
+  * Velocity classification (slow / moderate / explosive)
+
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+
+`labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <where observed, e.g. Creative Center IT, hashtag page> · evidence: <hashtag metrics | content observation | report | article> · confidence: <high | medium | low>`
+
+Ring: `IT` = Italian-language / Italian-market signal; `EU-EN` = English-language signal clearly from EU consumers; `Western` = NA, UK/IE, AU/NZ, or global. Confidence: **high** only when two independent sources agree, or one is a direct first-hand observation you fetched; **medium** for a single credible source; **low** for aggregator-only, undated, or cross-ring inference.
 
 ---
 
@@ -70,7 +85,8 @@ Identify and analyze **current TikTok trends in the [NICHE] niche** using **cred
 * **5. Strategic Insights (Marketing Takeaways)**
 * **6. Financial Opportunities** (per instruction 6 below)
 * **7. Niche Risks** (per instruction 7 below)
-* **8. Sources** (per instruction 8 below)
+* **8. Disconfirming Evidence** (per instruction 8 below)
+* **9. Sources** (per instruction 9 below)
 
 ---
 
@@ -122,7 +138,10 @@ Identify and analyze **current TikTok trends in the [NICHE] niche** using **cred
 
 ---
 
-8. **Sources**
+8. **Disconfirming Evidence**
+   Report what you looked for and did **not** find, and any evidence that cuts against the trend story: Italian hashtags you expected that show no traction, formats that died after a spike, engagement that never turns into product-seeking. A thin Italian TikTok footprint for a niche that is loud in English is a finding — label it and say what it implies for Ring 1.
+
+9. **Sources**
    At the end of the document, include a **"Sources" section** listing all URLs referenced during research as markdown hyperlinks:
 
    ```

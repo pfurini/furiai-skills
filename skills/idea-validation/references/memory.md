@@ -41,10 +41,11 @@ Persistent state for this pack. All specialist inputs and outputs use this tree.
 - `user_profile.md` is updated incrementally (later steps merge fields).
 - `market_insights/` is append-only: new dated file per run, never overwrite.
 - Each `.json` artifact contains one JSON object and nothing else — no code fences, no commentary before or after.
+- Every artifact carries a top-level `confidence: high | medium | low` field (JSON key or YAML frontmatter): the writing agent's evidence confidence, defined in each agent file. Additive and target-neutral.
 
 ## Target (`idea.md` frontmatter)
 
-Each idea carries `target: b2c | b2b` in its `idea.md` frontmatter, set once at workflow entry. It selects the calibration packs (`references/calibration/<target>/`) every specialist and the scoring step load. Absent → `b2c`. B2B ideas also carry `segment_size: micro | small | medium` (absent → micro/small; `medium` always triggers the sales-motion check in SKILL.md) and `sales_motion: self-serve | assisted-self-serve | sales-led` (the band inferred at workflow entry per SKILL.md). The artifact schemas are identical for both targets — only the rubrics and benchmarks behind them differ.
+Each idea carries `target: b2c | b2b` in its `idea.md` frontmatter, set once at workflow entry. It selects the calibration packs (`references/calibration/<target>/`) every specialist and the scoring step load. Absent → `b2c`. B2C ideas are validated ring by ring (Ring 1 Italy, Ring 2 Europe-English, Ring 3 Western — defined once in SKILL.md's Target section); findings and benchmark figures in b2c artifacts carry ring labels (`IT | EU-EN | Western`), and market sizing reports SAM per ring, Italy first. B2B ideas also carry `segment_size: micro | small | medium` (absent → micro/small; `medium` always triggers the sales-motion check in SKILL.md) and `sales_motion: self-serve | assisted-self-serve | sales-led` (the band inferred at workflow entry per SKILL.md). The artifact schemas are identical for both targets — only the rubrics and benchmarks behind them differ.
 
 ## Idea lifecycle (`idea.md` status)
 

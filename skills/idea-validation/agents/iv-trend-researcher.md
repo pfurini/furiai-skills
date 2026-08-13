@@ -72,6 +72,7 @@ status: fresh
 stale_after: YYYY-MM-DD   # 6 months after analyzed_at
 trend_velocity: rising-fast | rising | stable | declining
 overall_verdict: hot | warm | cool | cold
+confidence: high | medium | low   # evidence confidence: high = corroborated by two independent sources or direct observation; medium = single-source; low = thin or indirect
 key_insight: "<one-sentence takeaway>"
 top_signals: []           # 3–5 bullet strings: top hashtags, subreddits, queries, or app categories
 monetization_evidence: [] # 1–3 strings: existing products/revenue that confirm willingness to pay

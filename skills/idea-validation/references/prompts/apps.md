@@ -1,11 +1,11 @@
 ---
 prompt_for: apps
 placeholder: "[CATEGORY]"
-usage: Replace [CATEGORY] with the target app category (e.g., "nutrition", "fitness", "personal finance") before invoking. Be specific.
+usage: Replace [CATEGORY] with the bilingual category wording ("<Italian> / <English>") before invoking. Be specific. Ring-1 (Italy) research runs Italian-first.
 ---
 
 **Objective:**
-Identify and analyze **current trends in the [CATEGORY] app category** (covering both **mobile apps and web apps**) using **credible, recent sources (published within the last 6 months)**.
+Identify and analyze **current trends in the [CATEGORY] app category** (covering both **mobile apps and web apps**), ring by ring — **the Italian storefronts first (Ring 1 — IT), then Western/global signal (Ring 2 — EU-EN, Ring 3 — Western)** — using **credible, recent sources (published within the last 6 months)**. Every finding carries a ring label.
 
 ---
 
@@ -18,41 +18,46 @@ Identify and analyze **current trends in the [CATEGORY] app category** (covering
      **"Data observed as of [month/year]"**
    * Prioritize sources in this order:
 
-     **Tier 1 — Direct analytics platform blogs (highest fidelity, actual paid data repackaged for free)**
+     **Tier 1 — Italian storefront direct observation (Ring 1, your primary instrument)**
+     * App Store Italy (apps.apple.com/it) — a distinct storefront with its own charts (Top app gratuite / Top app a pagamento, plus giochi) and Italian category names; read chart positions, "Acquisti in-app" price lists (EUR, VAT-inclusive), and Italian review complaints. The IT paid chart is dominated by small Italy-specific utilities — read it for niches a solo developer can reach.
+     * Google Play Italy — set BOTH URL parameters: `hl=it&gl=IT`. `hl=it` alone silently returns US-market content with Italian labels.
+     * Italian tech press covering the IT storefront (e.g. Apple's Italian year-end charts as reported by Italian outlets)
+
+     **Tier 2 — Direct analytics platform blogs (Rings 2–3 — highest fidelity, actual paid data repackaged for free; label the ring, and state each figure's geographic base — most have no Italy cut)**
      * Sensor Tower Blog — mobile app downloads/revenue, category deep dives, market shifts
      * data.ai Blog — downloads, revenue, engagement benchmarks, category reports
      * Appfigures Blog — App Store/Play Store ranking trends, monetization data
      * Similarweb Blog — web traffic trends, audience behavior, category-level web app benchmarks, referral and engagement data
 
-     Also search for **articles and reports that cite Tier 1 sources** — tech press, trade publications, and research reports that quote or reference Sensor Tower, data.ai, Appfigures, or Similarweb data inherit their fidelity and often add interpretive context. Examples: TechCrunch, Business of Apps, Axios, The Verge, Wired, and Statista reports covering app or web market data.
+     Also search for **articles and reports that cite Tier 2 sources** — tech press, trade publications, and research reports that quote or reference Sensor Tower, data.ai, Appfigures, or Similarweb data inherit their fidelity and often add interpretive context. Examples: TechCrunch, Business of Apps, Axios, The Verge, Wired, and Statista reports covering app or web market data.
 
-     **Tier 2 — Search & SEO intelligence blogs (web app demand signal)**
+     **Tier 3 — Search & SEO intelligence blogs (web app demand signal)**
      * Ahrefs Blog — organic search demand, keyword trends, content gap analysis; useful for surfacing high-intent web app categories
      * Semrush Blog — search volume trends, competitive landscape, traffic share by category; strong signal for web-first products
      * Exploding Topics — emerging app and web product categories, early-stage trend detection before mainstream coverage
 
      Also search for **articles citing Ahrefs, Semrush, or Exploding Topics data** — marketing and growth blogs that embed their keyword charts or trend graphs carry the same signal.
 
-     **Tier 3 — AI & emerging tool directories (early discovery signal)**
+     **Tier 4 — AI & emerging tool directories (early discovery signal)**
      * Futurepedia — AI tool directory tracking new entrants, categories, and user adoption signals
      * There's An AI For That — AI app/tool landscape, category clustering, use case mapping; useful for spotting emerging AI-native app niches
 
-     **Tier 4 — Growth & product blogs (analytical interpretation layer)**
+     **Tier 5 — Growth & product blogs (analytical interpretation layer)**
      * Lenny's Newsletter — growth loops behind breakout apps, product strategy case studies
      * a16z Blog — consumer behavior shifts, emerging app categories, investment signals
      * First Round Review — product and growth case studies from early-stage winners
      * TechCrunch — app launches, funding rounds, breakout consumer and B2B products, market coverage
 
-     **Tier 5 — Trend aggregation & funding intelligence**
+     **Tier 6 — Trend aggregation & funding intelligence**
      * CB Insights — AI, health, fintech app trends; funding signals; category reports
      * Morning Brew (Emerging Tech sections) — mainstream-crossing trends, consumer app culture
 
-     **Tier 6 — Mobile growth & ASO blogs (tactical, often reveals micro-trends early)**
+     **Tier 7 — Mobile growth & ASO blogs (tactical, often reveals micro-trends early)**
      * Phiture Blog — App Store ranking insights, keyword trends, conversion optimization
      * MobileAction Blog — ASO keyword trends, category movement
      * Gummicube Blog — App Store visibility tactics, early keyword signal
 
-     **Tier 7 — Indie hacker / builder ecosystem (earliest signal, often pre-blog)**
+     **Tier 8 — Indie hacker / builder ecosystem (earliest signal, often pre-blog)**
      * X (Twitter) — follow builders sharing "we hit 100k users," revenue dashboards, growth experiments
      * Reddit (r/startups, r/androidapps, r/iosapps, r/SideProject, r/webdev) — real user sentiment, breakout app discovery
 
@@ -84,7 +89,7 @@ Identify and analyze **current trends in the [CATEGORY] app category** (covering
 
 **C. Quantitative Metrics**
 
-* Mobile: downloads, DAU/MAU, revenue figures, or category growth rates (preferably from Tier 1 mobile sources)
+* Mobile: downloads, DAU/MAU, revenue figures, or category growth rates (preferably from Tier 2 mobile sources)
 * Web: monthly visits, traffic growth, engagement benchmarks (preferably from Similarweb or sources citing it)
 * Search demand: keyword search volume or trend trajectory (from Ahrefs, Semrush, or Exploding Topics)
 * App Store / Play Store ranking movement if available
@@ -96,6 +101,12 @@ Identify and analyze **current trends in the [CATEGORY] app category** (covering
   * Growth rate (% increase over time OR absolute increase in downloads/traffic/revenue)
   * Timeframe of growth (e.g., "+85% downloads in 60 days," "+200% organic search volume YoY")
   * Velocity classification (slow / moderate / explosive)
+
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+
+`labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <where observed, e.g. App Store IT chart, Play IT, Sensor Tower> · evidence: <chart position | price list | review pattern | report | article> · confidence: <high | medium | low>`
+
+Ring: `IT` = Italian-storefront / Italian-market signal; `EU-EN` = English-language signal clearly from EU consumers; `Western` = NA, UK/IE, AU/NZ, or global. Confidence: **high** only when two independent sources agree, or one is a direct first-hand observation you fetched; **medium** for a single credible source; **low** for aggregator-only, undated, or cross-ring inference.
 
 ---
 
@@ -109,7 +120,8 @@ Identify and analyze **current trends in the [CATEGORY] app category** (covering
 * **5. Strategic Insights (Product & Marketing Takeaways)**
 * **6. Financial Opportunities** (per instruction 6 below)
 * **7. Niche Risks** (per instruction 7 below)
-* **8. Sources** (per instruction 8 below)
+* **8. Disconfirming Evidence** (per instruction 8 below)
+* **9. Sources** (per instruction 9 below)
 
 ---
 
@@ -162,7 +174,10 @@ Identify and analyze **current trends in the [CATEGORY] app category** (covering
 
 ---
 
-8. **Sources**
+8. **Disconfirming Evidence**
+   Report what you looked for and did **not** find, and any evidence that cuts against the category story: an empty or incumbent-locked IT chart where you expected local entrants, categories whose IT storefront shows no Italian-language competitors (opportunity or absent demand — say which the evidence supports), download growth that does not survive a revenue check. A category thriving globally but invisible on the Italian storefront is a finding — label it and say what it implies for Ring 1.
+
+9. **Sources**
    At the end of the document, include a **"Sources" section** listing all URLs referenced during research as markdown hyperlinks:
 
    ```

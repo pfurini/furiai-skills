@@ -121,8 +121,11 @@ Evaluate the secondary revenue path defined in the calibration pack (for B2C: th
 
 Write to `.idea-validation/ideas/<slug>/pricing.json` (create missing parent directories):
 
+The top-level `confidence` field is the artifact's evidence confidence: **high** = the load-bearing figures are corroborated by two independent sources or direct observation; **medium** = single-source coverage; **low** = mostly constructs, pack defaults, or acknowledged gaps.
+
 ```json
 {
+  "confidence": "high | medium | low",
   "wtp_range": {
     "low": 0,
     "target": 0,

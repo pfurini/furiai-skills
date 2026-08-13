@@ -119,6 +119,14 @@ across this niche's `market_insights/` files, and a threshold.
 
 The gate caps, it never boosts — abundant evidence earns nothing extra here.
 
+The pack may instead define a **ring-coverage disclosure** (the b2c pack
+does): count the ring-labeled findings across this niche's
+`market_insights/` files per the pack's rule and write the counts to
+`ring_coverage` in the output. The disclosure caps nothing and boosts
+nothing — it makes the evidence's geography visible. When it reports zero
+Ring-1 (`IT`) findings, the decision memo adds the NO-RING-1 watermark —
+see `references/decision-memo.md`.
+
 ### Step 6 — Issue verdict
 
 | Score | Verdict | Meaning |
@@ -258,6 +266,7 @@ Write to `.idea-validation/ideas/<slug>/scores.json` (or `pivot_scores.json` for
     "threshold": 0,
     "rule": "<the counting rule applied, from the target's rubric pack — or 'none defined'>"
   },
+  "ring_coverage": "<b2c only: {\"IT\": 0, \"EU-EN\": 0, \"Western\": 0} — ring-labeled finding counts per the b2c rubric pack's disclosure rule; omit for b2b>",
   "final_score": 0,
   "verdict": "pursue | test | pivot | drop",
   "sales_motion": "<b2b only: self-serve | assisted-self-serve | sales-led, from idea.md frontmatter — omit for b2c>",

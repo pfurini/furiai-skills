@@ -1,11 +1,11 @@
 ---
 prompt_for: reddit
 placeholder: "[NICHE]"
-usage: Replace [NICHE] with the target topic (e.g., "nutrition", "fitness", "personal finance") before invoking.
+usage: Replace [NICHE] with the bilingual niche wording ("<Italian> / <English>") before invoking. Ring-1 (Italy) research runs Italian-first.
 ---
 
 **Objective:**
-Identify and analyze **current Reddit trends and community discussions in the [NICHE] niche** using **credible, recent sources (published within the last 6 months)**.
+Identify and analyze **current community discussions in the [NICHE] niche, ring by ring — Italian-language communities first (Ring 1 — IT), then English-language communities (Ring 2 — EU-EN, Ring 3 — Western)** — using **credible, recent sources (published within the last 6 months)**. Every finding carries a ring label.
 
 ---
 
@@ -18,12 +18,19 @@ Identify and analyze **current Reddit trends and community discussions in the [N
      **"Data observed as of [month/year]"**
    * Prioritize sources in this order:
 
-     **Tier 1 — Reddit-native sources (highest signal fidelity)**
+     **Tier 1 — Italian-language communities, verified active (Ring 1, your primary surface)**
+     * Niche Italian surfaces, verified active 2026-08 — re-verify (a post within ~60 days) before citing as live:
+       finance/budgeting r/ItaliaPersonalFinance, r/bollette · fitness r/ItalyFitness, bodyweb.com/forum, bbhomepage.com/forum · food r/veganita (dietary-identity; no live general-cooking sub exists) · parenting forum.alfemminile.com (no live parenting subreddit exists) · students/study r/Universitaly, r/polinetwork · gaming r/italygames, r/AnimeItaly · tech/apps r/ItalyInformatica (large but ~1 post/day), r/ItalyHardware, r/IA_Italia, hwupgrade.it/forum · calcio/fantacalcio r/seriea, r/Calcio, r/fantacalcio_IT · giardinaggio giardinaggio.it/forum, r/giardinaggioITA · modellismo modellismo.net/forum · motori r/ItalyMotori · travel r/ViaggiITA, r/TrekkingItaly · wellbeing r/psicologia, r/Psicologia_Italia, r/adhd_italia · consumer reviews/complaints altroconsumo.it community and bacheca dei reclami
+     * General Italian subreddits for cross-niche signal: r/italy, r/Italia, r/CasualIT, r/consigli (advice-seeking)
+     * **Language traps — never cite as Ring-1 evidence**: r/ItalianFood, r/italiancooking, r/mediterraneandiet, r/ItalyTravel, r/askitaly, r/italianlearning are English-language communities of foreigners; r/studenti is Croatian. Niches with NO live Italian-language surface (do not invent one): language learning, general cooking, parenting on Reddit, productivity-as-such — route those to the general subreddits and report the absence as a finding.
+     * Private Facebook and Telegram groups are **existence signals only**, never activity evidence; Telegram public channels are broadcast, not discussion.
+
+     **Tier 2 — Reddit-native sources (Rings 2–3 — label the ring)**
      * Reddit itself — search top posts by subreddit, sort by "Top / Past 6 months" or "Hot"; look for posts with high upvotes and comment volume as proxy for community-wide resonance
      * Reddit Search — use Reddit's native search to find recurring keywords, questions, and complaints within relevant subreddits
      * r/[niche-specific subreddits] — identify the 3–5 most active subreddits in the niche; note subscriber count and posting frequency as baseline metrics
 
-     **Tier 2 — Reddit analytics & aggregation tools**
+     **Tier 3 — Reddit analytics & aggregation tools**
      * Redditmetis — subreddit growth stats, posting trends, engagement benchmarks
      * Subreddit Stats (subredditstats.com) — subscriber growth over time, activity trends
      * Front Page Metrics — tracks what reaches Reddit's front page; useful for identifying crossover appeal
@@ -31,7 +38,7 @@ Identify and analyze **current Reddit trends and community discussions in the [N
 
      Also search for **articles and analyses that cite Reddit data or aggregate Reddit discussions** — marketing blogs, research papers, and journalists who quote upvote counts, comment volumes, or subreddit activity inherit Reddit's community signal. Examples: The Verge, Vice, Wired, BuzzFeed News covering viral Reddit threads.
 
-     **Tier 3 — Complementary community platforms (triangulate Reddit signal)**
+     **Tier 4 — Complementary community platforms (triangulate Reddit signal)**
      * X (Twitter) — check if Reddit discussions are spilling into Twitter/X threads, which amplifies signal
      * Quora — recurring questions that mirror Reddit thread patterns indicate sustained informational demand
 
@@ -76,6 +83,12 @@ Identify and analyze **current Reddit trends and community discussions in the [N
   * Timeframe (e.g., "subreddit grew +40% in 90 days")
   * Velocity classification (slow / moderate / explosive)
 
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+
+`labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <subreddit or forum where observed> · evidence: <thread | recurring post pattern | subscriber metric | report | article> · confidence: <high | medium | low>`
+
+Ring: `IT` = Italian-language / Italian-market signal; `EU-EN` = English-language signal clearly from EU consumers; `Western` = NA, UK/IE, AU/NZ, or global. Confidence: **high** only when two independent sources agree, or one is a direct first-hand observation you fetched; **medium** for a single credible source; **low** for aggregator-only, undated, or cross-ring inference.
+
 ---
 
 4. **Structure the Output**
@@ -88,7 +101,8 @@ Identify and analyze **current Reddit trends and community discussions in the [N
 * **5. Strategic Insights (Marketing & Product Takeaways)**
 * **6. Financial Opportunities** (per instruction 6 below)
 * **7. Niche Risks** (per instruction 7 below)
-* **8. Sources** (per instruction 8 below)
+* **8. Disconfirming Evidence** (per instruction 8 below)
+* **9. Sources** (per instruction 9 below)
 
 ---
 
@@ -142,7 +156,10 @@ Identify and analyze **current Reddit trends and community discussions in the [N
 
 ---
 
-8. **Sources**
+8. **Disconfirming Evidence**
+   Report what you looked for and did **not** find, and any evidence that cuts against the demand story: Italian communities you expected that do not exist or are dead, recurring threads where the consensus is "the free tool is enough", topics whose post frequency is visibly declining. An absent or silent Italian-language community for a niche that is loud in English is a finding — label it and say what it implies for Ring 1.
+
+9. **Sources**
    At the end of the document, include a **"Sources" section** listing all URLs referenced during research as markdown hyperlinks:
 
    ```

@@ -86,7 +86,7 @@ When the user has no idea what they want to build or prefers not to answer perso
 4. After each batch, the user either:
    - Says **"more"** (or similar) → show the next batch
    - Says **"continue"** / **"let's go"** / **"generate"** (or similar) → proceed with selected domains
-5. Show up to 4 batches (20 domains total). If they haven't picked after all batches, ask: "None of these? Tell me in your own words what kind of problems or people interest you."
+5. Show up to 5 batches (25 domains total). If they haven't picked after all batches, ask: "None of these? Tell me in your own words what kind of problems or people interest you."
 6. Once the user says "continue" with 2–3 domains selected, ask one quick follow-up: "Last question — what's your technical level? (no-code / beginner / intermediate / expert)"
 7. Write the profile and proceed.
 
@@ -177,6 +177,25 @@ Present exactly this:
 >
 > **20. Spirituality & Mindfulness** — People pay to find meaning, build rituals, and feel grounded.
 > *Examples: meditation timers, prayer trackers, astrology journals, daily intention setters*
+
+### Batch 5 — Business Tools (Italy-first B2B)
+
+> These are tools sold to Italian businesses and professional firms rather than consumers — picking one means the ideas generated from it carry `target: b2b` (see SKILL.md's Target section). Mixing business and consumer picks is fine; each generated idea states its target.
+>
+> **21. Tools for Studi Professionali** — Commercialisti, consulenti del lavoro, and law firms pay for anything that cuts client-document chasing and adempimenti time.
+> *Examples: client document portals, scadenze dashboards, engagement-letter generators, antiriciclaggio checklists*
+>
+> **22. E-commerce & Merchant Operations** — Italian online sellers pay to manage orders, returns, and marketplace overhead.
+> *Examples: returns dashboards, fatturazione integrations, marketplace fee calculators, shipping tools*
+>
+> **23. Artigiani & Local Services** — Italian tradespeople pay for simple quoting, scheduling, and payment chasing.
+> *Examples: preventivo builders, job schedulers, payment reminders, worksite photo documentation*
+>
+> **24. Agencies & Freelance Studios** — Italian agencies pay to run client work profitably.
+> *Examples: time trackers, project profitability dashboards, client reporting tools, retainer managers*
+>
+> **25. HoReCa & Hospitality** — Italian bars, restaurants, and B&Bs pay to fill seats and cut admin.
+> *Examples: booking managers, menu/allergen tools, channel managers, review responders*
 
 ### After selection — Mandatory technical ability question
 

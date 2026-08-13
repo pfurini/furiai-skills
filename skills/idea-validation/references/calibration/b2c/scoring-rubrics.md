@@ -5,10 +5,20 @@ Loaded by the orchestrator (main thread) when scoring, per
 the B2C target. The algorithm — weights, floor penalty, missing-input
 discount, verdict bands, RAT, screening — lives in `references/scoring.md`.
 
-## Evidence-sufficiency gate
+## Evidence gate and ring-coverage disclosure
 
-This target defines **no evidence gate** (scoring.md Step 5b is skipped;
-`evidence_gate.triggered` = false, rule = "none defined").
+This target defines **no evidence gate** (`evidence_gate.triggered` =
+false, rule = "none defined") — consumer niches produce abundant global
+signal, so a count threshold would misfire.
+
+It defines instead a **mandatory ring-coverage disclosure** (scoring.md
+Step 5b). Counting rule: across this niche's `market_insights/` files,
+count the per-finding label lines (`labels — ring: ...`) by ring value —
+`IT`, `EU-EN`, `Western` — and write the three counts to `ring_coverage`
+in `scores.json`. Count label lines only; prose mentions of Italy do not
+count. The disclosure caps nothing and boosts nothing. If the `IT` count
+is 0, the decision memo adds the NO-RING-1 watermark (see
+`references/decision-memo.md`).
 
 Each dimension maps source data to a 0–100 sub-score. When source data uses qualitative labels, apply these conversions.
 
@@ -47,7 +57,7 @@ Adjust: +10 if top competitor complaints reveal an unserved pain point. -15 if a
 | LTV:CAC < 2:1 OR viability_verdict = "not-viable" | 10–34 |
 | No pricing data or CAC data | 0–9 (flag as missing) |
 
-Adjust: +10 if `freemium_conversion_estimate` > 5%. +5 if market_size_verdict = "large".
+Adjust: +10 if `freemium_conversion_estimate` > 5% (anchored to the pricing pack's freemium table: 5% sits at the top of the typical free-user→paid band for most categories, so exceeding it is a genuine monetization edge — credit it only when the estimate's rationale shows strong value gating, not hope). +5 if market_size_verdict = "large".
 
 ## Distribution (0–100)
 

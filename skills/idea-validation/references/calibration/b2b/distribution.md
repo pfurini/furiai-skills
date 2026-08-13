@@ -11,6 +11,15 @@ process live in the agent brief.
 > Reminder from the CAC pack: **cold email/PEC is legally excluded in
 > Italy** — never list it as an organic fallback here.
 
+## Contents
+
+- Growth Loop Types
+- Platform Advantage Rubric — Marketplace Listing Opportunity
+- Advocacy Channel Rubric — Founder Content & Community Fit
+- Intermediary & Events Surface (Italy-specific, feeds channel notes)
+- Paid Budget Tiers
+- Verdict Logic
+
 ## Growth Loop Types
 
 B2B self-serve tools spread through work artifacts and teams, not social
@@ -113,7 +122,7 @@ Budget tiers use the same vocabulary as the CAC specialist:
 | Budget tier | Monthly ad spend | Viable paid strategies |
 |---|---|---|
 | **Bootstrap** (≤ €100/mo) | Testing only | High-intent Italian niche keywords, exact match. Not a primary channel. |
-| **Lean** (€100–500/mo) | Narrow campaigns | Google Ads on Italian long-tail solution keywords; site retargeting (Meta, ~€0.43 CPC). LinkedIn NOT viable at this tier. |
+| **Lean** (€100–500/mo) | Narrow campaigns | Google Ads on Italian long-tail solution keywords; site retargeting (Meta, ~€0,43–0,50 CPC — currency basis unresolved, see the CAC pack). LinkedIn NOT viable at this tier. |
 | **Moderate** (€500–2,000/mo) | Real optimization | Search + retargeting with tested landing pages; a yearly fair as a discrete bet. |
 | **Serious** (> €2,000/mo) | Multi-channel | LinkedIn becomes testable, but only with ACV > €1,000/yr; keep search + retargeting running underneath. |
 

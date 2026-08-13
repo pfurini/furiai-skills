@@ -1,26 +1,43 @@
-# Retention — B2C calibration
+# Retention — B2C calibration (Italy-first rings)
 
 Loaded by `iv-retention` via the CALIBRATION path in its dispatch prompt.
 Defines the stickiness factor anchors, retention benchmarks, churn-risk
 library, and verdict thresholds for the B2C target. The scoring mechanics
 live in the agent brief.
 
+> Sources: retention benchmarks are global all-install data — Adjust
+> retention handbook (undated, flag), Statista 2024 study of 1,000+ apps via
+> 2024 roundups (stale, directional), AppsFlyer aggregates. **No
+> Italy-specific retention dataset exists** (say so if asked); retention is
+> a product construct, not a geography construct, so the same table applies
+> across rings. The category-range table below is a **construct**
+> (`confidence: low`): it describes **well-executed subscription apps** —
+> the kind a positive validation verdict recommends building — not category
+> medians. The published cross-industry medians are far lower (D1 ~25% ·
+> D7 ~13% · D30 ~3–7%; per-vertical D30 spans 2.3% gaming to 11.6% digital
+> banking). A subscription-app retention premium is widely asserted but
+> unverified at any open primary source. Never quote a pack range as an
+> industry median.
+
 ## Stickiness Factor Anchors (habit formation)
 
-Score each factor 1–5 against these anchors:
+Score each schema factor 1–5 against these anchors:
 
-| Factor | 5 (high retention signal) | 1 (low retention signal) |
+| Factor (schema key) | 5 (high retention signal) | 1 (low retention signal) |
 |---|---|---|
-| Usage frequency | Problem recurs multiple times per day | Problem recurs monthly or less |
-| External trigger | A real-world event cues every use (meal, workout, payday) | No natural trigger — the user must remember the app exists |
-| Progress/reward loop | Visible progress accumulates every session | No feedback loop |
-| Network effects | Gets better with more users | No network component |
-| Data lock-in | User data accumulates and would hurt to lose | Nothing to lose by leaving |
-| Habit stack | Slots into an existing daily routine | Requires building a new behavior from scratch |
+| Usage frequency (`usage_frequency`) | Problem recurs multiple times per day | Problem recurs monthly or less |
+| External trigger (`external_trigger`) | A real-world event cues every use (meal, workout, payday) | No natural trigger — the user must remember the app exists |
+| Progress/reward loop (`progress_reward_loop`) | Visible progress accumulates every session | No feedback loop |
+| Network effects (`network_effects`) | Gets better with more users | No network component |
+| Data lock-in (`data_lock_in`) | User data accumulates and would hurt to lose | Nothing to lose by leaving |
+| Habit stack (`habit_stack`) | Slots into an existing daily routine | Requires building a new behavior from scratch |
 
 ## Retention Benchmarks by Category
 
-Use these as the starting range for D1/D7/D30 estimates. The D30 columns match the fallback table in the CAC pack — if you change one, change both.
+Use these as the starting range for D1/D7/D30 estimates **only when the
+concept clears the stickiness anchors** (see the positioning rules). The
+D30 columns match the fallback table in the CAC pack — if you change one,
+change both.
 
 | Category | D1 | D7 | D30 |
 |---|---|---|---|
@@ -33,12 +50,21 @@ Use these as the starting range for D1/D7/D30 estimates. The D30 columns match t
 | Lifestyle / habit | 25–35% | 14–22% | 10–18% |
 | Creative tools | 25–35% | 15–24% | 12–20% |
 
+**Published-median floor (sourced, use it when the concept is weak):** the
+all-install cross-industry D30 median is **3–7%** (Adjust ~7% global;
+Statista 5.7%; AppsFlyer 3.36%). When two or more churn-risk factors apply,
+or `habit_formation_score` < 2.5, estimate from this floor — below the pack
+range — and say so in the rationale.
+
 **Position within the range:**
 - Top of range: `habit_formation_score` ≥ 4.0 AND `desire_strength_label` = "strong"
 - Bottom of range: `habit_formation_score` < 2.5 OR `desire_strength_label` = "weak"
 - Midpoint otherwise
 
-Then shift D30 by the primary demand driver: survival or control primary → +2 percentage points (recurring stakes keep users returning); curiosity primary → −2 points (novelty decays).
+Then shift D30 by the primary demand driver (construct — no published study
+links demand drivers to retention deltas): survival or control primary →
++2 percentage points (recurring stakes keep users returning); curiosity
+primary → −2 points (novelty decays).
 
 ## Churn Risk Factor Library
 
@@ -57,3 +83,9 @@ Check the concept against this library and list every factor that applies:
 - **sticky** if estimated D30 ≥ 15% and `habit_formation_score` ≥ 3.5
 - **disposable** if D30 < 8% or `habit_formation_score` < 2.0
 - **moderate** otherwise
+
+(Anchoring note: the "disposable" floor of 8% sits at or above the
+published all-install global median — deliberately. A median app IS
+disposable by this pack's standard: the thresholds classify indie
+build-worthiness against well-executed subscription apps, not industry
+normality.)

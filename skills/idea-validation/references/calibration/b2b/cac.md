@@ -14,6 +14,15 @@ verdict live in the agent brief.
 > relative channel ordering (referral/organic < paid). Always report the
 > derivation and mark absolute CACs as estimates.
 
+## Contents
+
+- Budget Tiers
+- Legal exclusion (Italy — overrides everything)
+- Channel Set and CAC Benchmarks (EUR)
+- Channel Relevance Filter
+- Lifespan Mapping (from retention.json — B2B semantics)
+- Payback Reference Points
+
 ## Budget Tiers
 
 | Tier | Monthly ad/marketing spend | Who this is | Implication |
@@ -61,9 +70,9 @@ These channel names are the keys of `cac_by_channel` in the output schema.
 | **Intermediary referral** (`intermediary_referral`) | Near-€0 cash; relationship + enablement effort | The commercialista/consulente/reseller recommendation is how Italian micro-firms actually adopt software — but credibility holds only INSIDE the studio's own workflow (large trust gap outside it). No published economics. `confidence: low` | Tool serves or visibly helps the studio itself; studio-side value prop exists | Tool is invisible to intermediaries or competes with what they sell |
 | **Events / fairs** (`events_fairs`) | One-time cohort; SMAU Milano ≈ €4,500+IVA a booth (regional de minimis programs can zero it for startup/PMI innovative) | Priced from published SMAU rates (2026). High-LTV channel class per MicroConf 2024 (conferences: 54% of >$5K-LTV companies). Lead quality real, volume modest. `confidence: medium` on cost, `low` on yield | ACV justifies it; founder can work a booth in Italian; regional funding available | Low ACV; no follow-up capacity (remember: no cold email after — collect consent AT the fair) |
 | **Cold outbound** (`cold_outbound`) | **viable: false — prohibited in Italy** (see Legal exclusion) | Statutory; Garante enforcement record | — | — |
-| **Paid search** (`paid_search`) | €300–1,500 per paying customer (planning range) | Derived: Italian B2B-intent CPC €1.50–4.00 (planning range, no methodology-disclosed study) × landing conv 2–5% × trial→paid 4–35%. Milan/Rome +20–50% CPC premium. `confidence: low` throughout | Exact-match Italian long-tail solution keywords; card trial | Broad keywords; freemium entry; Q4 auction pressure |
+| **Paid search** (`paid_search`) | €300–1,500 per paying customer (planning range) | Derived: Italian B2B-intent CPC €1.50–4.00 (planning range, no methodology-disclosed study) × landing conv 2–5% × trial→paid 4–35%. A Milan/Rome +20–50% CPC premium circulates but traces to US-adapted or undisclosed-sample sources — treat it as an untested assumption, not a measurement. `confidence: low` throughout | Exact-match Italian long-tail solution keywords; card trial | Broad keywords; freemium entry; Q4 auction pressure |
 | **Paid social — LinkedIn** (`paid_social_linkedin`) | Not viable below ~€2,000/mo (CPL ≈ €207, single source) | Impactable 2025 (LinkedIn, sample undisclosed). `confidence: low` | ACV > €1,000/yr AND Moderate+ budget | Everything else — exclude by default at indie budgets |
-| **Paid social — Meta retargeting** (`paid_social_meta`) | CPC ~€0.43 — cheap retargeting of site visitors; thin cold-B2B decision-maker pool | Meta global median country-cut. `confidence: low` | Retargeting warm site traffic with a self-serve offer | Cold prospecting for decision-makers; no traffic to retarget |
+| **Paid social — Meta retargeting** (`paid_social_meta`) | CPC ~€0,43–0,50 (Superads Italy median; the page states no currency, so the level is unresolved — the defensible figure is the ratio: ~50% below the global median) — cheap retargeting of site visitors; thin cold-B2B decision-maker pool | Superads Italy country cut, all-industries. `confidence: low` | Retargeting warm site traffic with a self-serve offer | Cold prospecting for decision-makers; no traffic to retarget |
 | **Referral / word of mouth** (`referral_word_of_mouth`) | €0–150 | Consistently the lowest-CAC channel across published rankings (no single citable source; confidence: low); peer advocacy through ordini/associations is the Italian variant | k ≥ 0.2 from distribution.json; client-facing artifacts; affiliate at €20+/mo price | No loop; solitary back-office tool |
 | **Integration partnerships** (`integration_partnerships`) | Effort-priced; near-€0 marginal | FIC App Store listing, connector ecosystems (bindCommerce-class), Zapier; incumbent partner programs beyond FIC are contact-gated — model as slow. `confidence: low` | Tool completes a workflow gap in an open ecosystem | Target incumbent has no API (Danea-class) or partner-gates it (Zucchetti-class) |
 | **Launch platforms** (`launch_platforms`) | One-time spike, heavily discounted for Italy | Product Hunt/HN audiences barely overlap Italian professional buyers — expect the low end of the global folklore range (tens of signups), near-zero for vertical niches. `confidence: low` | Dev-tool niche with international appeal | Italian vertical niche (skip) |

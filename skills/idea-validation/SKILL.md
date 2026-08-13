@@ -44,6 +44,16 @@ If intent is ambiguous, ask one clarifying question, then route.
 
 Every idea and market carries `target: b2c | b2b`. Infer it from the wording — consumer apps, habits, and personal life → `b2c`; tools sold to businesses and operators (merchants, agencies, practices, studi, dev teams) → `b2b` — state your inference in the workflow announcement so the user can correct it, and default to `b2c` when genuinely unclear. Write it into `idea.md` frontmatter at entry and pass `TARGET:` plus the matching `CALIBRATION:` paths in every dispatch.
 
+### B2C target = Italy-first rings
+
+`b2c` ideas are validated **ring by ring**, Italy first:
+
+1. **Ring 1 — Italy**: the Italian-language consumer market. EUR, Italian surfaces (App Store IT, TikTok IT, Italian subreddits and forums, Google.it).
+2. **Ring 2 — Europe-English**: EU consumers reachable with an English-language app. EUR, English surfaces filtered to EU signal where possible.
+3. **Ring 3 — Western**: NA, UK/IE, AU/NZ. USD, the global benchmarks.
+
+Eastern markets are out of scope; app languages are Italian and English only. Every finding and figure carries a ring label — `IT | EU-EN | Western`, the vocabulary all b2c templates and packs reuse. Market sizing reports SAM per ring, Italy first; distribution and CAC benchmarks state which ring each figure belongs to. Scoring mechanics stay target-neutral — rings shape the evidence and the benchmarks, not the math.
+
 ### B2B target = Italian micro/small businesses, self-serve
 
 `b2b` here means **self-serve / PLG micro-SaaS sold Italy-first**: buyers are Italian micro (<10 employees) and small (10–49) businesses and professional firms (studi commercialisti, studi legali, consulenti del lavoro, agencies, merchants). Research runs on Italian sources and the B2B calibration packs carry Italian benchmarks. B2B ideas also carry `segment_size: micro | small | medium` in `idea.md` (absent → micro/small). `medium` (50–249 employees) is edge scope: always run the sales-motion check below and carry its outcome into the verdict artifacts.
@@ -54,9 +64,9 @@ Every idea and market carries `target: b2c | b2b`. Infer it from the wording —
 2. **Assisted self-serve** — self-serve pricing (entry ≲ €50/mo ex-VAT) but Italian buyers typically arrive through assisted onboarding or an intermediary's referral (commercialista, consulente, reseller). In scope; flag the band in every verdict artifact and model the intermediary as a distribution channel, not as sales-led drift.
 3. **Sales-led** — demos required to buy, procurement, security reviews, custom contracts; in Italy this reliably starts above ~€50/mo ex-VAT entry pricing, where buyers expect a demo/contract/dealer motion. Out of scope for desk-research validation: say plainly that this segment is validated through customer-discovery interviews, not market signals. Offer to proceed anyway, and if the user does, carry the caveat into every verdict artifact (scores, memo).
 
-### B2B research language
+### Research language
 
-Run B2B searches Italian-first (buyer vocabulary is Italian: "gestionale", "fatturazione elettronica"), English second. Dispatch NICHE bilingually — `NICHE: <Italian wording> / <English wording>`. Artifacts are written in English; Italian quotes stay verbatim with a translation.
+Run B2B searches Italian-first (buyer vocabulary is Italian: "gestionale", "fatturazione elettronica"), English second. B2C Ring-1 research is likewise bilingual: Italian-first surfaces and queries for Ring 1, English for Rings 2–3. Dispatch NICHE bilingually for both targets — `NICHE: <Italian wording> / <English wording>`. Artifacts are written in English; Italian quotes stay verbatim with a translation.
 
 ## How to run a workflow
 
@@ -86,7 +96,7 @@ PROJECT ROOT: <absolute path — all .idea-validation/ paths resolve against thi
 DATE: <today, YYYY-MM-DD — run `date '+%Y-%m-%d'`, never assume>
 TARGET: <b2c | b2b — from idea.md frontmatter; absent → b2c>
 SEGMENT: <b2b only — segment_size from idea.md; absent → micro/small>
-SLUG: <idea slug or market- slug>   NICHE: <exact niche wording to use everywhere; b2b: Italian / English>
+SLUG: <idea slug or market- slug>   NICHE: <exact niche wording to use everywhere; both targets: Italian / English>
 READ: <input paths for this step, per the workflow>
 CALIBRATION: <absolute path to references/calibration/<target>/<pack>.md — for agents whose brief asks for one>
 EXTRA: <platform + prompt template path for trend researchers; other reference paths where the agent file asks for them. For b2b dispatches include the tooling reference path (references/tooling.md) for trend researchers and the market sizer>

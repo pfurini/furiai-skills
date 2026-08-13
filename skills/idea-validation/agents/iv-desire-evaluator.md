@@ -51,8 +51,11 @@ Score each driver dimension from the calibration pack 1–5. Anchor every score 
 
 Write to `.idea-validation/ideas/<slug>/desire_scores.json` (create missing parent directories). The keys of `scores` and `score_rationales` are the driver names from the calibration pack:
 
+The top-level `confidence` field is the artifact's evidence confidence: **high** = the load-bearing figures are corroborated by two independent sources or direct observation; **medium** = single-source coverage; **low** = mostly constructs, pack defaults, or acknowledged gaps.
+
 ```json
 {
+  "confidence": "high | medium | low",
   "scores": {
     "<driver-1>": 0,
     "<driver-2>": 0

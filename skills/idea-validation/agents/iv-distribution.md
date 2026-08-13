@@ -114,8 +114,11 @@ If `user_profile.md` is unavailable, skip tier adjustment and note it as a gap.
 
 Write to `.idea-validation/ideas/<slug>/distribution.json` (create missing parent directories):
 
+The top-level `confidence` field is the artifact's evidence confidence: **high** = the load-bearing figures are corroborated by two independent sources or direct observation; **medium** = single-source coverage; **low** = mostly constructs, pack defaults, or acknowledged gaps.
+
 ```json
 {
+  "confidence": "high | medium | low",
   "organic_reach_potential": "high | medium | low",
   "viral_loop_exists": false,
   "viral_loop_type": "inherent | collaborative | word-of-mouth | incentivized | content-as-distribution | none",

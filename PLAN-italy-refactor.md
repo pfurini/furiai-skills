@@ -488,6 +488,87 @@ Apple Ads 2026 (Italy ASA cross-check), DeRev Listino 2026 full grid.
 
 **Phase D-A is COMPLETE.** Next: Phase D-B rewrite in the plan's order.
 
+### Phase D-B log — rewrite (done 2026-08-13)
+
+All ten steps executed in order; `quick_validate.py` passed after every step.
+
+1. SKILL.md + memory.md: ring policy in the Target section (B2C subsection
+   before B2B), ring vocabulary `IT | EU-EN | Western` defined once,
+   "Research language" section generalized (b2c Ring-1 bilingual, same
+   NICHE-verbatim rule), dispatch envelope NICHE line now both-targets.
+2. Five b2c templates: Ring-1 tiers first (named verified surfaces from
+   DA5 with language-trap warnings in reddit.md; IT storefront + `gl=IT`
+   trap in apps.md; Google.it SERP + keyword-unmeasured fallback in
+   web-search.md; ONIM/Creative-Center-IT in tiktok.md; thin-Ring-1
+   expectation in x-twitter.md), one exact mandated label-line format
+   (`labels — ring: … · lang: … · surface: … · evidence: … · confidence:
+   …`), disconfirming-evidence section (new §8, Sources → §9) in all five,
+   Phase B2 drift fixes applied (tiktok tiers + citation inheritance;
+   x-twitter recency bullet, em-dash tier headers, indentation, sources
+   wording; velocity wording normalized).
+3. b2c/market-sizing.md rewritten on the b2b skeleton: Step 0 ring
+   reporting, Ring-1 population anchors, dated iOS table (StatCounter Jul
+   2026; SEA/India/LATAM rows removed with the ring policy), construct
+   labels (capture rates, multipliers — ratings-vs-reviews conflation
+   fixed), Outcome Reality Check (RevenueCat/Adapty), verdict bands and
+   fantasy trigger switched to EUR on summed rings with the
+   trigger-vs-band difference stated, ring-split fallback price.
+4. core-human-desires.md rewritten as a calibration table (trivia and
+   meta tail dropped); Fairness & Justice folded into Control; desire-2
+   name fixed; load-bearing driver-names warning added to
+   demand-drivers.md.
+5. b2c/pricing.md rewritten: Ring-1 mechanics block (VAT-inclusive, no
+   subscription equalization, proceeds math, weekly-billing norm), ring
+   columns on model sweet spots and category benchmarks (DA2 EUR anchors),
+   annual-discount bands corrected (60–70% = published market average, no
+   longer "avoid"), category billing-mix anchors added, lifetime split
+   into launch-LTD (3–5× annual) vs mature tier (observed 8–15× annual),
+   construct labels throughout.
+6. retention.md + cac.md together: schema keys added to the b2c factor
+   table; benchmark table reframed as well-executed-subscription band
+   (construct) with a sourced published-median floor (D30 3–7%) and rules
+   for when to use it; verdict-threshold anchoring note; cac.md renamed to
+   "Budget Tiers" (EUR), Bootstrap default without user_profile, Ring-1
+   channel-units table (ASA CPA $1.60 ≈ 0.42× US; Meta €10.48 CPM,
+   seasonality 2.3×; TikTok = no data, never estimate; creator floor
+   €100–300; Amazon.it 0% on apps), channel table redeclared as CPI with
+   funnel-stage rule matched to the iv-cac-modeler brief (freemium
+   conversion sits on the ARPU side — no double-counting), paid rows
+   re-anchored to published CPI ranges, Product Hunt cohort corrected to
+   ~100–1,000.
+7. b2c/distribution.md: "Growth Loop Types" (name unified with b2b),
+   k-rows re-anchored (Inherent 0.4–0.7 sustained; Incentivized 0.05–0.15
+   per Extole; sources block added), per-ring ASO scoring with IT
+   paid-chart observation, Ring-1 creator reality check (AGCM disclosure,
+   bespoke deals), budget tiers in EUR with the ASA-under-€2 note; the
+   accidental drop of Tier adjustment was caught and restored.
+8. Ring-coverage disclosure chain (DD2): scoring.md Step 5b extended,
+   `ring_coverage` added to scores.json (b2c only, additive, precedent:
+   `sales_motion`), counting rule in b2c/scoring-rubrics.md (label lines
+   only), NO-RING-1 watermark row + independent insertion rule in
+   decision-memo.md; freemium +10 anchored to the pricing pack's table.
+9. interview.md: Batch 5 — Business Tools (Italy-first B2B), 5 domains
+   with a target-routing note; batch count 4 → 5 (closes B2 finding H8).
+10. Cross-cutting: top-level `confidence` field in all 9 JSON agent
+    schemas + trend-file frontmatter + memory.md contract line (idea.md
+    already had one); Contents TOCs added to the seven >100-line b2b
+    packs; b2b touch-ups from DA3 applied (Superads €0.43 → €0,43–0,50
+    currency-unresolved with ratio framing, in b2b/cac.md and
+    b2b/distribution.md; Milan/Rome CPC premium relabeled untested
+    assumption).
+
+Decisions taken inside the plan's discretion, to watch in D-C:
+- Retention divergence resolved by REFRAMING (pack range = well-executed
+  subscription band + sourced median floor), not by lowering the table.
+  Overridable if the gated Adjust/AppsFlyer reports are ever pulled.
+- b2c market-sizer verdict bands and reality checks moved from USD to EUR
+  (same numerals) computed on summed rings.
+- CAC funnel-stage rule must be exercised in the forward test (checklist
+  item: no conversion double-counting in LTV:CAC).
+
+**Phase D-B is COMPLETE.** Next: Phase D-C (b2c audit checklist, then
+forward-test in Claude Code with Sonnet executors).
+
 ## Open decisions for the user
 
 1. **D4 threshold and mechanics** — cap-at-moderate vs. score-discount; the ~15-observation

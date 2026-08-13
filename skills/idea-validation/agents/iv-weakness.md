@@ -64,8 +64,11 @@ root cause, not just the symptom.
 
 Write to `.idea-validation/ideas/<slug>/weaknesses.json`:
 
+The top-level `confidence` field is the artifact's evidence confidence: **high** = the load-bearing figures are corroborated by two independent sources or direct observation; **medium** = single-source coverage; **low** = mostly constructs, pack defaults, or acknowledged gaps.
+
 ```json
 {
+  "confidence": "high | medium | low",
   "weak_dimensions": [
     {
       "dimension": "",

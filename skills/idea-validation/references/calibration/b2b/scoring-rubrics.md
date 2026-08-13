@@ -11,6 +11,16 @@ bands, RAT, screening — lives in `references/scoring.md`.
 > Italian pricing research 2026-08); unmarked anchors are provisional
 > (`confidence: low`).
 
+## Contents
+
+- Evidence-sufficiency gate (this target defines one)
+- Demand (0–100)
+- Competition (0–100)
+- Monetization (0–100)
+- Distribution (0–100)
+- Retention (0–100)
+- Founder-Market Fit (0–100)
+
 ## Evidence-sufficiency gate (this target defines one)
 
 **Counting rule:** across this niche's `market_insights/` files, count
