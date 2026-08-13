@@ -160,7 +160,7 @@ Templates: `tiktok.md`, `reddit.md`, `apps.md`, `web-search.md`, `x-twitter.md`.
 > 5. **Web Search (Google.it)** — Italian-language query demand first, English second
 > 6. **All of the above** — full multi-platform analysis (recommended for a new niche)
 
-Templates: `b2b/incumbents.md`, `b2b/communities.md`, `b2b/linkedin.md`, `b2b/g2-capterra.md`, `web-search.md` (run with the bilingual rule from the Target section). `x-twitter.md` stays available on request only — Italian professional signal on X is thin, so it is off the default menu.
+Templates: `b2b/incumbents.md`, `b2b/communities.md`, `b2b/linkedin.md`, `b2b/g2-capterra.md`, `b2b/web-search.md`. `x-twitter.md` stays available on request only — Italian professional signal on X is thin, so it is off the default menu.
 
 Dispatch one `iv-trend-researcher` per selected platform, passing the template path and the platform slug for the output filename.
 

@@ -179,7 +179,7 @@ Write to `.idea-validation/ideas/<slug>/cac.json` (create missing parent directo
     "<one-time-spike channels also carry>": { "one_time_cohort_estimate": 0 },
     "<channels the pack marks unavailable>": { "viable": false, "reason": "" }
   },
-  "skipped_channels": [],
+  "skipped_channels": [ { "channel": "", "reason": "" } ],
   "viable_channels": [],
   "marginal_channels": [],
   "non_viable_channels": [],

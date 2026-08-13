@@ -315,6 +315,48 @@ Open observations (decide after Run 2):
 - Gate threshold 15: Run 1 counted 18 in an evidence-rich commercialisti
   niche — the threshold looks sane there; Run 2 (generic PMI) probes lower.
 
+### Phase C log — Run 2 (pi acceptance test, done 2026-08-13)
+
+Setup: `~/tmp/iv-test-2`, pi with native `iv-*` dispatch (Opus orchestrator),
+idea "returns-management dashboard for small Italian e-commerce merchants"
+(self-serve band) plus an enterprise procurement-suite decoy. Verdict:
+28/100 **drop** — first live firing of the floor penalty (retention 18 →
+×0.72) — confidence medium, gate silent (21 IT observations vs 15).
+
+Checklist: 12/13 applicable items PASS (market sizing N/A — not in the
+default chain). The decoy was refused exactly per the guardrail ("clearly
+sales-led and falls outside scope for desk research... No fan-out, no
+score"). The Run-1 fixes held under a fresh orchestrator: pack-default
+counted as unavailable (discount 5/6), `sales_motion` written to idea.md,
+scores.json, and the memo line, `cold_outbound.viable=false`,
+`paid_social_meta` key, events_fairs assessed via the relevance filter.
+
+Exa incident: pi subagents fell back to Exa's free keyless MCP endpoint
+(rate-limited) — root cause is in the pi stack, not the skill: pi-web-access
+routes to `mcp.exa.ai` when `getApiKey()` resolves null, and the subagent
+execution context fails to resolve `~/.pi/web-search.json`'s key that the
+main session resolves fine. Impact on Run 2 was mild (3 mentions, 2 files;
+gate count unaffected), so the run stands. Workaround: export
+`EXA_API_KEY` in the shell launching pi. Root-cause fix belongs to a pi
+session (suspects: pi-subagents nested-tools / pi-claude-bridge worker env).
+
+Defect found and FIXED: the b2b menu reused the b2c `web-search.md`
+template, which carries no evidence-label block — Run 2's web-search file
+had zero per-finding geography labels (Run 1 masked this because the
+orchestrator injected labels into the dispatch prompt). Added
+`prompts/b2b/web-search.md` (Italy-first tiers, label slot E, disconfirming
+-evidence section, keyword-unmeasured fallback) and pointed the SKILL.md
+menu at it. Also: `skipped_channels` schema now specifies `{channel,
+reason}` entries (Run 2 emitted bare strings).
+
+Gate threshold check (open item 1): Run 1 counted 18, Run 2 counted 21,
+both in genuinely evidence-rich niches; neither fired. The 15 threshold
+looks sane; the label-format drift (fixed above for web-search) matters
+more than the number. Keep 15 until a low-signal vertical (avvocati) is
+actually run.
+
+**Phase C is COMPLETE.** Both forward-tests pass; fixes committed.
+
 ### Phase D — B2C (after B2B sign-off; outline only)
 
 Ring policy: Italy → Europe-English → Western (NA, UK/IE, AU/NZ); Eastern excluded; app

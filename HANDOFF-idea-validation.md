@@ -23,15 +23,23 @@ write harness-specific tool names into skill files. Describe capabilities.
 
 - Phase A (Italy research) is COMPLETE. Reports with citations are in
   `research/idea-validation-italy-b2b/`. Read its `README.md` first.
-- Phase B (Italy-first rewrite of the whole B2B surface) is COMPLETE.
-  `quick_validate.py` passes. About 28 files changed. Four new paths:
-  `references/tooling.md`, `references/prompts/b2b/incumbents.md`,
-  `scripts/` (5 scripts), `research/idea-validation-italy-b2b/`.
-- The changes are NOT committed. Recommend a commit checkpoint before you
-  start Phase C. Do not commit without the user's approval.
-- Phase C (forward-tests) is NOT started. It is the next task.
+- Phase B (Italy-first rewrite of the whole B2B surface) is COMPLETE and
+  committed, plus a Phase B2 prose audit against the pi-skill-creator
+  writing principles (~90 fixes; see PLAN Phase B2 for what was deferred).
+- Phase C (forward-tests) is COMPLETE, 2026-08-13. Run 1 (Claude Code,
+  Sonnet executors): 45/100 pivot, checklist 13/13. Run 2 (pi, native
+  dispatch, Opus): 28/100 drop, floor penalty fired, sales-led decoy
+  refused, checklist 12/13 applicable. Both runs' fixes are committed.
+  Full logs: `PLAN-italy-refactor.md` Phase C sections.
+- Known pi-stack issue (not a skill defect): pi subagents fell back to
+  Exa's free keyless endpoint (rate-limited) — pi-web-access `getApiKey()`
+  resolves null in the subagent context while the main session resolves
+  `~/.pi/web-search.json` fine. Workaround: export `EXA_API_KEY` in the
+  shell launching pi. Root-cause investigation belongs in a pi session
+  (suspects: pi-subagents nested-tools, pi-claude-bridge worker env).
+- Phase D (B2C Italy-first refactor) is NOT started. It is the next task.
 - The decision history is in `PLAN-italy-refactor.md` (decisions D1–D6,
-  tooling policy, phase log). Read it if you need the "why".
+  tooling policy, phase logs). Read it if you need the "why".
 
 ## Fast orientation (read in this order)
 
@@ -78,7 +86,16 @@ write harness-specific tool names into skill files. Describe capabilities.
   `python3 ~/.claude/skills/pi-skill-creator/scripts/quick_validate.py skills/idea-validation`
   (run from the repo root).
 
-## Next task: Phase C — forward-tests
+## Next task: Phase D — B2C Italy-first refactor
+
+Ring policy: Italy → Europe (English apps) → Western (NA, UK/IE, AU/NZ);
+Eastern markets excluded. The plan sketch is in `PLAN-italy-refactor.md`
+(Phase D section). Write the full plan first; it needs the user's sign-off
+before edits. Fold in the deferred b2c findings from the Phase B2 audit log
+(unsourced b2c pack figures, browse-path domains, template drift,
+disconfirming-evidence sections, `core-human-desires.md` cleanup).
+
+## Done: Phase C — forward-tests (kept for reference)
 
 Goal: prove the refactored skill works end to end, with fresh agents, on
 fake but realistic runs. Two runs, two stages.
@@ -148,15 +165,21 @@ fake but realistic runs. Two runs, two stages.
    skill rewrite / scripts+tooling / test fixes.
 3. Update this handoff: mark Phase C complete, promote Phase D.
 
-## Open items (after Phase C, in priority order)
+## Open items (in priority order)
 
-1. **Gate threshold calibration.** 15 Italian-source observations is a
-   first guess. Adjust it from the two forward-test runs.
-2. **Phase D — B2C Italy-first refactor.** Ring policy: Italy → Europe
-   (English apps) → Western (NA, UK/IE, AU/NZ). Eastern markets excluded.
-   Plan sketch is in `PLAN-italy-refactor.md`. Write the full plan only
-   after B2B sign-off.
-3. **Missing data, do not fabricate:** AssoSoftware/Osservatori "Il
+1. **Gate threshold.** Both runs counted 18–21 in evidence-rich niches and
+   the gate stayed silent, as it should. Keep 15 until a low-signal
+   vertical (avvocati) actually runs; the label-format drift mattered more
+   than the number (fixed for web-search; watch the other templates).
+2. **Evidence-label format mandate.** Findings' label lines still vary in
+   shape per researcher (bulleted vs bracket blocks), making gate counting
+   manual. Consider mandating one exact label-line format across the five
+   b2b templates.
+3. **Market sizer default for b2b?** The b2b monetization top band requires
+   "viable SOM", but `iv-market-sizer` is optional in the validation chain.
+   Decide whether b2b validation runs should include it by default (Run 1
+   added it manually; Run 2 went without).
+4. **Missing data, do not fabricate:** AssoSoftware/Osservatori "Il
    software gestionale in Italia" (user must obtain); RPO tariff tables
    (only if the phone-consent bridge is ever modeled); Italian
    review→customer multipliers (none exist); indie capture rates (none
