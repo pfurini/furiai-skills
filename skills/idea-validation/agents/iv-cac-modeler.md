@@ -73,6 +73,8 @@ Where:
 
 - **average_lifespan_months**: derive from `retention.json` using the lifespan mapping table in the calibration pack. If `retention.json` is unavailable, use the pack's category median fallbacks.
 
+**Annual-prepay rule.** The formula above assumes monthly-recurring charges. When the recommended plan is prepaid annual (or the plan mix includes one), revenue collected at conversion is NOT amortized by a shorter engagement lifespan — the year is paid regardless of usage decay. Compute LTV per converter from the plan mix instead (annual price × expected renewal count + monthly price × paying lifespan for the monthly share), blend by the mix, and document the derivation in `ltv_assumptions`. Never multiply an annualized ARPU by a sub-year engagement lifespan.
+
 ### LTV Confidence
 
 | Data available | Confidence |

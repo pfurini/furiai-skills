@@ -89,7 +89,7 @@ Identify and analyze **current web search trends in the [NICHE] niche, ring by r
   * Timeframe (e.g., "+180% search volume over 12 months")
   * Velocity classification (slow / moderate / explosive)
 
-**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape, always with all five slots — write `n/a` for a slot you cannot fill; the scoring step counts labels mechanically):
 
 `labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <where observed, e.g. Google.it SERP, Trends IT, Ahrefs> · evidence: <query | SERP observation | trends data | volume data | article> · confidence: <high | medium | low>`
 

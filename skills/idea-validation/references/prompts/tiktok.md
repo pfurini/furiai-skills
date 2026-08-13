@@ -67,7 +67,7 @@ Identify and analyze **current TikTok trends in the [NICHE] niche, ring by ring 
   * Timeframe of growth (e.g., "+120% in 30 days")
   * Velocity classification (slow / moderate / explosive)
 
-**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape, always with all five slots — write `n/a` for a slot you cannot fill; the scoring step counts labels mechanically):
 
 `labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <where observed, e.g. Creative Center IT, hashtag page> · evidence: <hashtag metrics | content observation | report | article> · confidence: <high | medium | low>`
 

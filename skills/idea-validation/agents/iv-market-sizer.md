@@ -94,7 +94,7 @@ Where:
 
 Run all available approaches and compare:
 - If estimates agree within 2× → high confidence. Use the geometric mean.
-- If estimates disagree by 2–5× → medium confidence. Use the most conservative estimate and note the range.
+- If estimates disagree by 2–5× → medium confidence. Use the most conservative estimate and note the range. The conservative-pick rule wins regardless of which approach produced the lower number — an approach's "primary"/"supplementary" label governs which approaches to attempt, never which estimate prevails.
 - If estimates disagree by > 5× → low confidence. Flag assumptions that cause the divergence.
 
 ## SAM Filtering

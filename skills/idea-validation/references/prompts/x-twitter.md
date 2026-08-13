@@ -76,7 +76,7 @@ For each trend, note whether it is **audience-led** (users requesting or complai
   * Velocity classification (slow / moderate / explosive)
   * Whether the signal crosses beyond X/Twitter into Reddit, search, newsletters, Product Hunt, Hacker News, or app stores
 
-**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape, always with all five slots — write `n/a` for a slot you cannot fill; the scoring step counts labels mechanically):
 
 `labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <where observed, e.g. X thread, Product Hunt, export> · evidence: <post pattern | launch thread | engagement metric | export | article> · confidence: <high | medium | low>`
 

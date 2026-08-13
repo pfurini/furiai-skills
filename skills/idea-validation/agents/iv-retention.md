@@ -84,6 +84,7 @@ The top-level `confidence` field is the artifact's evidence confidence: **high**
     "d7": 0,
     "d30": 0
   },
+  "estimated_retention_rationale": "<how the estimate was positioned: which benchmark band or floor was used and why — e.g. 'published-median floor: 4 churn-risk factors' or 'pack range midpoint'>",
   "churn_risk": "low | medium | high",
   "retention_verdict": "sticky | moderate | disposable"
 }

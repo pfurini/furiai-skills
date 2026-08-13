@@ -54,7 +54,7 @@ change both.
 all-install cross-industry D30 median is **3–7%** (Adjust ~7% global;
 Statista 5.7%; AppsFlyer 3.36%). When two or more churn-risk factors apply,
 or `habit_formation_score` < 2.5, estimate from this floor — below the pack
-range — and say so in the rationale.
+range — and say so in the artifact's `estimated_retention_rationale` field.
 
 **Position within the range:**
 - Top of range: `habit_formation_score` ≥ 4.0 AND `desire_strength_label` = "strong"

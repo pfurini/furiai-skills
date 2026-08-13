@@ -1,4 +1,4 @@
-# Handoff — idea-validation skill (Italy-first; B2B done, B2C next)
+# Handoff — idea-validation skill (Italy-first; B2B and B2C done)
 
 Date: 2026-08-13. Repo: `furiai-skills`. Skill: `skills/idea-validation/`.
 This file replaces the old handoff. It gives a fresh agent the context, the
@@ -9,8 +9,11 @@ rules, and the next tasks. Style: short sentences, one instruction each.
 One orchestrator skill (`SKILL.md`) validates indie product ideas and gives
 a scored verdict. It has 11 subagents (`agents/iv-*.md`) and per-target
 calibration packs. Two targets:
-- `b2c` — consumer apps. Still global/USD-calibrated; Phase D refactors it
-  Italy-first with a ring policy. This is the next task.
+- `b2c` — consumer apps, **Italy-first with a ring policy**: Ring 1 Italy
+  (EUR, Italian surfaces), Ring 2 Europe-English (EUR), Ring 3 Western
+  (USD). Findings carry `ring: IT | EU-EN | Western` label lines; sizing
+  reports rings separately, Italy first; scores carry a ring-coverage
+  disclosure (no evidence gate).
 - `b2b` — self-serve micro-SaaS for **Italian** micro (<10) and small
   (10–49) businesses and professional firms (commercialisti, avvocati,
   consulenti del lavoro, agencies, merchants). Medium (50–249) is edge
@@ -38,9 +41,13 @@ write harness-specific tool names into skill files. Describe capabilities.
   `~/.pi/web-search.json` fine. Workaround: export `EXA_API_KEY` in the
   shell launching pi. Root-cause investigation belongs in a pi session
   (suspects: pi-subagents nested-tools, pi-claude-bridge worker env).
-- Phase D (B2C Italy-first refactor) is NOT started. It is the next task.
-- The decision history is in `PLAN-italy-refactor.md` (decisions D1–D6,
-  tooling policy, phase logs). Read it if you need the "why".
+- Phase D (B2C Italy-first refactor) is COMPLETE, 2026-08-13: D-A research
+  pass (`research/idea-validation-italy-b2c/`, six reports), D-B rewrite
+  (DD1–DD5 approved; all ten steps), D-C forward test (Claude Code, Sonnet
+  executors: 45/100 pivot, checklist 11/13 pass + 2 partial, six defects
+  fixed). The optional pi acceptance run has NOT been done.
+- The decision history is in `PLAN-italy-refactor.md` (decisions D1–D6 and
+  DD1–DD5, tooling policy, phase logs). Read it if you need the "why".
 
 ## Fast orientation (read in this order)
 
@@ -54,10 +61,10 @@ write harness-specific tool names into skill files. Describe capabilities.
 5. `references/scoring.md` (Step 5b) + `calibration/b2b/scoring-rubrics.md`
    (the gate) + `references/decision-memo.md` (the interview kit).
 6. `references/tooling.md` — scripts and endpoint facts.
-7. For Phase D specifically: `PLAN-italy-refactor.md` Phase D (the plan)
-   and Phase B2 (the deferred b2c findings it folds in), then the current
-   `references/calibration/b2c/` packs and `references/prompts/` b2c
-   templates — the b2b siblings are the pattern to match.
+7. `references/calibration/b2c/` packs and the five `references/prompts/`
+   b2c templates — now Italy-first ring-calibrated, same pattern as the
+   b2b siblings; the research behind the numbers is in
+   `research/idea-validation-italy-b2c/` (read its README first).
 
 ## Rules that must not break
 
@@ -84,6 +91,17 @@ write harness-specific tool names into skill files. Describe capabilities.
   - B2B trend prompts may name only surfaces verified active. Dead:
     Forum GT, InfoJobs Italia, connect.gt (degraded). No open forum exists
     for avvocati.
+- Ring rules (b2c). Never soften these:
+  - Ring vocabulary is exactly `IT | EU-EN | Western`, defined in SKILL.md.
+  - The per-finding label-line format in the five b2c templates is
+    mandated verbatim (all five slots; `n/a` for unknowns) — the scorer
+    counts label lines mechanically into `ring_coverage`.
+  - b2c has NO evidence gate; it has the ring-coverage disclosure + the
+    NO-RING-1 memo watermark. Do not turn the disclosure into a cap.
+  - EUR for Rings 1–2, USD for Ring 3; never mix currencies in one row.
+  - Never cite the English-language trap subs (r/ItalianFood, r/ItalyTravel,
+    r/italianlearning class) as Ring-1 evidence, and never report a
+    template-named surface absent without fetched evidence (UNVERIFIABLE).
 - B2B platform slugs: `incumbents | communities | linkedin | g2-capterra |
   web-search` (+ `x-twitter` on request). Keep `memory.md`, `SKILL.md`, and
   `iv-trend-researcher.md` in agreement.
@@ -91,33 +109,20 @@ write harness-specific tool names into skill files. Describe capabilities.
   `python3 ~/.claude/skills/pi-skill-creator/scripts/quick_validate.py skills/idea-validation`
   (run from the repo root).
 
-## Next task: Phase D — B2C Italy-first refactor
+## Next task: pi acceptance run (optional) and open items
 
-The FULL plan is in `PLAN-italy-refactor.md`, section "Phase D — B2C
-Italy-first refactor (full plan)". Execute it in order:
+Phase D is complete on the Claude Code side. What remains:
 
-1. Get the user's sign-off on decisions **DD1–DD5** (table at the top of
-   the plan). Do not edit skill files before that.
-2. Phase D-A: Italy b2c research pass → `research/idea-validation-italy-b2c/`.
-   Same discipline as the b2b pass (source + date + confidence on every
-   figure; a "does not exist publicly" log per report).
-3. Phase D-B: rewrite in the plan's order (it respects the coupled-file
-   rules below). Validate after every step.
-4. Phase D-C: draft the b2c audit checklist, then forward-test (content
-   test in Claude Code with Sonnet executors, optional pi acceptance run).
-   The Phase C logs in PLAN show the working pattern to copy.
-5. Log outcomes in PLAN, propose commits, update this handoff.
-
-Working practices proven in Phase B2/C (keep them):
-- Web search in this repo's Claude Code sessions: exa MCP tools (load via
-  ToolSearch first). In pi, export `EXA_API_KEY` in the launching shell
-  (see the pi-stack issue in Current state).
-- Forward-test at the executor floor: Sonnet subagents, Opus orchestrator
-  in pi. Fresh agents, raw artifacts, checklist-based audit.
-- Scratch projects OUTSIDE the repo (e.g. `~/tmp/iv-test-*`) so
-  `.idea-validation/` does not pollute it. Inject the current date into
-  every subagent prompt.
-- Commit checkpoints per phase, only with the user's approval.
+1. **Optional pi acceptance run** for b2c — same division as Phase C
+   (content test done in CC; acceptance in pi with native `iv-*` dispatch,
+   Opus orchestrator, Sonnet executors). Export `EXA_API_KEY` in the shell
+   launching pi (see the pi-stack issue above). Reuse the Phase D-C
+   checklist in PLAN; watch the three "open observations" logged there
+   (mirror-based subreddit discovery, grey-zone IT labels, translation
+   enforcement).
+2. Work the open-items list below.
+3. After any run: log outcomes in PLAN, propose commits, update this
+   handoff.
 
 ## Open items (in priority order)
 
@@ -145,6 +150,11 @@ Working practices proven in Phase B2/C (keep them):
 
 ## Research records (source of truth for numbers)
 
+- `research/idea-validation-italy-b2c/` — Italy consumer pass, 2026-08-13.
+  Six reports (device base, EUR price anchors, paid channels, creator
+  economy, verified communities, Ring-3 benchmark sourcing); README carries
+  the synthesis and the consolidated negative log. Never invent a number a
+  report lists as not existing.
 - `research/idea-validation-italy-b2b/` — Italy pass, 2026-08-13. Five
   reports + `gated-pdf-digests.md` (MicroConf 2024, SaaS Capital RB32) +
   the two PDFs. Each report ends with a "does not exist publicly" list.

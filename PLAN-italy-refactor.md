@@ -569,6 +569,113 @@ Decisions taken inside the plan's discretion, to watch in D-C:
 **Phase D-B is COMPLETE.** Next: Phase D-C (b2c audit checklist, then
 forward-test in Claude Code with Sonnet executors).
 
+### Phase D-C — b2c audit checklist (drafted 2026-08-13, before the run)
+
+Scored against raw artifacts from a fresh full-chain run. PASS/FAIL each:
+
+1. **Label lines.** Every finding in every trend file carries the exact
+   mandated line (`labels — ring: … · lang: … · surface: … · evidence: …
+   · confidence: …`); counting by ring is mechanical.
+2. **Ring-1 evidence, Italian-first.** Italian surfaces researched first;
+   bilingual NICHE used verbatim by every researcher.
+3. **Named-surface rule.** No dead/unverified surface cited as live; no
+   English-language trap sub presented as Ring-1; private FB/Telegram as
+   existence signals only.
+4. **No invented volumes.** Without an Italian keyword instrument, the
+   web-search file states "Italian keyword demand is unmeasured" once near
+   the top; Ring-1 volume claims stay qualitative.
+5. **Translations.** Italian quotes carry parenthetical translations;
+   artifacts are in English.
+6. **Disconfirming evidence.** Section present and substantive in every
+   trend file (not a token line).
+7. **Ring-based sizing** (if market sizer runs). SAM/SOM per ring, Italy
+   first, EUR Rings 1–2 / USD Ring 3, verdict on summed EUR; dated iOS
+   filter used; capture rates treated as constructs.
+8. **Ring-1 pricing.** EUR VAT-inclusive anchors; subscription price set
+   as a decision (no USD-conversion logic); model consistent with the pack
+   menu; correct `currency` field.
+9. **Retention discipline.** Schema factor keys present; the
+   published-median floor path used (and stated) when ≥2 churn-risk
+   factors or habit score < 2.5; D30 ↔ cac lifespan coupling consistent.
+10. **CAC discipline.** Bootstrap default + flag when no user_profile;
+    funnel-stage rule respected (no conversion double-count in LTV:CAC);
+    Ring-1 units used where they exist; no invented TikTok-Italy costs;
+    `skipped_channels` entries are {channel, reason}.
+11. **Disclosure & confidence.** `ring_coverage` in scores.json matches a
+    manual label count; evidence_gate rule "none defined"/false; top-level
+    `confidence` present in every artifact (frontmatter or JSON).
+12. **Memo logic.** NO-RING-1 watermark fires only when IT = 0 (expected
+    NOT to fire in this run — negative test); EUR in memo numbers;
+    concrete next step.
+13. **Dispatch hygiene.** Date injected everywhere; agents wrote only
+    their own artifacts; wave order respected.
+
+### Phase D-C log — Run 1 (Claude Code content test, done 2026-08-13)
+
+Setup: scratch project `~/tmp/iv-test-3`, idea "Cura Verde — plant-care
+companion for Italian hobby gardeners (balcone, terrazzo, orto)", target
+b2c, no user_profile.md (deliberate: exercises Bootstrap default + neutral
+founder fit). All specialists ran as generic Sonnet subagents; all five
+b2c platforms + the market sizer. Full chain produced. Verdict **45/100
+pivot**, confidence medium, `ring_coverage` {IT 23, EU-EN 1, Western 29}
+(53 mechanically countable label lines), evidence gate "none defined",
+floor penalty silent (no dimension < 25). One market-sizer connection
+failure was re-dispatched once per the workflow rule and succeeded.
+
+Checklist: **11/13 PASS, 2 PARTIAL.**
+- Item 3 PARTIAL: the reddit researcher reported r/giardinaggioITA
+  "searched exhaustively, not found" while the DA5 pass had verified it
+  ACTIVE the same day — a live named surface mis-reported as absent (the
+  inverse of the dead-surface error the rule was written against).
+- Item 5 PARTIAL: one Italian quote without a parenthetical translation
+  (enforcement drift, no file defect).
+
+New machinery validated live: exact label-line format held in 51/53
+findings; ring-coverage disclosure written and NO-RING-1 correctly silent;
+retention published-median floor path fired (4 churn-risk factors → D30
+6%, disposable); ring-based sizing reported Ring 1 first in EUR with Rings
+2–3 = n/a plus stated reasons, no reality check falsely triggered, outcome
+reality check present; EUR verdict bands classified micro-niche
+consistently (SOM y1 €1,861); pricing stayed EUR-native inside the
+IT cluster and stated its conversion funnel; CAC applied Bootstrap default
+with the profile-gap flag and kept funnel stages consistent;
+`confidence` present in all 14 artifacts.
+
+Defects found and FIXED in this pass:
+1. Retention schema had no field to state the floor-path choice the pack
+   demands: added `estimated_retention_rationale` (additive); pack now
+   points at it.
+2. iv-cac-modeler's LTV formula silently mis-handles prepaid annual plans
+   (amortizes collected revenue by engagement lifespan — the executor
+   caught and corrected it, a weaker one would not): annual-prepay rule
+   added to the brief's LTV section.
+3. b2c channel set lacked an `apple_search_ads` key despite ASA being the
+   best-evidenced Ring-1 paid channel: additive row added.
+4. iv-market-sizer had no precedence rule when the conservative-pick rule
+   inverts the primary/supplementary approach roles: clarified (the
+   conservative pick always wins; primacy governs what to attempt).
+5. reddit.md named-surface list had no protection against confident
+   absence claims: added the UNVERIFIABLE rule (never report a listed
+   surface absent without fetched evidence).
+6. 2/53 label lines dropped the `evidence:` slot: all five templates now
+   mandate all five slots with `n/a` for unknowns.
+
+Open observations (decide before/with the pi run):
+- The reddit executor failed to *find* a live subreddit by search even
+  though it exists — mirror-based discovery (not just verification) may
+  need a hint in the template if it recurs in the pi run.
+- The tiktok researcher labeled an unconfirmed aggregator as `ring: IT ·
+  confidence: low` with an inline caveat — acceptable grey-zone handling;
+  watch whether the pattern degrades under other executors.
+- Translation enforcement (one missed quote) lives in SKILL.md's research
+  language rule; consider echoing it in the trend-researcher brief if the
+  pi run repeats the miss.
+
+**Phase D-C Claude Code content test is COMPLETE.** Fixes applied and
+validated. Remaining: optional pi acceptance run (same division as Phase
+C: content test in CC, acceptance in pi; export `EXA_API_KEY` in the
+launching shell).
+
 ## Open decisions for the user
 
 1. **D4 threshold and mechanics** — cap-at-moderate vs. score-discount; the ~15-observation

@@ -102,7 +102,7 @@ Identify and analyze **current trends in the [CATEGORY] app category** (covering
   * Timeframe of growth (e.g., "+85% downloads in 60 days," "+200% organic search volume YoY")
   * Velocity classification (slow / moderate / explosive)
 
-**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape, always with all five slots — write `n/a` for a slot you cannot fill; the scoring step counts labels mechanically):
 
 `labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <where observed, e.g. App Store IT chart, Play IT, Sensor Tower> · evidence: <chart position | price list | review pattern | report | article> · confidence: <high | medium | low>`
 

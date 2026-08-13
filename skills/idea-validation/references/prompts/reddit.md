@@ -24,6 +24,7 @@ Identify and analyze **current community discussions in the [NICHE] niche, ring 
      * General Italian subreddits for cross-niche signal: r/italy, r/Italia, r/CasualIT, r/consigli (advice-seeking)
      * **Language traps — never cite as Ring-1 evidence**: r/ItalianFood, r/italiancooking, r/mediterraneandiet, r/ItalyTravel, r/askitaly, r/italianlearning are English-language communities of foreigners; r/studenti is Croatian. Niches with NO live Italian-language surface (do not invent one): language learning, general cooking, parenting on Reddit, productivity-as-such — route those to the general subreddits and report the absence as a finding.
      * Private Facebook and Telegram groups are **existence signals only**, never activity evidence; Telegram public channels are broadcast, not discussion.
+     * **Never report a surface named in this list as absent or dead without fetched evidence.** reddit.com walls unauthenticated fetches; if a listed surface cannot be reached (directly or via a mirror), record it as UNVERIFIABLE — an unfetchable surface is not a missing one.
 
      **Tier 2 — Reddit-native sources (Rings 2–3 — label the ring)**
      * Reddit itself — search top posts by subreddit, sort by "Top / Past 6 months" or "Hot"; look for posts with high upvotes and comment volume as proxy for community-wide resonance
@@ -83,7 +84,7 @@ Identify and analyze **current community discussions in the [NICHE] niche, ring 
   * Timeframe (e.g., "subreddit grew +40% in 90 days")
   * Velocity classification (slow / moderate / explosive)
 
-**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape; the scoring step counts labels mechanically):
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape, always with all five slots — write `n/a` for a slot you cannot fill; the scoring step counts labels mechanically):
 
 `labels — ring: <IT | EU-EN | Western> · lang: <it | en> · surface: <subreddit or forum where observed> · evidence: <thread | recurring post pattern | subscriber metric | report | article> · confidence: <high | medium | low>`
 
