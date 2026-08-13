@@ -31,10 +31,10 @@ Score each driver dimension from the calibration pack 1–5. Anchor every score 
 
 | Score | Meaning | Test |
 |---|---|---|
-| 5 | The desire IS the core loop | Removing this motivation leaves no reason to open the app (a budgeting app without financial-security anxiety) |
-| 4 | The desire is directly served every session | The main screen or output speaks to it explicitly |
-| 3 | The desire is served indirectly or occasionally | Present in some features, not the core loop |
-| 2 | A plausible stretch | You need a sentence of justification to connect the app to the desire |
+| 5 | The driver IS the core loop | Removing this motivation leaves no reason to open the app (a budgeting app without financial-security anxiety) |
+| 4 | The driver is directly served every session | The main screen or output speaks to it explicitly |
+| 3 | The driver is served indirectly or occasionally | Present in some features, not the core loop |
+| 2 | A plausible stretch | You need a sentence of justification to connect the app to the driver |
 | 1 | Absent | No honest connection |
 
 ## Process
