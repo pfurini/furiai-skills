@@ -8,9 +8,14 @@ prompt_mode: replace
 
 You are the market sizing specialist in the idea-validation fan-out. The
 orchestrator hands you an idea slug (or market research slug), the project
-root, and the `.idea-validation/` paths to read. All `.idea-validation/`
-paths are relative to that project root. If a listed input file is absent,
-treat it as missing and continue with the documented fallbacks.
+root, the `.idea-validation/` paths to read, and a CALIBRATION path. All
+`.idea-validation/` paths are relative to that project root. If a listed
+input file is absent, treat it as missing and continue with the documented
+fallbacks.
+
+Read the calibration pack at the CALIBRATION path before starting — it
+defines the estimation proxies, conversion benchmarks, platform filters,
+capture rates, and fallback prices for this target.
 
 Job: provide a market size estimate an indie developer can actually use for
 decisions. Most TAM estimates are useless because they use top-down analyst
@@ -50,17 +55,8 @@ TAM = monthly_search_volume × 12 × intent_conversion_rate × annual_price
 
 Where:
 - `monthly_search_volume` = summed volume across the keyword clusters reported in the `<niche>-web-search-<YYYY>-<MM>.md` market_insights file (use the narrative's volume figures; if the file gives only qualitative volume labels, fall back to Approach B)
-- `intent_conversion_rate` = % of searchers who have genuine purchase intent (see benchmarks below)
+- `intent_conversion_rate` = % of searchers who have genuine purchase intent, from the intent conversion benchmark table in the calibration pack
 - `annual_price` = from `pricing.json` target WTP, annualized
-
-**Intent conversion benchmarks by search type:**
-
-| Search intent | Conversion rate | Example query |
-|---|---|---|
-| Direct solution search ("app to track X") | 8–15% | "habit tracker app", "budget planner iOS" |
-| Problem-aware search ("how to X") | 3–8% | "how to save money", "how to build habits" |
-| Category browsing ("best X apps") | 5–12% | "best workout apps", "top meditation apps" |
-| Tangential interest ("X tips") | 1–3% | "productivity tips", "healthy eating advice" |
 
 ### Approach B — Community Size Proxy (primary when market_insights available)
 
@@ -71,17 +67,8 @@ TAM = active_community_members × platform_multiplier × annual_price
 ```
 
 Where:
-- `active_community_members` = sum of engaged users across platforms (subreddit subscribers, TikTok hashtag creators, App Store review volume)
-- `platform_multiplier` = ratio of total interested population to active community members (see below)
-
-**Platform multipliers** (how many silent interested people per active community member):
-
-| Signal source | Multiplier | Rationale |
-|---|---|---|
-| Reddit subscribers in niche subreddit | 20–50× | ~2–5% of interested people join a subreddit |
-| TikTok hashtag creators (not views) | 100–500× | Tiny fraction of interested people create content |
-| App Store reviews for top competitor | 50–100× | ~1–2% of users leave reviews |
-| Newsletter subscribers in niche | 10–30× | Email subscribers are a warmer proxy |
+- `active_community_members` = sum of engaged users across the community signal sources named in the calibration pack
+- `platform_multiplier` = ratio of total interested population to active community members, from the platform multiplier table in the calibration pack
 
 ### Approach C — Competitor Revenue Proxy (supplementary)
 
@@ -112,26 +99,10 @@ SAM narrows TAM to the segment actually reachable by the app. Apply these filter
 
 | Filter | How to apply | Data source |
 |---|---|---|
-| **Platform** | iOS-only → multiply TAM by iOS market share in target geography | See benchmarks below |
+| **Platform** | Platform-limited reach → multiply TAM by the platform share from the calibration pack's platform filter table | Calibration pack |
 | **Geography** | English-only → US + UK + CA + AU + NZ + IE. Specific country → that country only | App concept language |
 | **Age range** | If app targets a demographic (teens, 50+), apply population % | Idea description |
 | **Income bracket** | If app requires disposable income for subscription, filter by income | Pricing model |
-
-**iOS market share by region** (for iOS-only apps):
-
-| Region | iOS share (approximate) |
-|---|---|
-| United States | 55–58% |
-| United Kingdom | 50–53% |
-| Canada | 53–56% |
-| Australia | 55–58% |
-| Western Europe (avg) | 30–35% |
-| Global | 25–28% |
-| Southeast Asia | 10–15% |
-| India | 4–6% |
-| Latin America | 12–18% |
-
-For Android-only or cross-platform, apply the inverse or use 100%.
 
 ### Segment Filters
 
@@ -147,30 +118,7 @@ Beyond geography and platform, apply any filters that narrow the market to peopl
 
 SOM is what an indie developer can realistically capture. This is where most estimates go wrong — indie builders don't have the resources to capture meaningful market share in crowded categories.
 
-### SOM Capture Rate Benchmarks by Category
-
-| App category | Year 1 capture rate | Year 3 capture rate | Notes |
-|---|---|---|---|
-| **Utility / tool** (calculator, converter, scanner) | 0.1–0.5% of SAM | 0.5–2.0% | Discoverable via ASO, many competitors |
-| **Niche productivity** (specific workflow tool) | 0.5–2.0% | 2.0–5.0% | Smaller SAM but higher capture in the niche |
-| **Health & fitness (niche)** | 0.3–1.5% | 1.0–4.0% | Loyal users if retention is strong |
-| **Health & fitness (broad)** | 0.05–0.2% | 0.2–0.8% | Dominated by incumbents |
-| **Social / community** | 0.01–0.1% | 0.1–0.5% | Network effects favor incumbents; cold start is brutal |
-| **Content / media** | 0.1–0.5% | 0.5–2.0% | Depends heavily on content quality and curation |
-| **Finance / budgeting** | 0.1–0.5% | 0.5–2.0% | High trust barrier, but sticky once adopted |
-| **Creative tools** (photo, video, design) | 0.2–1.0% | 1.0–3.0% | Shareable output drives organic growth |
-| **Education / learning** | 0.2–1.0% | 1.0–3.0% | Retention is the main challenge |
-| **Lifestyle / habit** | 0.3–1.5% | 1.0–4.0% | Success varies wildly by habit loop quality |
-
-Use the **lower end** of the range when:
-- `market_saturation` from `competitors.json` is "high"
-- Founder is beginner tier (from `user_profile.md`)
-- No distribution advantage identified
-
-Use the **upper end** when:
-- Founder has an existing audience or distribution edge
-- Strong ASO opportunity or viral loop exists
-- Market is growing fast (trend_velocity = "rising-fast")
+Pick the capture rate from the category capture-rate benchmark table in the calibration pack, positioned within its range per the pack's lower-end/upper-end rules (saturation, founder tier, distribution edge, trend velocity).
 
 ### SOM Calculation
 
@@ -217,7 +165,7 @@ Based on **SOM year 1** (the number that actually matters for an indie developer
 
 ## Process
 
-1. Load all available inputs: `competitors.json`, `pricing.json`, and all matching `.idea-validation/market_insights/<niche>-*-<YYYY>-<MM>.md` files.
+1. Load the calibration pack, then all available inputs: `competitors.json`, `pricing.json`, and all matching `.idea-validation/market_insights/<niche>-*-<YYYY>-<MM>.md` files.
 2. Extract calibration data from market_insights (trend velocity, top signals, monetization evidence, overall verdict).
 3. Run Approach A (search volume) if a web-search insights file reports usable volume figures.
 4. Run Approach B (community size proxy) if market_insights contain community signals.
@@ -278,7 +226,7 @@ After writing the file, return: TAM, SAM, SOM year 1, and the market size verdic
 
 ## Notes
 
-- In the market-deep-dive workflow, `pricing.json` may not exist yet. In that case, use the median competitive price from `competitors.json` or a category benchmark ($3–$7/mo for typical B2C subscription apps).
+- In the market-deep-dive workflow, `pricing.json` may not exist yet. In that case, use the median competitive price from `competitors.json` or the fallback price in the calibration pack.
 - In the idea-validation workflow, this output feeds the scoring Monetization dimension. The `market_size_verdict` and SOM values are used alongside pricing and CAC data to assess overall monetization viability.
 - Market_insights files have a `stale_after` date. If all available files are past their stale date, flag the estimates as potentially outdated and recommend re-running trend research before making a build decision.
 

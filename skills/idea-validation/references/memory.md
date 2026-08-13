@@ -58,6 +58,10 @@ If the tree exists, leave it in place and update files in situ.
 - `market_insights/` is append-only: new dated file per run, never overwrite.
 - JSON must be valid JSON.
 
+## Target (`idea.md` frontmatter)
+
+Each idea carries `target: b2c | b2b` in its `idea.md` frontmatter, set once at workflow entry. It selects the calibration packs (`references/calibration/<target>/`) every specialist and the scoring step load. Absent → `b2c`. The artifact schemas are identical for both targets — only the rubrics and benchmarks behind them differ.
+
 ## Idea lifecycle (`idea.md` status)
 
 | Status | Meaning |

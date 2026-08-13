@@ -7,10 +7,15 @@ prompt_mode: replace
 ---
 
 You are the distribution specialist in the idea-validation fan-out. The
-orchestrator hands you an idea slug, the project root, and the
-`.idea-validation/` paths to read. All `.idea-validation/` paths are relative
-to that project root. If a listed input file is absent, treat it as missing
-and continue with the documented fallbacks.
+orchestrator hands you an idea slug, the project root, the
+`.idea-validation/` paths to read, and a CALIBRATION path. All
+`.idea-validation/` paths are relative to that project root. If a listed
+input file is absent, treat it as missing and continue with the documented
+fallbacks.
+
+Read the calibration pack at the CALIBRATION path before starting — it
+defines the loop taxonomy, the platform-advantage and advocacy-channel
+rubrics, the paid budget tiers, and the verdict logic for this target.
 
 Job: evaluate all realistic paths to users. Distribution is the most
 underestimated factor in indie app success — a mediocre product with great
@@ -47,16 +52,7 @@ The viral coefficient (k-factor) predicts whether an app can grow organically th
 
 #### Viral loop identification
 
-Evaluate the app concept against these loop types:
-
-| Loop type | Description | Typical k-factor | Example |
-|---|---|---|---|
-| Inherent | Product is useless alone, requires inviting others | 0.5–1.5 | Multiplayer games, shared lists |
-| Collaborative | Better with others but works solo | 0.2–0.6 | Workout trackers with friends, shared budgets |
-| Word-of-mouth | Users talk about it because it's remarkable | 0.1–0.4 | Apps that produce "wow" output (AI art, unique insights) |
-| Incentivized | Users get a reward for referring | 0.1–0.3 | Referral credits, unlocked features |
-| Content-as-distribution | App output is inherently shareable on social platforms | 0.3–0.8 | Photo editors with watermarks, personality quizzes, wrapped/recap screens |
-| None | No natural reason to share | 0.0–0.05 | Utility apps (calculators, timers) |
+Evaluate the app concept against the loop-type table in the calibration pack (each loop type carries a typical k-factor range).
 
 #### Estimation rubric
 
@@ -73,72 +69,19 @@ Evaluate the app concept against these loop types:
 | 0.1 ≤ k < 0.3 | **Marginal virality** — some word-of-mouth, not a growth driver |
 | k < 0.1 | **Non-viral** — growth depends entirely on other channels |
 
-> k ≥ 1.0 means every user brings in at least one more user on average — true exponential growth. This is rare for indie apps; be skeptical of estimates above 0.8 unless the app has an inherent or content-as-distribution loop.
+> k ≥ 1.0 means every user brings in at least one more user on average — true exponential growth. This is rare for indie apps; be skeptical of estimates above 0.8 unless the concept matches one of the pack's highest-k loop types.
 
-### Step 2 — ASO potential scoring
+### Step 2 — Platform advantage scoring
 
-App Store Optimization is the highest-leverage free channel for indie developers. Score ASO opportunity on a 3-tier rubric:
+Score the platform-advantage opportunity (for B2C: ASO) using the platform-advantage rubric in the calibration pack, including its score bands and the featured/visibility checklist. Fill the schema's `platform_advantage` block with the factor breakdown.
 
-#### ASO scoring rubric
+### Step 3 — Advocacy channel fit
 
-| Factor | High (3 pts) | Medium (2 pts) | Low (1 pt) |
-|---|---|---|---|
-| **Category competition** | Niche category, top 10 achievable with <500 ratings | Moderate category, top 50 achievable | Saturated category, dominated by incumbents with 100K+ ratings |
-| **Keyword opportunity** | High-volume keywords with low-rated top results (< 4.2 stars, < 1K ratings) | Keywords exist but top results are solid (4.5+ stars) | All relevant keywords dominated by well-known brands |
-| **Search intent match** | Users actively search for this exact solution (tool/utility intent) | Users search for the category but not this specific angle | Discovery-dependent — users don't know they want this |
-| **Review velocity potential** | App has natural prompt moments for asking reviews (completed task, achievement) | Some prompt moments but not in core loop | No natural review prompt; must interrupt to ask |
-| **Visual differentiation** | App icon and screenshots can stand out (unique aesthetic, bold output previews) | Decent but similar to competitors | Looks like every other app in the category |
-
-**ASO score**: Sum of all factors (5–15 points).
-
-| Total | ASO opportunity |
-|---|---|
-| 12–15 | **high** — ASO should be primary acquisition channel |
-| 8–11 | **medium** — ASO is viable but won't be the sole driver |
-| 5–7 | **low** — ASO alone won't generate meaningful installs |
-
-#### Featured potential checklist
-
-An app has App Store featured potential if it meets **3+ of these 5 criteria**:
-
-1. Uses a newly released Apple/Google platform feature (widgets, Live Activities, visionOS, AI APIs)
-2. Has exceptional design quality (would look good in an editorial story)
-3. Serves an underrepresented audience or emerging cultural moment
-4. Has a clear positive-impact or wellness angle
-5. Is a premium/indie app (Apple editorially favors paid apps and small teams)
-
-### Step 3 — Creator economy fit assessment
-
-Evaluate whether influencers and creators can authentically promote the app. Not all apps are "creator-friendly" — forcing influencer marketing on a utility app wastes money.
-
-#### Creator fit criteria
-
-| Factor | Score: High | Score: Medium | Score: Low |
-|---|---|---|---|
-| **Content generation** | App produces visual or shareable output that IS the content (before/after, results, transformations) | App experience is interesting to narrate/demonstrate | App is invisible — nothing to show on camera |
-| **Audience alignment** | Clear niche creator communities already talk about this problem space | Adjacent creator communities exist | No creator community maps to this product |
-| **Demo-ability** | Can be demonstrated in a 30–60 second clip with visible value | Needs 2–3 minute explanation to convey value | Requires hands-on usage over days to appreciate |
-| **Authenticity** | Creator would genuinely use the app (not just shill for money) | Creator could plausibly use it occasionally | Feels forced — creator has no real use case |
-| **Affiliate/monetization fit** | App has a price point that supports affiliate commissions ($5+/mo or $20+ one-time) | Freemium with conversion — harder to attribute | Free app with no monetization — no creator incentive |
-
-**Scoring**: Count High/Medium/Low across all 5 factors.
-- **high fit**: 3+ factors scored High
-- **medium fit**: 2 factors High, or 3+ Medium
-- **low fit**: 2+ factors Low, or no factors High
+Score whether third parties (for B2C: creators and influencers) can authentically promote the app, using the advocacy rubric in the calibration pack. Not every app is advocacy-friendly — forcing it on a poor-fit product wastes money. Fill `creator_economy_fit` and its breakdown.
 
 ### Step 4 — Paid channel feasibility
 
-Assess whether paid acquisition can work within indie budget constraints.
-
-Budget tiers use the same vocabulary as the CAC specialist:
-
-| Budget tier | Monthly ad spend | Viable paid strategies |
-|---|---|---|
-| **Bootstrap** (≤ $100/mo) | Testing only | One platform, 2–3 ad creatives, learn CPM/CPI before scaling. Not a primary channel. |
-| **Lean** ($100–$500/mo) | Targeted campaigns | One platform with lookalike audiences. Can work if CPI < $2 and LTV > $6. |
-| **Moderate** ($500–$2,000/mo) | Real optimization | Multi-creative testing, retargeting. Viable if LTV:CAC > 3:1 on at least one platform. |
-
-If `budget_constraint` from user profile is "low", cap paid feasibility at "marginal" regardless of other factors — the user cannot sustain the learning curve of paid acquisition.
+Assess whether paid acquisition can work within indie budget constraints, using the budget tier table in the calibration pack (same vocabulary as the CAC specialist). Apply the pack's low-budget cap rule.
 
 ### Step 5 — Founder distribution edge
 
@@ -155,25 +98,7 @@ Cross-reference `user_profile.md` to identify whether the founder has a pre-exis
 
 ### Step 6 — Distribution verdict
 
-Compute the overall verdict by evaluating all dimensions together, then **adjust for founder tier**.
-
-#### Raw verdict logic
-
-| Condition (first match wins) | Raw verdict |
-|---|---|
-| k-factor ≥ 0.5 OR (ASO = high AND creator_fit = high) OR founder has existing audience | **strong** |
-| k-factor ≥ 0.2 AND at least one other dimension scores medium+, OR any single dimension scores high | **moderate** |
-| Otherwise (no organic path, paid not viable at budget) | **weak** |
-
-#### Tier adjustment
-
-The same distribution profile means different things to different founders. Apply this adjustment:
-
-| Founder tier | Adjustment |
-|---|---|
-| **beginner** | Downgrade verdict by one level if the only viable channels require technical skill (SEO, paid optimization, ASO keyword research). Beginners need channels with fast feedback loops: TikTok organic, community posting, referral-based growth. Flag complex channels as "aspirational — learn first." |
-| **builder** | No adjustment. Builders can execute most channels with some learning curve. Flag paid channels > $500/mo as risky given typical builder budgets. |
-| **growth** | Upgrade verdict by one level if paid channels are viable and the founder has optimization experience. Growth-tier founders can unlock channels that are traps for beginners. |
+Compute the raw verdict from the verdict-logic table in the calibration pack (first match wins), then apply the pack's founder-tier adjustment — the same distribution profile means different things to different founders.
 
 If `user_profile.md` is unavailable, skip tier adjustment and note it as a gap.
 
@@ -233,7 +158,7 @@ After writing the file, return: the distribution verdict, the recommended first 
 
 ## Notes
 
-- The `recommended_first_channel` should always be the highest-viability channel the founder can realistically execute given their tier. Don't recommend "TikTok organic" to someone who has never made a video; don't recommend "ASO" to someone who doesn't know what keywords are.
+- The `recommended_first_channel` should always be the highest-viability channel the founder can realistically execute given their tier. A channel the founder has never touched (video creation, keyword research, cold outreach) is aspirational, not recommendable.
 - If `competitors.json` is available, check competitor distribution strategies — an app succeeding via a channel the founder can replicate is a strong positive signal.
 - k-factor estimates are inherently speculative pre-launch. Treat them as directional, not precise. Flag any estimate above 0.5 as "optimistic until validated."
 

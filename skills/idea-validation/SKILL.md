@@ -65,11 +65,15 @@ The agent's system prompt already carries its rubrics; the per-agent prompt is c
 ```
 PROJECT ROOT: <absolute path — all .idea-validation/ paths resolve against this>
 DATE: <today, YYYY-MM-DD — run `date '+%Y-%m-%d'`, never assume>
+TARGET: <b2c | b2b — from idea.md frontmatter; absent → b2c>
 SLUG: <idea slug or market- slug>   NICHE: <exact niche wording to use everywhere>
 READ: <input paths for this step, per the workflow>
-EXTRA: <platform + prompt template path for trend researchers; reference paths where the agent file asks for them>
+CALIBRATION: <absolute path to references/calibration/<target>/<pack>.md — for agents whose brief asks for one>
+EXTRA: <platform + prompt template path for trend researchers; other reference paths where the agent file asks for them>
 Run your analysis and write your artifact. Return only the summary your brief asks for.
 ```
+
+Calibration packs (in `references/calibration/<target>/`, per agent): `demand-drivers.md` → iv-desire-evaluator · `pricing.md` → iv-pricing-wtp · `distribution.md` → iv-distribution · `retention.md` → iv-retention · `cac.md` → iv-cac-modeler · `market-sizing.md` → iv-market-sizer · `competitor-sources.md` → iv-competitor-mapper · `scoring-rubrics.md` → main-thread scoring. Trend researchers and the remaining agents take no pack.
 
 Give every trend researcher the same NICHE wording verbatim — five researchers reinterpreting the niche five ways poisons the whole evidence base.
 

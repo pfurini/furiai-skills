@@ -63,6 +63,7 @@ The file uses YAML frontmatter for machine-readable metadata and a full narrativ
 ---
 idea_slug: <slug>
 status: candidate
+target: <b2c | b2b — the TARGET the orchestrator gave you>
 created_at: <ISO date — use the date the orchestrator gave you>
 source_niche: <niche>
 source_files: []        # .idea-validation/market_insights/ filenames read
