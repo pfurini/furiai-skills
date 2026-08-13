@@ -357,13 +357,96 @@ actually run.
 
 **Phase C is COMPLETE.** Both forward-tests pass; fixes committed.
 
-### Phase D — B2C (after B2B sign-off; outline only)
+### Phase D — B2C Italy-first refactor (full plan, written 2026-08-13)
 
-Ring policy: Italy → Europe-English → Western (NA, UK/IE, AU/NZ); Eastern excluded; app
-languages Italian + English only. Trend prompts get ring-labeled sourcing (Italian TikTok/
-App Store IT/Reddit-EN split); `market-sizing` sizes rings separately (SAM-Italy first);
-`distribution`/`cac` mostly unchanged (global app stores) except IT-market CPI/ASO notes;
-scoring unchanged. Detailed plan written after B2B lands.
+**Ring policy (the organizing idea).** A b2c idea is validated ring by ring:
+- **Ring 1 — Italy**: Italian-language consumer market, EUR, Italian surfaces
+  (TikTok IT, App Store IT, Italian subreddits/forums, Google.it).
+- **Ring 2 — Europe-English**: EU consumers reachable with an English-language
+  app, EUR, English surfaces filtered to EU signal where possible.
+- **Ring 3 — Western**: NA, UK/IE, AU/NZ; USD; the current global benchmarks.
+- Eastern markets excluded. App languages: Italian + English only.
+Every finding and figure carries a **ring label**; market sizing reports SAM
+per ring, Italy first; distribution and CAC state which ring a benchmark
+belongs to. Scoring mechanics stay target-neutral and unchanged.
+
+#### Decisions needing user sign-off before edits (DD1–DD5)
+
+| # | Decision | Recommendation |
+|---|---|---|
+| DD1 | Port the b2b evidence-label + disconfirming-evidence pattern into the five b2c templates? | Yes — labels become **ring** (IT / EU-EN / Western) instead of geography IT/non-IT, same confidence definition. Makes b2c evidence as falsifiable as b2b. |
+| DD2 | b2c evidence gate? | No hard cap. Consumer niches have abundant global signal; a b2b-style cap misfires. Instead: a mandatory **ring-coverage disclosure** in `scores.json` (which rings the evidence came from) and a memo watermark when Ring-1 evidence is absent for an Italy-first idea. |
+| DD3 | Currency handling | Benchmarks carry a ring column: EUR for Rings 1–2, USD for Ring 3. No conversion mixing inside one table row. |
+| DD4 | Research-pass depth (D-A below) | Run DA1–DA5 as fresh web research; DA6 is annotate-and-source the existing global figures, no new hunting unless a figure is unfindable (then mark it a construct, confidence: low). |
+| DD5 | Cross-artifact `confidence` field (both targets, additive, deferred from Phase B2) | Roll it out in D-B step 10 while the packs are open anyway. |
+
+#### Phase D-A — Italy b2c research pass (writes `research/idea-validation-italy-b2c/`)
+
+Same discipline as the b2b pass: every figure carries source + date +
+confidence; each report ends with a "does not exist publicly" log; never
+invent what the log says is missing.
+
+| # | Question | Target sources | Feeds |
+|---|---|---|---|
+| DA1 | IT device/platform base: iOS vs Android share Italy (dated), smartphone penetration, App Store IT category structure | StatCounter (dated), Comscore/AGCOM reports | market-sizing platform filter |
+| DA2 | Italian consumer app WTP anchors: EUR price points on the IT App Store for the main b2c categories (subscriptions, one-time) | IT App Store listings, vendor pricing pages | pricing |
+| DA3 | Italian consumer paid-channel units: Meta/TikTok/Google CPI and CPC for IT consumer campaigns | published IT benchmarks (WordStream-class, agency reports) | cac |
+| DA4 | Italian creator economy: TikTok/Instagram/YouTube IT — active categories, sponsorship cost norms, affiliate practices | published reports, creator-platform data | distribution, cac |
+| DA5 | Italian-language consumer communities per major b2c niche, verified active (subreddits, forums, Facebook/Telegram) with the dead/degraded log | direct verification | reddit + web-search templates (must name real surfaces) |
+| DA6 | Source-and-date the existing global (Ring 3) figures the b2c packs already carry: D1/D7/D30 retention table, capture rates, k-factor ranges, freemium conversions, CAC table | original sources where findable | all b2c packs (annotation pass) |
+| DA7 | What does NOT exist publicly for Italian consumer apps (negative-result log) | — | all packs |
+
+#### Phase D-B — rewrite (order respects the coupled-pack rules)
+
+1. `SKILL.md` + `memory.md`: ring policy statement in the b2c part of the
+   Target section; ring vocabulary defined once; Ring-1 research runs
+   bilingually (Italian-first surfaces, same NICHE-verbatim rule).
+2. Five b2c trend prompts (`tiktok.md`, `reddit.md`, `apps.md`,
+   `web-search.md`, `x-twitter.md`): ring-labeled source tiers (Ring 1
+   surfaces first), evidence labels + disconfirming-evidence section (DD1),
+   and the Phase B2 drift fixes (tiktok tier structure + citation-inheritance
+   clause; x-twitter recency bullet, list indentation, em-dash tier headers,
+   sources-section wording; velocity-classification wording normalized).
+3. `calibration/b2c/market-sizing.md`: ring-based SAM (Italy sized first,
+   rings reported separately), date the iOS-share table (DA1), source the
+   community multipliers and capture rates (DA6), align the SOM-fantasy
+   trigger with the "large" band or state why they differ.
+4. `demand-drivers.md` + `core-human-desires.md` together: retitle and clean
+   core-human-desires (calibration-file opener naming its consumer, drop the
+   meta/key-principle tail and trivia notes, fix the desire-2 name), resolve
+   the Fairness & Justice mapping (fold into Control or declare it unscored),
+   add the "driver NAMES are load-bearing" warning (b2c `pricing.md` is keyed
+   to them exactly like b2b).
+5. `calibration/b2c/pricing.md`: Ring-1 EUR anchors from DA2, ring column on
+   WTP and conversion tables, source/date/confidence on every figure.
+6. `retention.md` + `cac.md` together (coupled): add the schema keys to the
+   b2c factor table (b2b already carries them), source the D1/D7/D30 table,
+   IT channel units from DA3, rename "Indie Budget Tiers" → "Budget Tiers"
+   (b2b's name).
+7. `calibration/b2c/distribution.md`: App Store IT ASO notes, Italian
+   creator-economy notes (DA4), settle one loop-table name for both targets
+   ("Growth Loop Types").
+8. `calibration/b2c/scoring-rubrics.md`: ring-coverage disclosure block per
+   DD2; anchor the freemium +10 threshold to the pricing pack's table.
+9. `references/interview.md`: Browse Path gets a fifth batch of Italian
+   professional/SMB domains (or an explicit b2c/b2b routing note) — closes
+   Phase B2 finding H8.
+10. Cross-cutting, both targets: `confidence` field in every artifact schema
+    (DD5); TOCs on the eight >100-line b2b packs; pack-skeleton alignment
+    (section names in the same order per pack type).
+
+#### Phase D-C — validation
+
+- `quick_validate.py` after every step (same command).
+- Forward-test: one Italian consumer idea (pick a niche with a real Ring-1
+  surface, e.g. a hobby/family app) through the full chain in Claude Code
+  with Sonnet executors, orchestrated per SKILL.md. Draft a b2c audit
+  checklist first, analogous to Phase C's: ring labels on every finding,
+  SAM-Italy reported first, EUR anchors in Ring-1 pricing, named-surface
+  rule respected (DA5's verified list), Italian quotes translated, no
+  invented search volumes, ring-coverage disclosure present in scores.
+- Optional pi acceptance run after the CC run passes, same division as
+  Phase C (content test in CC, acceptance in pi).
 
 ## Open decisions for the user
 
