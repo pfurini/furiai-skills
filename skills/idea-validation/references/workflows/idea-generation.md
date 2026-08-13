@@ -36,8 +36,11 @@ When this workflow is triggered, **immediately** say this before doing anything 
 3. Trend research — fan-out wave
    ↓ browse mode → selected_interest_domains are the niches. Otherwise infer the
    |   niche from the profile or existing insights and confirm with the user.
-   ↓ Ask which platforms (see the trend platform menu in SKILL.md). Apply the
-   |   freshness check first.
+   ↓ Determine the target (b2c | b2b) from the confirmed niche per SKILL.md —
+   |   consumer-life niches → b2c; operator/business niches → b2b. Candidates
+   |   generated in step 4 inherit it in their idea.md frontmatter.
+   ↓ Ask which platforms (see the target's trend platform menu in SKILL.md).
+   |   Apply the freshness check first.
    ↓ dispatch: iv-trend-researcher × one per selected platform × per niche,
    |   all in one message, in background
    ↓ writes: .idea-validation/market_insights/<niche>-<platform>-<YYYY>-<MM>.md (one per dispatch)

@@ -15,9 +15,10 @@ When this workflow is triggered, **immediately** say this before doing anything 
 
 ## Entry Conditions
 
-- User specifies a topic or category (e.g. "nutrition apps", "B2B invoicing tools"). No product idea is required.
+- User specifies a topic or category (e.g. "nutrition apps", "agency reporting tools"). No product idea is required.
+- Determine the target (b2c | b2b) from the topic per SKILL.md, state it in the announcement, and pass it in every dispatch.
 - Create a research slug with `market-` prefix (e.g. `market-nutrition-2026`) and `.idea-validation/ideas/<slug>/`.
-- Apply the market_insights freshness check for this niche. Ask the user which platforms to research (see the trend platform menu in SKILL.md).
+- Apply the market_insights freshness check for this niche. Ask the user which platforms to research (see the target's trend platform menu in SKILL.md).
 
 ## Wave Plan
 

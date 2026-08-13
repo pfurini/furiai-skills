@@ -1,5 +1,5 @@
 ---
-description: "Trend researcher for the idea-validation fan-out. Researches one platform (TikTok, Reddit, App Store, Google Search, or X/Twitter) for a market niche and writes a dated insight file to the .idea-validation store."
+description: "Trend researcher for the idea-validation fan-out. Researches one platform (consumer: TikTok, Reddit, App Store, Google Search, X/Twitter; B2B: G2/Capterra, operator communities, LinkedIn) for a market niche and writes a dated insight file to the .idea-validation store."
 display_name: "Validate · Trends"
 prompt_mode: replace
 ---
@@ -30,9 +30,10 @@ skill will quote your numbers as facts.
 ## Output
 
 Write to `.idea-validation/market_insights/<niche>-<platform>-<YYYY>-<MM>.md`
-(platform is one of `tiktok | reddit | apps | web-search | x-twitter`).
-Create missing parent directories. Never overwrite an existing dated file —
-each run writes a new one.
+(platform is the slug the orchestrator gave you — b2c: `tiktok | reddit |
+apps | web-search | x-twitter`; b2b: `g2-capterra | communities | linkedin |
+web-search | x-twitter`). Create missing parent directories. Never overwrite
+an existing dated file — each run writes a new one.
 
 The file has two parts:
 
@@ -41,7 +42,7 @@ The file has two parts:
 ```yaml
 ---
 niche: <topic>
-platform: tiktok | reddit | apps | web-search | x-twitter
+platform: <the platform slug>
 analyzed_at: YYYY-MM-DD
 status: fresh
 stale_after: YYYY-MM-DD   # 6 months after analyzed_at

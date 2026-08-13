@@ -46,7 +46,7 @@ If the tree exists, leave it in place and update files in situ.
 
 - Idea slugs: kebab-case, max 40 characters, from the idea name (`habit-tracker-climbers`).
 - Market-only research slugs: `market-` prefix (`market-nutrition-2026`).
-- Trend files: `<niche>-<platform>-<YYYY>-<MM>.md` with `platform` one of `tiktok | reddit | apps | web-search | x-twitter`. Combined file only if the user asks: `<niche>-multi-<YYYY>-<MM>.md`.
+- Trend files: `<niche>-<platform>-<YYYY>-<MM>.md` with `platform` one of `tiktok | reddit | apps | web-search | x-twitter` (b2c) or `g2-capterra | communities | linkedin | web-search | x-twitter` (b2b). Combined file only if the user asks: `<niche>-multi-<YYYY>-<MM>.md`.
 
 ## Protocol
 

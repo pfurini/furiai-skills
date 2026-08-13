@@ -2,15 +2,18 @@
 
 ### *To Build or Not to Build — that is the question this answers.*
 
-A skill pack that turns Claude Code into a personal venture analyst for indie B2C app developers — from idea brainstorming to full validation, market research, and pivot analysis. Validate in 10 minutes instead of regretting in six months.
+A skill pack that turns Claude Code into a personal venture analyst for indie builders — from idea brainstorming to full validation, market research, and pivot analysis. Covers two targets with dedicated calibration: **consumer apps (B2C)** and **self-serve B2B micro-SaaS** (credit-card signup, no sales team — marketplace apps, dev tools, vertical SMB tools). Validate in 10 minutes instead of regretting in six months.
 
 ## Who Is This For?
 
 - **Indie app developers** who want to validate app ideas before building
-- **Solo founders** exploring B2C startup ideas and looking for a data-driven brainstorming partner
+- **Micro-SaaS builders** targeting merchants, agencies, and other small-business operators with self-serve tools
+- **Solo founders** exploring startup ideas and looking for a data-driven brainstorming partner
 - **Side-project builders** deciding where to invest their limited time
 - **Aspiring developers** with no idea yet who want to discover one worth building
 - **Anyone** tired of building things nobody wants
+
+Explicitly out of scope: sales-led enterprise SaaS (procurement, demos, custom contracts) — that segment is validated through customer-discovery interviews, which desk research can't replace. The agent says so when an idea drifts there.
 
 ## Installation Scope
 
@@ -21,7 +24,8 @@ Install this skill **per project**, not globally at the user level. All analysis
 One orchestrator skill drives eleven specialist subagents that communicate only through files:
 
 - **`idea-validation`** (this skill) is the entry point. It fires on natural requests — "validate my idea", "what should I build?", "tell me about the journaling market", "should I pivot?" — detects your intent, and routes to the right workflow. You can also ask for a **single dimension** ("who are the competitors of X?") without a full workflow.
-- **Specialist agents** (`agents/iv-*.md`) each analyze one dimension and write one artifact into `.idea-validation/`. Independent dimensions run **in parallel waves**: five platform researchers sweep TikTok, Reddit, the App Store, Google, and X simultaneously; then competitors, desire, and distribution analyze concurrently; then pricing and retention; then unit economics. Each agent runs with a clean context containing only its rubrics and inputs, on a model tier matched to its dimension (see `agents/README.md`).
+- **Specialist agents** (`agents/iv-*.md`) each analyze one dimension and write one artifact into `.idea-validation/`. Independent dimensions run **in parallel waves**: five platform researchers sweep the target's evidence surfaces simultaneously (B2C: TikTok, Reddit, App Store, Google, X; B2B: G2/Capterra, operator communities, LinkedIn, Google, X); then competitors, demand drivers, and distribution analyze concurrently; then pricing and retention; then unit economics. Each agent runs with a clean context containing only its rubrics and inputs, on a model tier matched to its dimension (see `agents/README.md`).
+- **Per-target calibration packs** (`references/calibration/b2c/` and `b2b/`) hold the benchmark tables — churn bands, channel CACs, WTP ranges, capture rates — while the agents hold only the mechanisms. Each idea carries a `target: b2c | b2b` field that selects the pack set; the artifact schemas are identical for both targets. B2B gating numbers are web-sourced with citations; construct tables are flagged `confidence: low` pending a source-hardening pass (raw research in `research/idea-validation-b2b-benchmarks/`).
 - **The conversational and synthesis steps stay on the main thread**: the founder interview, segmentation, the 0–100 scoring, and the decision memo (`references/*.md`) — so the math stays auditable and the verdict draws on the full conversation.
 
 The agent files are built for pi-subagents custom agent types but degrade gracefully: harnesses without them (e.g. Claude Code) dispatch generic subagents carrying the agent body as their brief, and with no subagents at all the orchestrator runs the same briefs inline. Specialists never call each other; the orchestrator reads each wave's outputs and feeds the next. Conversation history is not the store — `.idea-validation/` is, so nothing is lost between sessions.
@@ -65,6 +69,7 @@ Score this — a subscription app that sends meal plans based on your grocery bu
 - **Competitors** are analyzed via systematic App Store search + 1-star/3-star review mining to surface the exact gaps incumbents leave open
 - **Riskiest Assumption Test (RAT)** designs a ≤2-week, ≤$100 behavioral experiment to validate the single assumption most likely to kill the idea
 - **Pre-mortem** (Klein, 2007) imagines the idea failing in 12 months and traces the most probable causes back to scored weaknesses
+- **On the B2B target**, the same machinery runs with swapped calibration: pain/ROI demand drivers instead of desires, workflow-embedding retention with churn-by-price-band benchmarks, marketplace-listing opportunity instead of ASO, G2/Capterra review mining instead of the App Store, and SOM estimates reality-checked against Stripe-verified indie revenue cohorts
 
 **Verdict bands:** 75–100 **pursue** · 55–74 **test** (run the RAT first) · 35–54 **pivot** · 0–34 **drop**
 

@@ -18,7 +18,7 @@ When this workflow is triggered, **immediately** say this before doing anything 
 1. Derive slug: kebab-case from idea name, max 40 chars.
 2. Create `.idea-validation/ideas/<slug>/` if needed.
 3. Write `.idea-validation/ideas/<slug>/idea.md` with the raw idea (`status: in-validation`, and the `target` field per SKILL.md) before the chain, unless it already exists.
-4. Apply the market_insights freshness check for this niche. Ask the user which platforms to research (or reuse fresh files); see the trend platform menu in SKILL.md.
+4. Apply the market_insights freshness check for this niche. Ask the user which platforms to research (or reuse fresh files); see the target's trend platform menu in SKILL.md.
 
 ## Wave Plan
 

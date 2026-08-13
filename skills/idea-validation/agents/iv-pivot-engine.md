@@ -176,7 +176,7 @@ Before finalizing, verify each pivot option passes these constraints:
 | **Budget feasible** | Pivot requires spend exceeding founder's budget tier (e.g., "run paid social" for a Bootstrap founder) |
 | **Time feasible** | Pivot requires > 3 months of work for the founder's tier |
 | **Skill feasible** | Pivot requires skills the founder doesn't have and can't learn in 4 weeks (e.g., "build an ML model" for a no-code beginner) |
-| **No enterprise creep** | Pivot moves the idea toward B2B enterprise, custom sales, or long sales cycles — fundamentally not an indie B2C play |
+| **No sales-led creep** | Pivot moves the idea toward a sales-led motion — enterprise procurement, custom contracts, demos required to buy, long sales cycles — outside the indie self-serve play for either target |
 
 If a pivot fails any constraint, either modify it to fit or discard it and note why.
 
