@@ -448,6 +448,46 @@ invent what the log says is missing.
 - Optional pi acceptance run after the CC run passes, same division as
   Phase C (content test in CC, acceptance in pi).
 
+### Phase D-A log — Italy b2c research pass (done 2026-08-13)
+
+DD1–DD5 approved by the user as recommended, 2026-08-13, before any edits.
+
+Six reports written to `research/idea-validation-italy-b2c/` by six parallel
+web-research agents (exa-backed, bilingual, executor prompts carried the date,
+the confidence mandate, and the negative-log requirement). All six pass the
+structure check (source + date + confidence on every figure; per-report
+"does not exist publicly" log). README carries the headline synthesis and the
+consolidated DA7 log.
+
+Headlines the D-B rewrite must absorb (full detail in the README):
+- Italy 35% iOS / 65% Android; the pack's iOS-share table is stale in 8 of 9
+  rows (only Western Europe holds). Subscriptions are NOT price-equalized by
+  Apple (EUR/USD observed 0.80–1.20): a subscription price is a decision, not
+  a conversion. Indie EUR bands: 4,99–9,99 €/mo, 29,99–69,99 €/yr, VAT inside.
+- Only ASA (Italy CPA $1.60 ≈ 0.42× US) and Meta (CPM €10.48, ~50% below
+  global) have Italy-specific paid data; TikTok Italy = NOT REPORTED (citation
+  ring); no Italy CPI from any MMP.
+- No Italian app-install creator data exists; nano/micro TikTok/IG is the
+  optimum; Amazon.it pays 0% on Android apps; disclosure liability falls on
+  the commissioning advertiser (AGCM).
+- 47 verified-active Italian surfaces; four niches with none (language
+  learning, parenting-on-Reddit, general cooking, productivity-as-such);
+  English-language trap subs documented for the templates.
+- DA6 verdicts: retention D30 table 2–4× above published medians; annual-
+  discount "avoid" band contradicts the market average (63–67%); CAC table
+  conflates CPI with cost-per-payer; constructs confirmed (capture rates,
+  community multipliers, driver multipliers, organic CAC, lifespan mapping).
+- Corrections feeding back into b2b files (apply in D-B step 10 or a b2b
+  touch-up): Superads €0.43 CPC currency basis unverified (carry the ratio,
+  ~52% below global); Milan/Turin CPC premium unsupported after source
+  exclusions.
+
+Gated pulls left to the user (optional): Adjust Mobile App Trends 2026 +
+AppsFlyer Subscription 2026 (would settle the retention premium), SplitMetrics
+Apple Ads 2026 (Italy ASA cross-check), DeRev Listino 2026 full grid.
+
+**Phase D-A is COMPLETE.** Next: Phase D-B rewrite in the plan's order.
+
 ## Open decisions for the user
 
 1. **D4 threshold and mechanics** — cap-at-moderate vs. score-discount; the ~15-observation
