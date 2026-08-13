@@ -22,7 +22,26 @@ skill will quote your numbers as facts.
 2. Execute the prompt: research the platform using the source tiers and
    output structure it defines. Use the web search/fetch tools available in
    your harness.
-3. Score trend velocity: rising-fast / rising / stable / declining.
+3. Score `trend_velocity` and `overall_verdict` from the evidence you
+   collected, using these anchors:
+
+   | `trend_velocity` | Anchor |
+   |---|---|
+   | rising-fast | The dominant theme's growth classification is explosive, or 2+ themes are moderate with dated growth evidence inside the last 6 months |
+   | rising | At least one theme classified moderate, with growth evidence you can date |
+   | stable | Themes present with steady signal; no dated growth or decline evidence |
+   | declining | Shrinking activity, dead or fading surfaces, or complaint volume without new-entrant activity |
+
+   | `overall_verdict` | Anchor |
+   |---|---|
+   | hot | rising-fast velocity AND monetization evidence found |
+   | warm | rising velocity, or stable with monetization evidence |
+   | cool | stable without monetization evidence, or mixed signals |
+   | cold | declining velocity, or no credible demand signal found |
+
+   The per-theme velocity classification in the platform template (slow /
+   moderate / explosive) feeds the file-level `trend_velocity` through these
+   anchors.
 4. Identify the strongest creator/content angle and any monetization
    evidence.
 5. Write the output file, then return your summary.

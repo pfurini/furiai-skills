@@ -25,7 +25,7 @@ Identify and analyze **the software landscape and buyer sentiment for [NICHE] on
      * Reviews inside Italian marketplaces where the niche touches them: **Fatture in Cloud App Store**, **TeamSystem Commerce Apps Market**.
 
      **Tier 2 — Global review platforms and marketplaces (directional)**
-     * G2 / Capterra.com / GetApp / Software Advice — category structure, the global leaders, their review velocity and structured "dislikes"; label all of it `geography: global`.
+     * G2 / Capterra.com / GetApp / Software Advice — category structure, the global leaders, their review velocity and structured "dislikes"; label all of it `geography: non-IT`.
      * Global marketplaces where the niche lives inside a platform (Shopify App Store, Zapier, Chrome Web Store): listing counts, installs, rating distributions, last-update dates — installs are global; check for Italian-language listings/reviews as the Italy proxy.
 
      **Tier 3 — Corroborating sources**
@@ -50,7 +50,7 @@ Identify and analyze **the software landscape and buyer sentiment for [NICHE] on
 
 **D. Growth Analysis** — for rising themes only: growth evidence with timeframe and velocity classification (slow / moderate / explosive).
 
-**E. Evidence labels** (mandatory) — **geography** (IT / global) · **segment** · **firm-size proxy** · **stack named** · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** (review, listing, pricing page, comparison article) · **confidence** (high only if corroborated by an Italian-language source or 2+ independent platforms).
+**E. Evidence labels** (mandatory) — **geography** (IT / non-IT) · **region** (national / North / Centre / South / province; "n/a" for non-IT) · **segment** (commercialista, avvocato, consulente del lavoro, artigiano, merchant, agency, generic PMI) · **firm-size proxy** · **stack** (the software the source uses, when stated) · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** (review, listing, pricing page, comparison article) · **confidence** (high only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; medium for a single Italian source; low for non-IT or vendor-supplied).
 
 4. **Structure the Output**
 

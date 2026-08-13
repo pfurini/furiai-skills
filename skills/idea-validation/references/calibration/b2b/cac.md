@@ -53,14 +53,15 @@ These channel names are the keys of `cac_by_channel` in the output schema.
 | Channel (schema key) | Indie-scale CAC estimate | Derivation / source | Adjust down if | Adjust up if |
 |---|---|---|---|---|
 | **Content / SEO** (`content_seo`) | €50–300 effective (founder time) | Italian SERPs are less crowded than English ones for niche B2B terms, but Italian long-tail volume is low and publicly unmeasured — instrument with SEOZoom/DataForSEO before relying on it. `confidence: low` | Weak Italian top results; incumbent content is thin/dated | Volumes too small to matter; zero-click erosion |
-| **Marketplace organic** (`marketplace_organic`) | Rev-share + listing effort; near-€0 marginal once ranked | Verified terms: **Fatture in Cloud App Store — publication free, API free on all plans** (claimed 500K+ businesses, 16K accountants); TeamSystem Commerce partner rev-share; Shopify 0% first $1M then 15%. No install→paid funnel data published anywhere — say so. `confidence: high` on terms, `low` on funnel | Product attaches to FIC-class open ecosystem; category has stale listings | No marketplace exists for the niche (most Italian verticals — check first) |
+| **Marketplace organic** (`marketplace_organic`) | Rev-share + listing effort; near-€0 marginal once ranked | Verified terms (2026-08): **Fatture in Cloud App Store — publication free, API free on all plans** (claimed 500K+ businesses, 16K accountants); TeamSystem Commerce partner rev-share; Shopify 0% first $1M then 15%. No install→paid funnel data published anywhere — say so. `confidence: high` on terms, `low` on funnel | Product attaches to FIC-class open ecosystem; category has stale listings | No marketplace exists for the niche (most Italian verticals — check first) |
 | **Communities / founder-brand** (`communities`) | €20–150 effective (founder time) | Qualitative only. Italian surfaces are few and verified (Fisco Forum, r/commercialisti, association events) — presence is cheap but reach is capped; no cost-per-customer data exists. `confidence: low` | Founder authentically belongs (iscritto all'albo, operates in the niche) | Communities ban promotion; founder is an outsider; niche discussion is private/offline |
 | **Intermediary referral** (`intermediary_referral`) | Near-€0 cash; relationship + enablement effort | The commercialista/consulente/reseller recommendation is how Italian micro-firms actually adopt software — but credibility holds only INSIDE the studio's own workflow (large trust gap outside it). No published economics. `confidence: low` | Tool serves or visibly helps the studio itself; studio-side value prop exists | Tool is invisible to intermediaries or competes with what they sell |
 | **Events / fairs** (`events_fairs`) | One-time cohort; SMAU Milano ≈ €4,500+IVA a booth (regional de minimis programs can zero it for startup/PMI innovative) | Priced from published SMAU rates (2026). High-LTV channel class per MicroConf 2024 (conferences: 54% of >$5K-LTV companies). Lead quality real, volume modest. `confidence: medium` on cost, `low` on yield | ACV justifies it; founder can work a booth in Italian; regional funding available | Low ACV; no follow-up capacity (remember: no cold email after — collect consent AT the fair) |
 | **Cold outbound** (`cold_outbound`) | **viable: false — prohibited in Italy** (see Legal exclusion) | Statutory; Garante enforcement record | — | — |
 | **Paid search** (`paid_search`) | €300–1,500 per paying customer (planning range) | Derived: Italian B2B-intent CPC €1.50–4.00 (planning range, no methodology-disclosed study) × landing conv 2–5% × trial→paid 4–35%. Milan/Rome +20–50% CPC premium. `confidence: low` throughout | Exact-match Italian long-tail solution keywords; card trial | Broad keywords; freemium entry; Q4 auction pressure |
-| **Paid social** (`paid_social_linkedin`) | LinkedIn: not viable below ~€2,000/mo (CPL ≈ €207, single source). Meta: CPC ~€0.43 — cheap retargeting, thin B2B decision-maker pool | Impactable 2025 (LinkedIn, sample undisclosed); Meta global median country-cut. `confidence: low` | ACV > €1,000/yr AND Moderate+ budget (LinkedIn); site retargeting (Meta) | Everything else — exclude by default at indie budgets |
-| **Referral / word of mouth** (`referral_word_of_mouth`) | €0–150 | Lowest-CAC channel in every published ranking; peer advocacy through ordini/associations is the Italian variant | k ≥ 0.2 from distribution.json; client-facing artifacts; affiliate at €20+/mo price | No loop; solitary back-office tool |
+| **Paid social — LinkedIn** (`paid_social_linkedin`) | Not viable below ~€2,000/mo (CPL ≈ €207, single source) | Impactable 2025 (LinkedIn, sample undisclosed). `confidence: low` | ACV > €1,000/yr AND Moderate+ budget | Everything else — exclude by default at indie budgets |
+| **Paid social — Meta retargeting** (`paid_social_meta`) | CPC ~€0.43 — cheap retargeting of site visitors; thin cold-B2B decision-maker pool | Meta global median country-cut. `confidence: low` | Retargeting warm site traffic with a self-serve offer | Cold prospecting for decision-makers; no traffic to retarget |
+| **Referral / word of mouth** (`referral_word_of_mouth`) | €0–150 | Consistently the lowest-CAC channel across published rankings (no single citable source; confidence: low); peer advocacy through ordini/associations is the Italian variant | k ≥ 0.2 from distribution.json; client-facing artifacts; affiliate at €20+/mo price | No loop; solitary back-office tool |
 | **Integration partnerships** (`integration_partnerships`) | Effort-priced; near-€0 marginal | FIC App Store listing, connector ecosystems (bindCommerce-class), Zapier; incumbent partner programs beyond FIC are contact-gated — model as slow. `confidence: low` | Tool completes a workflow gap in an open ecosystem | Target incumbent has no API (Danea-class) or partner-gates it (Zucchetti-class) |
 | **Launch platforms** (`launch_platforms`) | One-time spike, heavily discounted for Italy | Product Hunt/HN audiences barely overlap Italian professional buyers — expect the low end of the global folklore range (tens of signups), near-zero for vertical niches. `confidence: low` | Dev-tool niche with international appeal | Italian vertical niche (skip) |
 
@@ -70,7 +71,7 @@ These channel names are the keys of `cac_by_channel` in the output schema.
 |---|---|
 | Always (Italy, statutory) | Cold outbound (email/PEC) — `viable: false`, cite the law |
 | `budget_constraint` = "low" (Bootstrap) | Paid search, paid social, events/fairs (unless regionally funded) |
-| ACV < €50/mo | Paid social; events/fairs rarely pay back |
+| ACV < €50/mo | `paid_social_linkedin` (Meta retargeting can stay); events/fairs rarely pay back |
 | Product doesn't attach to an open ecosystem | Marketplace organic, integration partnerships |
 | Tool invisible/irrelevant to studi and resellers | Intermediary referral |
 | No identifiable Italian communities discussing the pain | Communities / founder-brand |
@@ -84,9 +85,9 @@ The retention specialist's B2B pack writes `d7` = month-1 logo retention and
 
 | Monthly logo churn | Estimated avg lifespan | Rationale |
 |---|---|---|
-| ≤ 2% | 30–36 months (cap at 36 pre-launch) | Best-in-class embedding; ChartMogul top bands |
-| 2–3% | 24–33 months | "Good" for the $25–100 ARPA band |
-| 3–5% | 20–30 months | Around the $25–100 median (4.2%) |
+| ≤ 2% | 36 months (the cap) | Best-in-class embedding; ChartMogul top bands |
+| 2–3% | 33–36 months (cap at 36 pre-launch) | "Good" for the $25–100 ARPA band |
+| 3–5% | 20–33 months | Around the $25–100 median (4.2%) |
 | 5–7% | 14–20 months | Below median |
 | > 7% | < 14 months | "Weak" band; disposable territory |
 

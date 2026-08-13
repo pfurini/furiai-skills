@@ -1,5 +1,5 @@
 ---
-description: "Market sizing specialist for the idea-validation fan-out. Estimates TAM, SAM, and a realistic indie SOM for a B2C app idea or market category via triangulated bottom-up methodology, and writes market_size.json."
+description: "Market sizing specialist for the idea-validation fan-out. Estimates TAM, SAM, and a realistic indie SOM for an idea or market category in either target via triangulated bottom-up methodology, and writes market_size.json."
 display_name: "Validate · Market Size"
 model: openai-codex/gpt-5.6-terra
 thinking: medium
@@ -97,8 +97,6 @@ Run all available approaches and compare:
 - If estimates disagree by 2–5× → medium confidence. Use the most conservative estimate and note the range.
 - If estimates disagree by > 5× → low confidence. Flag assumptions that cause the divergence.
 
-Always report which approaches were used and their individual estimates in the output.
-
 ## SAM Filtering
 
 SAM narrows TAM to the segment actually reachable by the app. Apply these filters in order:
@@ -108,7 +106,7 @@ SAM narrows TAM to the segment actually reachable by the app. Apply these filter
 | Filter | How to apply | Data source |
 |---|---|---|
 | **Platform** | Platform-limited reach → multiply TAM by the platform share from the calibration pack's platform filter table | Calibration pack |
-| **Geography** | English-only → US + UK + CA + AU + NZ + IE. Specific country → that country only | App concept language |
+| **Geography** | Apply the geographic filter defined in the calibration pack; if the pack names a single market, SAM is bounded by that market's population base | Calibration pack |
 | **Age range** | If app targets a demographic (teens, 50+), apply population % | Idea description |
 | **Income bracket** | If app requires disposable income for subscription, filter by income | Pricing model |
 
@@ -152,24 +150,16 @@ If multiple platform files have different velocities, use the **median** velocit
 
 Before finalizing, run these sanity checks:
 
+Run the numeric reality checks defined in the calibration pack (TAM inflation, SAM breadth, SOM fantasy thresholds live there); record every triggered check in `reality_checks_triggered`.
+
 | Check | Threshold | Action if triggered |
 |---|---|---|
-| **TAM inflation** | TAM > $10B for a niche indie app | Almost certainly using top-down numbers. Redo with bottom-up only. |
-| **SAM too broad** | SAM > 50% of TAM | Filters are too loose. Add platform/geography/niche constraints. |
-| **SOM fantasy** | SOM year 1 > $500K for a solo developer | Reality-check the capture rate. Most indie apps earn $0–$50K in year 1. |
 | **No monetization evidence** | `monetization_evidence` from market_insights is empty across all platforms | Discount TAM by 30–50%. People may want this but not pay for it. |
 | **Cold market** | All market_insights files show `overall_verdict` = "cold" or "cool" | Flag as speculative. Note that market demand is unvalidated. |
 
-## Market Size Verdict Thresholds
+## Market Size Verdict
 
-Based on **SOM year 1** (the number that actually matters for an indie developer deciding whether to build):
-
-| SOM year 1 | Verdict | Meaning for an indie dev |
-|---|---|---|
-| > $200K | **large** | Significant indie opportunity. Even partial execution could be life-changing. |
-| $50K–$200K | **medium** | Viable as a primary project. Can sustain a solo developer if retention is good. |
-| $10K–$50K | **niche** | Side-project scale. Viable if build cost is low and the founder has another income source. |
-| < $10K | **micro-niche** | Hobby scale. Only worth building if the founder has a personal reason to build it or can expand the niche. |
+Issue `market_size_verdict` (large / medium / niche / micro-niche) from the SOM-year-1 bands in the calibration pack. The verdict is based on SOM year 1 — the number that matters for an indie developer deciding whether to build.
 
 ## Process
 
@@ -183,7 +173,7 @@ Based on **SOM year 1** (the number that actually matters for an indie developer
 8. Estimate SOM using category-appropriate capture rate benchmark.
 9. Apply growth multiplier from trend velocity.
 10. Run reality checks. Adjust if any are triggered.
-11. Determine market size verdict from SOM year 1 thresholds.
+11. Determine `market_size_verdict` from the calibration pack's SOM-year-1 bands (see Market Size Verdict).
 12. Write output.
 
 ## Output
@@ -203,7 +193,7 @@ Write to `.idea-validation/ideas/<slug>/market_size.json` (create missing parent
   "triangulation_confidence": "high | medium | low",
   "tam": {
     "value": 0,
-    "currency": "USD",
+    "currency": "<USD | EUR — the currency the calibration pack prices in>",
     "period": "annual",
     "assumptions": []
   },

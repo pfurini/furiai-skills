@@ -29,8 +29,7 @@ Score each schema factor 1–5 against these B2B interpretations:
 | Data lock-in (`data_lock_in`) | Business records accumulate (client history, configurations, integrations wired into the gestionale) | Nothing stored that would hurt to lose; switch costs one afternoon |
 | Habit stack (`habit_stack`) | Slots into an existing operating routine or fires automatically inside the stack (wired to the incumbent suite via integration) | Requires the business to adopt a new process around the tool |
 
-`habit_formation_score` = mean of the six factor scores, one decimal
-(1.0–5.0). In B2B mode read it as a **workflow-embedding score**.
+In B2B mode read `habit_formation_score` as a **workflow-embedding score**.
 
 ## Churn Benchmarks by Price Band
 
@@ -71,7 +70,7 @@ The shared schema's `d1/d7/d30` fields carry B2B semantics — also write an
 
 - `d1` = **activation rate**: % of signups reaching the activation milestone. Benchmarks: median 25% all products / 30% B2B; ≥ 60% is top-decile (Lenny's Newsletter, 500+ products, 2022 — stale, directional).
 - `d7` = **month-1 logo retention** of paying customers = 100 − monthly churn from the table above.
-- `d30` = **month-3 logo retention** = (month-1 retention)^3, in percent. Cross-check: top-quartile 3-month new-customer retention is 98% at ASP > $500/mo vs 87% at < $10/mo (ChartMogul Retention Report, 2023).
+- `d30` = **month-3 logo retention** = (month-1 retention ÷ 100)^3 × 100 — e.g. 97% month-1 → 91.3%. Cross-check: top-quartile 3-month new-customer retention is 98% at ASP > $500/mo vs 87% at < $10/mo (ChartMogul Retention Report, 2023).
 
 The CAC specialist's B2B pack derives customer lifespan from these exact
 semantics — keep them.
@@ -102,9 +101,6 @@ Check the concept against this library and list every factor that applies:
 - **Canone resentment** — the niche shows subscription-resistance sentiment; renewals face "perché pago ancora?" pressure regardless of value (see pricing pack's one-time option)
 - **Intermediary concentration** — accounts arrived through commercialisti/consulenti/resellers; if the intermediary switches recommendation, whole portfolios churn at once
 - **Platform absorption** — the incumbent suite or host platform is likely to ship the feature natively
-
-**`churn_risk`:** high if 3+ factors apply or `habit_formation_score` < 2.5;
-low if ≤ 1 factor applies and `habit_formation_score` ≥ 4.0; medium otherwise.
 
 ## Verdict Thresholds
 

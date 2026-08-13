@@ -15,7 +15,7 @@ When this workflow is triggered, **immediately** say this before doing anything 
 
 ## Entry Conditions
 
-- `.idea-validation/ideas/<slug>/scores.json` must exist (full validation only — a screening score does not qualify). If missing, run the **idea-validation** workflow first (or tell the user).
+- `.idea-validation/ideas/<slug>/scores.json` must exist — full validation only; a `screening_scores.json` alone does not qualify. If missing, say the idea has no full validation yet and offer the **idea-validation** workflow.
 - User specifies which idea (slug or name). If several scored ideas exist, list them and ask.
 
 ## Chain

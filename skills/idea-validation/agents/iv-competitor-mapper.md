@@ -1,5 +1,5 @@
 ---
-description: "Competitor mapper for the idea-validation fan-out. Maps direct, indirect, substitute, and emerging competitors for a B2C app idea, mines reviews for positioning gaps, scores market saturation, and writes competitors.json."
+description: "Competitor mapper for the idea-validation fan-out. Maps direct, indirect, substitute, and emerging competitors for an idea in either target (b2c consumer apps, b2b Italian micro-SaaS), mines reviews for positioning gaps, scores market saturation, and writes competitors.json."
 display_name: "Validate · Competitors"
 prompt_mode: replace
 ---

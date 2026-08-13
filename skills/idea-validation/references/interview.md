@@ -44,7 +44,7 @@ Before showing the opening message, check if `.idea-validation/user_profile.md` 
 
 Before asking the first question, say exactly this:
 
-> I'm going to ask you **10 questions** to understand your background, skills, and interests. This helps me find app ideas that genuinely fit you — not generic ideas, but ones where you have a real edge.
+> I'm going to ask you **10 questions** to understand your background, skills, and interests. This helps me find product ideas that genuinely fit you — not generic ideas, but ones where you have a real edge.
 >
 > Answer as freely as you'd like. There are no right or wrong answers.
 >
@@ -202,7 +202,7 @@ Ask only these four questions (numbered [1/4] through [4/4]):
 
 1. **[1/4]** — "What's your technical skill level? (no-code / beginner / intermediate / expert) And what domain or industry do you know best?"
 2. **[2/4]** — "Do you have any existing audience, community, or content presence online? If yes, what topic and roughly how large?"
-3. **[3/4]** — "What do your close friends or family do for work? Would any of them test an app or give you feedback regularly?"
+3. **[3/4]** — "What do your close friends or family do for work? Would any of them test a product or give you feedback regularly?"
 4. **[4/4]** — "What are your constraints? Hours per week, monthly budget, and is this your main focus or a side project?"
 
 Question [1/4] covers the mandatory technical ability question. If the user's answer to [1/4] only addresses domain and skips technical level, follow up: "Got it — and what's your technical level? (no-code / beginner / intermediate / expert)"
@@ -236,9 +236,9 @@ Ask each question one at a time. Show the counter format **[X/10]** at the start
 
 > What industry or professional domain have you spent the most time in? What do you understand about this space that most outsiders wouldn't?
 >
-> Also — think about your close friends, family members, or relatives. What do they do for work? Are any of them in industries you find interesting, and would they be willing to give you honest feedback, test an early version of an app, or help you understand their daily problems? (Even one person who'd answer your questions regularly is a massive advantage.)
->
-> And specifically for business tools: do you know operators or professionals who serve many businesses — a commercialista, a consulente del lavoro, a lawyer, an agency owner, a reseller? Could any of them introduce you to their peers or their clients? (In the Italian B2B market these intermediaries are both the research access and often the distribution channel.)
+> Also — think about your close friends, family members, or relatives. What do they do for work? Are any of them in industries you find interesting, and would they be willing to give you honest feedback, test an early version of a product, or help you understand their daily problems? (Even one person who'd answer your questions regularly is a massive advantage.)
+
+**[2b — ask as the follow-up whenever the answer does not name one]**: "Do you have direct access to a commercialista, consulente del lavoro, or trade association — someone who serves many businesses and could introduce you?" → `b2b_intermediary_access`
 
 *Covers: industry experience, domain access through personal network, intermediary access for B2B (feeds founder-fit scoring and the intermediary channel)*
 
@@ -295,9 +295,9 @@ Ask each question one at a time. Show the counter format **[X/10]** at the start
 
 **[10/10] — Constraints**
 
-> What are your real constraints for building an app? Give me your best estimate for:
+> What are your real constraints for building a product? Give me your best estimate for:
 > - Available hours per week
-> - Monthly budget for tools, ads, or subscriptions (in USD)
+> - Monthly budget for tools, ads, or subscriptions (in EUR)
 > - Is this a main focus or a side project?
 > - How much risk are you comfortable with: low (I need it to work fast), medium, or high (I can experiment for months)?
 
@@ -323,6 +323,8 @@ Do not ask more than one follow-up per question. If the second attempt is still 
 
 Write to `.idea-validation/user_profile.md`:
 
+(`user_profile.md` holds a single fenced JSON code block and nothing else; merging means parsing that block, adding or updating keys, and rewriting it.)
+
 ```json
 {
   "strong_domains": [],
@@ -334,7 +336,6 @@ Write to `.idea-validation/user_profile.md`:
   "b2b_intermediary_access": [],
   "selected_interest_domains": [],
   "technical_level": "",
-  "fit_score_by_niche": {},
   "interview_summary": "",
   "interview_mode": "full | fast | browse | skipped",
   "all_questions_and_answers": []

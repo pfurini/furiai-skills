@@ -33,7 +33,7 @@ no-approval threshold for titolari and studi. Consequences:
 | **Flat monthly tier(s)** | Single-operator tools, clear job, predictable usage | Leaves seat-expansion uncollected | €9–49/mo, 2–3 tiers, billed per azienda |
 | **Per-seat subscription** | Team/studio tools where value scales with people | Seat scrutiny at renewal; per-seat resentment | €8–25/seat/mo (legal-PM class runs €49–99/lawyer at the top) |
 | **Usage-based / credits** | Value scales with volume (documents, orders, invii) | Bill-shock complaints | Base fee + usage; Zucchetti-style prepaid packs are a familiar Italian pattern |
-| **Freemium → paid tier** | Marketplace apps needing review velocity; natural power-user wall | Median freemium→paid only 3–5% (global data); free users cost support | Free tier + €9–49/mo paid |
+| **Freemium → paid tier** | Marketplace apps needing review velocity; natural power-user wall | Freemium converts at 3–5% (the "Good" band — see Entry-Model Conversion Benchmarks below); free users cost support | Free tier + €9–49/mo paid |
 | **Free trial (no card) → paid** | Products needing days to show value | Global median trial→paid 4–6% of signups; ~2× the LTV of card-required (MicroConf 2024) | 14-day trial, then €9–49/mo |
 | **Free trial (card required) → paid** | Obvious, fast-provable ROI | Fewer trials started; hostile for cold Italian audiences (card diffidence is real) | Same prices; 25–35% trial→paid typical globally |
 | **One-time / lifetime licence** | Utilities; niches with strong canone resistance | No recurring revenue | €49–199 one-time; consider "one-time + paid updates" hybrid where subscription resistance shows in evidence |
@@ -79,8 +79,8 @@ driver differs from the primary and scores ≥ 3.
 | Micro-firm invoicing/gestionale class | **€12–25/mo mode**; forfettario floor €2.50–4/mo; multi-user/warehouse €35–60/mo | Vendor list prices (Fatture in Cloud, Danea, Aruba…), 2026-08 (`confidence: high`) |
 | SMB team tools (agencies, small ops) | €29–99/mo flat or €10–25/seat | Italian + international tools sold into Italy (`confidence: medium`) |
 | Studio-side professional tools (commercialisti) | The suite line runs €100–250/mo per small studio — but dealer-mediated, annual contracts. An indie add-on prices into **discretionary spend beside the suite: €19–79/mo per studio** | Derived from quote-only research (`confidence: medium`) |
-| Legal practice tools | €49–99/lawyer/mo (suite class); indie add-ons €19–49/lawyer or flat per studio | (`confidence: medium`) |
-| Booking/appointment, vertical ops | €50–80/mo small team | (`confidence: medium`) |
+| Legal practice tools | €49–99/lawyer/mo (suite class); indie add-ons €19–49/lawyer or flat per studio | No published source; derived from vendor pricing pages, 2026-08 (`confidence: medium`) |
+| Booking/appointment, vertical ops | €50–80/mo small team | No published source; derived from vendor pricing pages, 2026-08 (`confidence: medium`) |
 | Marketplace apps (global platforms) | $10–100/mo; Shopify store-wide average $66.54/mo | Global scrape Jan 2025 (`confidence: high` for e-commerce, global market) |
 | Dev tools / API products | €19–99/mo + usage | Provisional (`confidence: low`) |
 
@@ -121,8 +121,9 @@ conversion rate alone. For Italy, lean no-card when the audience is cold.
 - Price tiers on a value metric the buyer already tracks (documenti,
   aziende gestite, pratiche, ordini, seats) — never arbitrary feature
   splits ("feature ransom" complaints recur in reviews).
-- Keep the entry price under €50/mo ex-VAT (the no-approval threshold)
-  whenever `budget_authority` is a weak driver.
+- Keep the entry price at or under €50/mo ex-VAT — the no-approval
+  threshold for titolari and studi. A weak `budget_authority` driver pushes
+  the entry price lower still, toward the €12–25/mo mode.
 
 ## Secondary Revenue Path (self-serve → expansion)
 

@@ -23,6 +23,14 @@ monetization. You bridge social listening and product ideation.
 - `.idea-validation/market_insights/<niche>-<platform>-<YYYY>-<MM>.md` — one or more trend research files for the niche. Read the full narrative (Part 2) from each file; do not rely solely on the YAML frontmatter.
 - `.idea-validation/user_profile.md` to filter for the user's domain fit and constraints (and `selected_interest_domains` when the profile came from browse mode)
 
+> **B2B target note:** for `TARGET: b2b` the market_insights platform files are
+> `<niche>-incumbents|communities|linkedin|g2-capterra|web-search-*.md`
+> (Italy-first evidence). Read the same signal classes from them — buyer
+> complaints and tool-seeking threads play the Reddit role, marketplace/
+> review listings play the App Store role, practitioner posts play the
+> TikTok-narrative role — and prefer findings labeled as Italian sources
+> over `geography: global` ones.
+
 ## Pipeline
 
 ```
@@ -92,10 +100,8 @@ What specific frustration or unmet desire is this idea addressing? Describe it f
 ## Market Signal Evidence
 What trend data supports this? For each platform covered, cite the specific signal:
 
-- **TikTok:** <hashtag, view count, content angle>
-- **Reddit:** <subreddit, recurring post type, upvote pattern>
-- **App Store:** <category trend, review complaint pattern, new entrant activity>
-- **Web Search:** <rising query, search volume indicator>
+One bullet per market_insights file you read, keyed by that file's `platform` frontmatter value:
+- **<platform slug>:** <the specific signal — hashtag, thread, listing, review pattern, or query, with its number>
 
 **Trend velocity:** <rising-fast | rising | stable | declining>
 **Cross-platform resonance:** <yes/no — does the same problem appear on 2+ platforms?>

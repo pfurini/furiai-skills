@@ -233,6 +233,43 @@ passes. Remaining before commit: Phase C forward-tests.
   one professional-vertical (tool per studi commercialisti) and one generic PMI/e-commerce
   tool; test the enterprise/medium guardrail and the evidence-sufficiency gate.
 
+### Phase B2 — prose audit against pi-skill-creator writing principles (done 2026-08-13)
+
+Four parallel reviewers audited all 49 skill files against
+`pi-skill-creator/references/writing-principles.md`; ~75 findings. Tiers 1–3
+applied (~90 edits by four editor agents + main thread): contract breaks
+(CAC lifespan read from the wrong retention field; monetization top band
+requiring WTP ≥ €50/mo; market-sizer USD verdict bands moved into per-target
+packs; `idea.md` B2C evidence template; missing `trend_velocity`/`overall_verdict`
+anchors; watermark keyed to the wrong predicate; top-2 vs top-3 mismatch),
+guardrail drift (ex-VAT qualifier, €50-ceiling nuance clause, cold-outreach
+scope in memo + distribution brief, missing no-TAM clause in two templates),
+and consistency (unified evidence-label block with `geography: IT | non-IT`
+across the four b2b templates, one confidence definition, `sales_motion:`
+frontmatter field documented, EUR in interview/segmentation/scoring, READMEs
+relocated to `docs/`). `quick_validate.py` passes. Verified intact: gate ↔
+scoring ↔ memo chain, demand-driver ↔ pricing keys, retention ↔ cac pack
+semantics.
+
+Deferred (apply during Phase D or a later pass):
+- b2c pack sourcing (no source/date/confidence on any b2c figure; iOS-share
+  table undated; "newly released" feature list rots).
+- b2c template drift (tiktok tiers, x-twitter recency bullet, formatting);
+  no disconfirming-evidence section in b2c templates (deliberate decision
+  needed).
+- Browse Path domains are consumer-only (interview.md) — b2b founder cannot
+  reach professional niches via browse.
+- `core-human-desires.md` off-pattern + Fairness desire maps to no dimension.
+- TOCs missing on the eight >100-line b2b packs; pack skeleton alignment
+  (b2b vs b2c section names).
+- Cross-agent `confidence` field addition to every artifact schema (additive,
+  target-neutral — do after forward-tests, not before).
+- b2c SOM-fantasy trigger ($500K) vs "large" band floor ($200K) intentionally
+  left as the original values.
+
+Per the audit discipline, these edits are behavior changes tested against the
+pre-audit snapshot (`d9b1976`): the Phase C forward-tests are the test round.
+
 ### Phase D — B2C (after B2B sign-off; outline only)
 
 Ring policy: Italy → Europe-English → Western (NA, UK/IE, AU/NZ); Eastern excluded; app

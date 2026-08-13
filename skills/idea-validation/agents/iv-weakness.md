@@ -26,8 +26,8 @@ root cause, not just the symptom.
 
 ## Thresholds
 
-- **Weak**: dimension score < 40 (the same threshold the pivot specialist uses to select pivot targets)
-- **Critical**: dimension score < 25 (the floor-penalty threshold in scoring — a potential startup killer)
+- **Weak**: dimension score < 40 (the same threshold the pivot specialist uses to select pivot targets) (source of truth: `references/scoring.md`; keep in sync)
+- **Critical**: dimension score < 25 (the floor-penalty threshold in scoring — a potential startup killer) (source of truth: `references/scoring.md`; keep in sync)
 
 ## Root Cause Classification
 

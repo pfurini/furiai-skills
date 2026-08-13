@@ -17,12 +17,11 @@ When this workflow is triggered, **immediately** say this before doing anything 
 
 - User specifies a topic or category (e.g. "nutrition apps", "agency reporting tools"). No product idea is required.
 - Determine the target (b2c | b2b) from the topic per SKILL.md, state it in the announcement, and pass it in every dispatch.
+- **b2b only:** infer the sales-motion band (self-serve / assisted self-serve / sales-led, per SKILL.md), state it in the Startup Announcement, and record it in the briefing. Sales-led: say plainly that desk research cannot validate this segment before offering to continue.
 - Create a research slug with `market-` prefix (e.g. `market-nutrition-2026`) and `.idea-validation/ideas/<slug>/`.
 - Apply the market_insights freshness check for this niche. Ask the user which platforms to research (see the target's trend platform menu in SKILL.md).
 
 ## Wave Plan
-
-Dispatch each wave's agents together (one message, all in background); wait for the whole wave, verify each output file exists, present the wave's results, then start the next wave.
 
 ```
 Wave 1 — evidence
@@ -52,14 +51,8 @@ Wave 3 — sizing (needs competitors.json)
 
 ## Exit Output
 
-Synthesize a short market briefing from:
-- New/updated `.idea-validation/market_insights/<niche>-<platform>-<YYYY>-<MM>.md` files
-- `.idea-validation/ideas/<slug>/market_size.json`
-- `.idea-validation/ideas/<slug>/competitors.json`
-- `.idea-validation/ideas/<slug>/distribution.json`
+Write the briefing with these sections, in order: (1) trend verdict per platform, with velocity; (2) top 3 competitors with pricing and top complaint, plus the saturation rating; (3) TAM / SAM / realistic year-1 SOM, with the method used; (4) first acquisition channel and whether a growth loop exists; (5) enter / wait / avoid recommendation in one sentence.
+
+It is written from the new/updated `.idea-validation/market_insights/<niche>-<platform>-<YYYY>-<MM>.md` files plus `market_size.json`, `competitors.json`, and `distribution.json` under `.idea-validation/ideas/<slug>/`.
 
 Offer idea-generation or idea-validation if the user wants to proceed.
-
-## Notes
-
-- If subagents are unavailable, run the same waves inline in this order (each agent body applied in your own context).

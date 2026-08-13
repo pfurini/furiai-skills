@@ -19,7 +19,7 @@ Identify and analyze **what Italian operators and practitioners are discussing, 
    * **Unverifiable** — login wall or bot block prevented observation. This is NOT evidence of death; report it as unverifiable and move on.
    * Never invent member counts or activity levels. If the platform hides them, write "not visible".
 
-   Known state as of 2026-08 (re-verify, do not assume): **Forum GT is dead** (parked domain); its successor connect.gt is a degraded archive; **InfoJobs Italia shut down 2025-12-31**; the Telegram channel @commercialistatelematico is dead. **ItaliaOggi is still publishing.** There is **no open Italian forum for avvocati** — for legal niches, lean on Tier 3 sources and expect the evidence-sufficiency gate to fire.
+   Known state as of 2026-08 (re-verify, do not assume): **Forum GT is dead** (parked domain); its successor connect.gt is a degraded archive; **InfoJobs Italia shut down 2025-12-31**; the Telegram channel @commercialistatelematico is dead. **ItaliaOggi** is still publishing as of 2026-08 (re-verify, do not assume). There is **no open Italian forum for avvocati** — for legal niches, lean on Tier 3 sources and expect the evidence-sufficiency gate to fire.
 
 2. **Source Criteria**
 
@@ -60,7 +60,7 @@ Identify and analyze **what Italian operators and practitioners are discussing, 
 
 **D. Growth Analysis** — for rising themes only: growth evidence (post-frequency change, new groups forming, spikes tied to a scadenza or platform change), timeframe, velocity (slow / moderate / explosive).
 
-**E. Evidence labels** (mandatory) — **region** · **segment** (commercialista, avvocato, consulente del lavoro, merchant, agency, artigiano, generic PMI) · **firm-size proxy** · **stack named** (incumbent software mentioned) · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** · **confidence** (high only if cross-surface in Italian sources or interview-confirmed).
+**E. Evidence labels** (mandatory) — **geography** (IT / non-IT) · **region** (national / North / Centre / South / province; "n/a" for non-IT) · **segment** (commercialista, avvocato, consulente del lavoro, artigiano, merchant, agency, generic PMI) · **firm-size proxy** · **stack** (the software the source uses, when stated) · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** · **confidence** (high only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; medium for a single Italian source; low for non-IT or vendor-supplied).
 
 5. **Structure the Output**
 

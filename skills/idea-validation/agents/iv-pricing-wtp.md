@@ -127,7 +127,7 @@ Write to `.idea-validation/ideas/<slug>/pricing.json` (create missing parent dir
     "low": 0,
     "target": 0,
     "aspirational": 0,
-    "currency": "USD",
+    "currency": "<USD | EUR — the currency the calibration pack prices in>",
     "period": "monthly | yearly | one-time"
   },
   "van_westendorp": {

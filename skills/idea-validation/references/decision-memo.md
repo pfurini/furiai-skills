@@ -19,13 +19,13 @@ it draw on everything the specialists wrote AND the conversation itself.
 
 ## Writing Principles
 
-The memo must be **scannable in under 2 minutes**. Follow these rules:
+Follow these rules:
 
-1. **No hedging.** "This might work if…" is banned. State the verdict and own it.
+1. **State the verdict as fact.** "This is a test-tier idea; the RAT decides it." — no conditional hedges.
 2. **Evidence over opinion.** Every strength and risk must cite a specific data point from a dimension file (k-factor, LTV:CAC ratio, D30 retention, WTP range, etc.).
 3. **Asymmetric emphasis on risks.** Humans overweight strengths and underweight risks. The memo corrects for this by giving risks more detail than strengths.
 4. **One clear next action.** Not three options — one. The alternative path exists only as a contingency.
-5. **Respect the founder's tier.** Don't tell a beginner to "optimize your Meta ads funnel." Don't tell a growth-tier founder to "watch some TikTok tutorials."
+5. **Calibrate to `icp_tier`.** A beginner gets one named channel and a two-week scope; a growth-tier founder gets a CAC target and the channel to scale.
 
 ## Formatting Constraints
 
@@ -33,7 +33,7 @@ The memo must be **scannable in under 2 minutes**. Follow these rules:
 |---|---|---|
 | Verdict line | 1 sentence | Instant signal |
 | Score + confidence | 1 line | Quantitative anchor |
-| Validation watermark | 1–2 lines | Trust calibration (only if confidence < high) |
+| Validation watermark | 1–3 lines (both sentences when both low-confidence causes fire) | Trust calibration (only if confidence < high) |
 | Top 3 Strengths | 1 sentence each, with one data point | What's working |
 | Top 3 Risks | 2 sentences each: the risk + what happens if ignored | What kills it |
 | Riskiest Assumption | 3–5 sentences | The one thing to test before building anything |
@@ -43,7 +43,7 @@ The memo must be **scannable in under 2 minutes**. Follow these rules:
 | Alternative Path | 1–2 sentences | Plan B |
 | Interview kit | 10 questions + 2–3 recruiting routes | Only when required (see below) — the desk-research escape hatch |
 
-Total memo length: **~400–600 words** (+ the interview kit when required). If it's longer, cut. Brevity is a feature.
+Total memo length: **~400–600 words** (+ the interview kit when required).
 
 ## Interview Kit (conditional section)
 
@@ -65,8 +65,11 @@ The kit contains:
 2. **Recruiting routes** (2–3, concrete for this niche): ordine/association
    events and local sections, the verified-active communities from
    market_insights, the founder's named contacts from `user_profile.md`,
-   LinkedIn direct engagement (public commenting → conversation — NOT cold
-   email; the CAC pack's legal exclusion applies to outreach here too).
+   LinkedIn direct engagement — comment publicly on the practitioner's
+   posts until a conversation starts, then ask. No cold outbound in any
+   channel (email, PEC, InMail, DM, phone): art. 130 governs interview
+   recruiting exactly as it governs acquisition; the CAC pack's legal
+   exclusion applies here too.
 3. **A target**: 10–15 interviews, separating "has the pain" from "would
    pay/replace/integrate" — the interview outcomes become the RAT evidence.
 
@@ -95,12 +98,10 @@ If `score_confidence` from `scores.json` is not "high", insert a watermark immed
 | Confidence | Watermark |
 |---|---|
 | **medium** | "This score is based on incomplete data. {list missing dimensions}. Run these analyses before making a build/no-build decision." |
-| **low** | "LOW CONFIDENCE — Only {N} of 6 dimensions scored. This verdict is directional, not conclusive. Required before acting: {list mandatory missing analyses}." |
+| **low** (missing dimensions) | "LOW CONFIDENCE — Only {N} of 6 dimensions scored. This verdict is directional, not conclusive. Required before acting: {list mandatory missing analyses}." |
+| **low** (`evidence_gate.triggered`) | "DESK-LIMITED — only {observations_counted} in-market observations found (threshold {threshold}). This market under-produces public evidence; the score is capped and the interview kit below is the required next step." |
 
-If `evidence_gate.triggered` is true, the watermark must additionally say:
-"DESK-LIMITED — only {observations_counted} in-market observations found
-(threshold {threshold}). This market under-produces public evidence; the
-score is capped and the interview kit below is the required next step."
+If both causes apply, emit both rows' sentences.
 
 ### Pre-mortem Method
 
@@ -109,7 +110,7 @@ The pre-mortem is a proven debiasing technique (Klein, 2007). It forces the foun
 Instructions:
 1. Assume the idea launched and failed within 12 months.
 2. Working backward from the risk profile and killer dimensions, write the 3 most probable causes of death.
-3. Each cause must be specific and tied to a scored dimension — not generic ("ran out of money" is too vague; "CAC exceeded LTV by 4x because TikTok organic reach declined and no paid channel was viable under $500/mo" is useful).
+3. Each cause must be specific and tied to a scored dimension — not generic ("ran out of money" is too vague; "CAC exceeded LTV by 4x because TikTok organic reach declined and no paid channel was viable under €500/mo" is useful).
 
 ## Output
 
@@ -189,6 +190,9 @@ The assumption most likely to kill this idea:
 **Dove trovare gli intervistati:** <2–3 concrete recruiting routes for this niche>
 
 **Target:** 10–15 interviste. Separate "ha il problema" da "pagherebbe / sostituirebbe / integrerebbe". <Tie to the RAT pass threshold.>
+
+<!-- Only on re-generation after a re-score: -->
+_v<N> — re-scored after <what changed>_
 ```
 
 ## Notes

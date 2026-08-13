@@ -45,7 +45,7 @@ Canonical Italian counts (cite the reference year; ASIA lags ~2 years):
 | Population | Count | Source (reference year) | Confidence |
 |---|---|---|---|
 | Active enterprises, total | ~4.51M | ISTAT ASIA (2023) | high |
-| — micro (<10 addetti) | ~4.27M (94.8%) | ISTAT ASIA (2023) | high |
+| — micro (<10 addetti) | ~4.27M (94.8%) | ISTAT ASIA (2023) | high — never a TAM; see the bias warning above |
 | — firms with 10+ addetti | ~236K | ISTAT ASIA (2023) | high |
 | — firms with 3+ addetti | ~1.02M | ISTAT census frame (2022) | medium |
 | Studi commercialisti | ~69.2K studi · 119K professionals | CNDCEC (2024 — cite as 2024, not newer) | high |
@@ -120,6 +120,27 @@ products average 12% MoM growth vs 5.3% consumer; exit multiples cluster at
 1–2.9× forward run rate (37%) then 3–4.9× (28%). SaaS Capital 2025: median
 bootstrapped-company NRR 104% — but that sample excludes <$1M ARR; ChartMogul's
 82% NRR self-serve median is the right expectation at indie scale.
+
+## Reality-check thresholds and SOM verdict bands (read by the market-sizer brief)
+
+Numeric reality checks (record every triggered check in
+`reality_checks_triggered`):
+
+| Check | Threshold | Action if triggered |
+|---|---|---|
+| TAM inflation | TAM > €500M for a vertical Italian niche | Top-down artifact; redo bottom-up from the buyer-redirected population |
+| SAM too broad | SAM > 50% of TAM | Filters too loose; tighten segment, size class, or software-stack filters |
+| SOM fantasy | SOM year 1 > €110K ARR for a solo developer | That is already a top-decile outcome (TrustMRR, n=5,079); justify the capture rate explicitly or cut it |
+
+`market_size_verdict` from SOM year 1 (bands are constructs anchored to the
+outcome distribution above, `confidence: low`):
+
+| SOM year 1 | Verdict |
+|---|---|
+| > €110K | large — implies a top-decile outcome; double-check before trusting it |
+| €45K–110K | medium — sustains a solo developer |
+| €10K–45K | niche — side-project scale |
+| < €10K | micro-niche — hobby scale |
 
 ## Fallback Price (when pricing.json is absent)
 

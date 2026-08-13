@@ -19,8 +19,8 @@ When this workflow is triggered, **immediately** say this before doing anything 
 1. Interview — main thread, conversational
    Read references/interview.md now and run it yourself.
    ↓ writes: .idea-validation/user_profile.md
-   ↓ ALWAYS runs first, even if user_profile.md exists — the reference itself
-   |   handles existing-profile reuse (use / update / browse) and mode selection.
+   ↓ Step 1 always runs, even when `user_profile.md` exists — `interview.md`
+   |   handles reuse (use / update / browse) and mode selection.
    ↓ route by the resulting interview_mode (for a reused profile, its stored mode):
    |     full or fast → step 2
    |     browse or skipped → step 3, skipping segmentation; default icp_tier = "beginner"

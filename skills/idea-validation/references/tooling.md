@@ -1,23 +1,14 @@
 # Research tooling (harness-portable)
 
-How the skill's research steps reach the web and data sources, in mandatory
-preference order. This file is passed via `EXTRA:` to B2B trend researchers
+The script index and endpoint facts behind the skill's research steps (the
+routing order itself lives in SKILL.md). This file is passed via `EXTRA:` to B2B trend researchers
 and the market sizer; the orchestrator applies it too. Verified 2026-08
 (`research/idea-validation-italy-b2b/tooling-matrix.md` is the source
 record).
 
-## Routing rule
-
-1. **Scripts first** (`scripts/` in this skill — bash + curl + jq only,
-   keys via env vars) for every source that has a stable API.
-2. **Harness web tools by capability** for everything else: "your web
-   search tool" (e.g. pi-web-access `web_search` — batch queries,
-   `domainFilter`, `recencyFilter`; or any equivalent), "your page fetch
-   tool" (`fetch_content` — also converts PDFs), "your claim-check tool"
-   (`source_check`) when available. Never name harness-specific tools in
-   artifacts; describe the capability.
-3. **Manual steps** for gated sources — list them for the user, never
-   automate logins.
+Routing (scripts first → harness web tools by capability → manual for
+gated sources) is defined in SKILL.md; this file carries the script index
+and endpoint facts.
 
 ## Script index
 
@@ -28,14 +19,8 @@ record).
 | `anac_dataset.sh <dataset-id\|list>` | ANAC CKAN open data | nothing | Below-EU-threshold Italian procurement datasets |
 | `apify_run.sh <owner~actor> [input.json]` | Apify REST | `APIFY_TOKEN` | Any store actor: reviews (Capterra/Trustpilot/G2), job posts (LinkedIn/Indeed), LinkedIn group posts (cookieless actors only), Facebook public groups |
 | `exa_search.sh "<query>" [n]` (`EXA_MODE=answer` for cited answers) | Exa API | `EXA_API_KEY` | Semantic search / claim checking when no harness search tool is available |
-
-Business-register drill-down (ATECO × province × size × revenue):
-Openapi.com `GET /impresa` — €0.001/request, up to 1,000 companies per
-request, `OPENAPI_TOKEN`; free sandbox at `test.visurecamerali.openapi.it`.
-No script shipped yet — call it with curl per its console docs. Italian
-keyword volumes: DataForSEO (Basic auth, `DATAFORSEO_LOGIN`/`_PASSWORD`,
-$50 minimum deposit, SERP $0.0006/query) — otherwise treat Italian search
-volume as unmeasured and say so.
+| Openapi.com `GET /impresa` (no script yet — call with curl) | Registro Imprese via Openapi.com | `OPENAPI_TOKEN` | Company counts/lists by ATECO × province × size; €0.001/request, up to 1,000 companies per request; free sandbox at `test.visurecamerali.openapi.it` |
+| DataForSEO (no script) | DataForSEO API (Basic auth) | `DATAFORSEO_LOGIN`/`_PASSWORD` ($50 minimum deposit) | Italian keyword/SERP volumes (SERP $0.0006/query); without it treat Italian search volume as unmeasured and say so |
 
 ## Hard-won endpoint facts (do not rediscover these)
 

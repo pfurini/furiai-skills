@@ -30,7 +30,7 @@ before the business sustains itself.
 - Idea slug
 - `.idea-validation/user_profile.md` (budget constraint, ICP tier)
 - `.idea-validation/ideas/<slug>/pricing.json` (target price → revenue per user)
-- `.idea-validation/ideas/<slug>/retention.json` (D30 retention, churn risk → estimated lifespan)
+- `.idea-validation/ideas/<slug>/retention.json` (retention curve + churn risk → estimated lifespan; the calibration pack defines which field carries monthly churn)
 - `.idea-validation/ideas/<slug>/distribution.json` (viable channels, k-factor, ASO opportunity, creator fit)
 - `.idea-validation/ideas/<slug>/competitors.json` (competitor pricing and scale signals — optional)
 - `.idea-validation/market_insights/<niche>-*-<YYYY>-<MM>.md` (trend data — **use all available platform files**)
@@ -77,7 +77,7 @@ Where:
 
 | Data available | Confidence |
 |---|---|
-| `pricing.json` + `retention.json` with D30 data | High |
+| `pricing.json` + `retention.json` with retention-curve data | High |
 | `pricing.json` only (using category median retention) | Medium |
 | Neither (using category defaults for both) | Low — flag prominently |
 
@@ -101,7 +101,7 @@ The channel set, base CAC ranges, and per-channel adjust-up/adjust-down conditio
 
 ### Channel Relevance Filter
 
-Not all channels apply to every idea. Skip channels matching the skip conditions in the calibration pack and list them in `skipped_channels`.
+Not all channels apply to every idea. Skip channels matching the skip conditions in the calibration pack and list them in `skipped_channels`. Distinguish *skipped* (irrelevant to this idea — list in `skipped_channels`) from *unavailable* (the calibration pack forbids it — keep the key in `cac_by_channel` with `viable: false` and the pack's stated reason).
 
 ## LTV:CAC Ratio Thresholds
 
@@ -176,7 +176,8 @@ Write to `.idea-validation/ideas/<slug>/cac.json` (create missing parent directo
   "founder_budget_tier": "bootstrap | lean | moderate | serious",
   "cac_by_channel": {
     "<channel-key from the calibration pack>": { "cac": 0, "ltv_cac_ratio": 0, "classification": "", "payback_months": 0 },
-    "<one-time-spike channels also carry>": { "one_time_cohort_estimate": 0 }
+    "<one-time-spike channels also carry>": { "one_time_cohort_estimate": 0 },
+    "<channels the pack marks unavailable>": { "viable": false, "reason": "" }
   },
   "skipped_channels": [],
   "viable_channels": [],
@@ -197,7 +198,7 @@ After writing the file, return: the viability verdict, LTV:CAC for the recommend
 
 ## Notes
 
-- The `recommended_first_channel` must be achievable by the founder at their current tier. Don't recommend a paid channel to a Bootstrap founder, or a community channel to someone with no community presence. Cross-reference `user_profile.md` distribution advantages.
+- The `recommended_first_channel` must be achievable by the founder at their current tier: within the pack's spend band for their budget tier, and on a surface they already have access to (cross-reference `user_profile.md` distribution advantages).
 - If `retention.json` is unavailable, LTV confidence drops to medium at best. Flag this prominently — CAC ratios are only as good as the LTV estimate, and LTV depends entirely on retention.
 - When `distribution.json` shows a strong viral loop (k-factor ≥ 0.3), the effective CAC for word-of-mouth should account for the viral multiplier: `effective_CAC = base_CAC × (1 − k)`. A k-factor of 0.5 halves the effective CAC.
 - One-time-spike channels (flagged in the calibration pack) are launch events, not channel strategies. Model them as a one-time cohort and exclude them from recurring channel viability.

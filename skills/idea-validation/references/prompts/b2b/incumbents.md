@@ -33,7 +33,7 @@ Why this platform exists: in Italy, most professional and SMB workflows live ins
 
 2. **For EACH incumbent product, provide:**
 
-**A. Identity** — vendor, product, the [NICHE] job it owns, claimed customer base (discount marketing claims by half; cite).
+**A. Identity** — vendor, product, the [NICHE] job it owns, claimed customer base (record the claim verbatim and attribute it to the vendor; treat it as marketing, not evidence, and keep it out of revenue math unless a second independent source corroborates it).
 
 **B. Pricing observed** — EUR, billing unit (per azienda / per utente / per postazione), ex-VAT vs incl., quote-only where list prices are not published (quote-only is itself a finding: it marks the dealer-mediated tier).
 
@@ -43,6 +43,8 @@ Why this platform exists: in Italy, most professional and SMB workflows live ins
 
 **E. Absorption risk** — is the vendor shipping toward [NICHE]? Recent releases, acquisitions, AI features that could absorb the wedge natively.
 
+**F. Evidence labels** (mandatory — the shared label block) — **geography** (IT / non-IT) · **region** (national / North / Centre / South / province; "n/a" for non-IT) · **segment** (commercialista, avvocato, consulente del lavoro, artigiano, merchant, agency, generic PMI) · **firm-size proxy** · **stack** (the software the source uses, when stated) · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** (vendor page, forum, review, connector market, press) · **confidence** (high only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; medium for a single Italian source; low for non-IT or vendor-supplied).
+
 3. **Wedge analysis (the core deliverable)**
 
    For each viable entry point, state:
@@ -50,11 +52,12 @@ Why this platform exists: in Italy, most professional and SMB workflows live ins
    * **The attach surface**: which incumbent it plugs into and through what (API, file exchange, marketplace listing) — and the openness class from C.
    * **Who buys**: the firm itself vs the professional studio managing many firms (a studio-side tool multiplies value per seat across its clients).
    * **Switching constraint it avoids**: the wedge must NOT require replacing the suite or migrating compliance data.
+   * Label each wedge with the same evidence labels (F above).
 
 4. **Structure the Output**
 
 * **1. Executive Summary (Key Insights)**
-* **2. Incumbent Map** (per-product A–E)
+* **2. Incumbent Map** (per-product A–F)
 * **3. Category-Wide Failure Themes**
 * **4. Wedge Analysis** (per instruction 3)
 * **5. Strategic Insights (positioning & distribution takeaways — incl. which marketplace/API route is open)**
@@ -64,7 +67,7 @@ Why this platform exists: in Italy, most professional and SMB workflows live ins
 * **9. Sources**
 
 5. **Financial Opportunities**
-   Identify the problems Italian firms in [NICHE] are **already paying to solve** — incumbent module prices, connector-vendor prices, hours of manual re-keying. For each: **Problem** · **Incumbent signal** (module price, forum complaint volume, connector demand) · **Evidence of willingness to pay** (EUR figures observed) · **Saturation** (is the integration slot already crowded?) · **Realistic revenue math** (bottoms-up from firm counts × observed EUR prices; cite what it rests on) · **Why now** (regulation deadline, incumbent neglect, new API).
+   Identify the problems Italian firms in [NICHE] are **already paying to solve** — incumbent module prices, connector-vendor prices, hours of manual re-keying. For each: **Problem** · **Incumbent signal** (module price, forum complaint volume, connector demand) · **Evidence of willingness to pay** (EUR figures observed) · **Saturation** (is the integration slot already crowded?) · **Realistic revenue math** (bottoms-up from firm counts × observed EUR prices; cite what it rests on; never present a national firm-count (e.g. the 4.27M micro-firm figure) as an addressable pool — size from the reachable, qualified subset and say how you narrowed it) · **Why now** (regulation deadline, incumbent neglect, new API).
 
 6. **Niche Risks**
    For each: **Risk** · **Signal** · **Severity (Low/Medium/High)** · **Mitigation angle**. Consider at least: **incumbent absorption** (vendor ships the feature); **API dependency** (the one open API changes terms — TeamSystem's API licence is revocable); **dealer-channel lock** (buyers only trust the incumbent's dealer, self-serve invisible); **compliance drift** (the workflow touches SDI/PCT/AML — errors carry legal exposure); **quote-only opacity** (can't verify the competing price).
@@ -72,10 +75,7 @@ Why this platform exists: in Italy, most professional and SMB workflows live ins
 7. **Disconfirming Evidence** (mandatory)
    What argues AGAINST entering: satisfied-user evidence, an incumbent already shipping the fix, a connector market that stayed tiny, forums showing tolerance rather than budget ("fastidioso ma gratis" patterns).
 
-8. **Evidence labels** (mandatory, per finding)
-   Tag every finding with: **region** (national / North / Centre / South / province) · **segment** (commercialista, avvocato, consulente del lavoro, merchant, agency, generic PMI) · **firm-size proxy** · **stack named** (which incumbent) · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** (vendor page, forum, review, connector market, press) · **confidence** (high only if seen in 2+ independent Italian sources).
-
-9. **Sources** — end with a `## Sources` section listing every URL consulted as markdown links, including pages consulted but not quoted.
+8. **Sources** — end with a `## Sources` section listing every URL consulted as markdown links, including pages consulted but not quoted.
 
 ---
 

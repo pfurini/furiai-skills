@@ -2,20 +2,6 @@
 
 Persistent state for this pack. All specialist inputs and outputs use this tree. Paths are relative to the **current project root**.
 
-## Bootstrap
-
-If `<project-root>/.idea-validation/` is missing, create:
-
-```
-.idea-validation/
-  market_insights/
-  ideas/
-```
-
-Do not create `user_profile.md` until the founder interview runs. Do not seed sample ideas. Do not copy skill reference files into `.idea-validation/`.
-
-If the tree exists, leave it in place and update files in situ.
-
 ## Structure (what actually gets written)
 
 ```
@@ -44,8 +30,6 @@ If the tree exists, leave it in place and update files in situ.
 
 ## Naming
 
-- Idea slugs: kebab-case, max 40 characters, from the idea name (`habit-tracker-climbers`).
-- Market-only research slugs: `market-` prefix (`market-nutrition-2026`).
 - Trend files: `<niche>-<platform>-<YYYY>-<MM>.md` with `platform` one of `tiktok | reddit | apps | web-search | x-twitter` (b2c) or `incumbents | communities | linkedin | g2-capterra | web-search` (b2b; `x-twitter` on explicit request). Combined file only if the user asks: `<niche>-multi-<YYYY>-<MM>.md`.
 
 ## Protocol
@@ -56,11 +40,11 @@ If the tree exists, leave it in place and update files in situ.
 - Never delete an idea directory. Set `status: dropped` in `idea.md`.
 - `user_profile.md` is updated incrementally (later steps merge fields).
 - `market_insights/` is append-only: new dated file per run, never overwrite.
-- JSON must be valid JSON.
+- Each `.json` artifact contains one JSON object and nothing else — no code fences, no commentary before or after.
 
 ## Target (`idea.md` frontmatter)
 
-Each idea carries `target: b2c | b2b` in its `idea.md` frontmatter, set once at workflow entry. It selects the calibration packs (`references/calibration/<target>/`) every specialist and the scoring step load. Absent → `b2c`. B2B ideas also carry `segment_size: micro | small | medium` (absent → micro/small; `medium` always triggers the sales-motion check in SKILL.md). The artifact schemas are identical for both targets — only the rubrics and benchmarks behind them differ.
+Each idea carries `target: b2c | b2b` in its `idea.md` frontmatter, set once at workflow entry. It selects the calibration packs (`references/calibration/<target>/`) every specialist and the scoring step load. Absent → `b2c`. B2B ideas also carry `segment_size: micro | small | medium` (absent → micro/small; `medium` always triggers the sales-motion check in SKILL.md) and `sales_motion: self-serve | assisted-self-serve | sales-led` (the band inferred at workflow entry per SKILL.md). The artifact schemas are identical for both targets — only the rubrics and benchmarks behind them differ.
 
 ## Idea lifecycle (`idea.md` status)
 

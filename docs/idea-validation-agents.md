@@ -1,5 +1,7 @@
 # Idea-validation agents
 
+> Maintainer notes. The agent files live at `skills/idea-validation/agents/`; the frontmatter there is authoritative — keep this document in sync when changing model or thinking pins.
+
 Eleven pi-subagents custom agent types used by the `idea-validation` skill
 (one per analysis dimension; `subagent_type` = filename without `.md`). Each
 receives an idea slug or topic plus the store paths to read, writes exactly

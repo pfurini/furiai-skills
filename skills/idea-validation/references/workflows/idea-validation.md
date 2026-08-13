@@ -18,11 +18,10 @@ When this workflow is triggered, **immediately** say this before doing anything 
 1. Derive slug: kebab-case from idea name, max 40 chars.
 2. Create `.idea-validation/ideas/<slug>/` if needed.
 3. Write `.idea-validation/ideas/<slug>/idea.md` with the raw idea (`status: in-validation`, and the `target` field per SKILL.md) before the chain, unless it already exists.
-4. Apply the market_insights freshness check for this niche. Ask the user which platforms to research (or reuse fresh files); see the target's trend platform menu in SKILL.md.
+4. **b2b only:** infer the sales-motion band (self-serve / assisted self-serve / sales-led, per SKILL.md), state it in the Startup Announcement, and write `sales_motion: self-serve | assisted-self-serve | sales-led` into `idea.md` frontmatter. Sales-led: say plainly that desk research cannot validate this segment before offering to continue.
+5. Apply the market_insights freshness check for this niche. Ask the user which platforms to research (or reuse fresh files); see the target's trend platform menu in SKILL.md.
 
 ## Wave Plan
-
-Dispatch each wave's agents together (one message, all in background); wait for the whole wave, verify each output file exists, present the wave's results, then start the next wave.
 
 ```
 Wave 1 — evidence
@@ -85,4 +84,3 @@ If verdict is `pivot` or `drop`, offer the **pivot-optimization** workflow.
 ## Notes
 
 - The market-sizing agent (`iv-market-sizer`) is not part of this chain by default; scoring's Monetization rubric works from pricing + CAC. Add it to Wave 3 if the user asks for market size, and it will feed the Monetization dimension.
-- If subagents are unavailable, run the same waves inline in this order (each agent body applied in your own context) — the wave boundaries still order the file reads correctly.

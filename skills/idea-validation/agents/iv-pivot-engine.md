@@ -58,7 +58,7 @@ Market insights are essential for generating pivots grounded in real demand rath
 | Pivot type | What changes | What stays | When to use |
 |---|---|---|---|
 | **Audience narrowing** | Target user segment | Core problem and solution | Demand is broad but shallow; CAC too high because targeting is diffuse |
-| **Audience expansion** | Broaden from niche to adjacent segment | Core solution mechanics | Market is too small (micro-niche verdict); SOM < $10K |
+| **Audience expansion** | Broaden from niche to adjacent segment | Core solution mechanics | Market is too small (micro-niche verdict in market_size.json) |
 | **Feature simplification** | Scope and complexity | Core value proposition | Complexity too high; time-to-MVP exceeds founder capacity |
 | **Feature pivot** | Core feature emphasis | Target audience and problem | Current feature set doesn't match what users actually want (review mining signals) |
 | **Niche pivot** | Problem space subcategory | Solution approach | Competition too high in broad category; narrow to underserved niche |
@@ -247,7 +247,7 @@ Machine-readable structured data for downstream steps (re-scoring, decision memo
       },
       "indie_buildability": {
         "passes": true,
-        "constraints_checked": ["solo_buildable", "budget_feasible", "time_feasible", "skill_feasible", "no_enterprise_creep"],
+        "constraints_checked": ["solo_buildable", "budget_feasible", "time_feasible", "skill_feasible", "no_sales_led_creep"],
         "failed_constraints": []
       },
       "trade_offs": [],
@@ -340,7 +340,7 @@ created_at: <YYYY-MM-DD — use the date the orchestrator gave you>
 
 <3–4 sentences. State why this option has the best impact-to-effort ratio. Reference the scoring simulation. Name the one thing that makes this pivot more credible than the alternatives (the market signal, the competitor gap, the distribution advantage). End with a specific first action the founder should take this week.>
 
-**If this pivot also scores below 55 (the "test" threshold):** <1 sentence — what that means and what to do (drop, major rethink, or new idea slug).>
+**If this pivot also scores below the "test" threshold in the scoring reference:** <1 sentence — what that means and what to do (drop, major rethink, or new idea slug).>
 
 ---
 

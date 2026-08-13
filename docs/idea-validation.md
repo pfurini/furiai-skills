@@ -2,6 +2,8 @@
 
 ### *To Build or Not to Build — that is the question this answers.*
 
+> The skill lives at `skills/idea-validation/`; relative paths below resolve against that directory.
+
 A skill pack that turns Claude Code into a personal venture analyst for indie builders — from idea brainstorming to full validation, market research, and pivot analysis. Covers two targets with dedicated calibration: **consumer apps (B2C)** and **self-serve B2B micro-SaaS** (credit-card signup, no sales team — marketplace apps, dev tools, vertical SMB tools). Validate in 10 minutes instead of regretting in six months.
 
 ## Who Is This For?
@@ -24,7 +26,7 @@ Install this skill **per project**, not globally at the user level. All analysis
 One orchestrator skill drives eleven specialist subagents that communicate only through files:
 
 - **`idea-validation`** (this skill) is the entry point. It fires on natural requests — "validate my idea", "what should I build?", "tell me about the journaling market", "should I pivot?" — detects your intent, and routes to the right workflow. You can also ask for a **single dimension** ("who are the competitors of X?") without a full workflow.
-- **Specialist agents** (`agents/iv-*.md`) each analyze one dimension and write one artifact into `.idea-validation/`. Independent dimensions run **in parallel waves**: five platform researchers sweep the target's evidence surfaces simultaneously (B2C: TikTok, Reddit, App Store, Google, X; B2B: G2/Capterra, operator communities, LinkedIn, Google, X); then competitors, demand drivers, and distribution analyze concurrently; then pricing and retention; then unit economics. Each agent runs with a clean context containing only its rubrics and inputs, on a model tier matched to its dimension (see `agents/README.md`).
+- **Specialist agents** (`agents/iv-*.md`) each analyze one dimension and write one artifact into `.idea-validation/`. Independent dimensions run **in parallel waves**: five platform researchers sweep the target's evidence surfaces simultaneously (B2C: TikTok, Reddit, App Store, Google, X; B2B: incumbent ecosystems, operator communities, LinkedIn/jobs, G2-Capterra, Google.it — X only on request); then competitors, demand drivers, and distribution analyze concurrently; then pricing and retention; then unit economics. Each agent runs with a clean context containing only its rubrics and inputs, on a model tier matched to its dimension (see `docs/idea-validation-agents.md`).
 - **Per-target calibration packs** (`references/calibration/b2c/` and `b2b/`) hold the benchmark tables — churn bands, channel CACs, WTP ranges, capture rates — while the agents hold only the mechanisms. Each idea carries a `target: b2c | b2b` field that selects the pack set; the artifact schemas are identical for both targets. The B2B target is **Italy-first** (micro/small businesses and professional firms, self-serve): packs carry EUR anchors from Italian vendor pricing, ISTAT/ordini population counts, the art. 130 cold-outreach exclusion, and an evidence-sufficiency gate for low-signal verticals. Sources with citations live in `research/idea-validation-italy-b2b/` and `research/idea-validation-b2b-benchmarks/`; remaining `confidence: low` tables are constructs with no published data anywhere (capture rates, driver multipliers).
 - **The conversational and synthesis steps stay on the main thread**: the founder interview, segmentation, the 0–100 scoring, and the decision memo (`references/*.md`) — so the math stays auditable and the verdict draws on the full conversation.
 

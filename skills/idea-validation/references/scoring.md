@@ -86,7 +86,7 @@ adjusted_score = base_score * floor_penalty * missing_discount
 final_score = round(clamp(adjusted_score, 0, 100))
 ```
 
-The missing-input discount ensures that ideas scored on only 3 of 6 dimensions can never reach the "pursue" tier without completing more analysis.
+The missing-input discount caps what partial analysis can return: 3 of 6 dimensions ceilings the score at 50 ("pivot"), 4 of 6 at 67 ("test"). A "pursue" verdict requires all 6.
 
 ### Step 5 — Determine confidence level
 
@@ -108,9 +108,9 @@ across this niche's `market_insights/` files, and a threshold.
 - If it does: count the observations per the pack's rule. Below the
   threshold, the gate fires: **cap `final_score` at 74** (verdict can be at
   most "test"), set `score_confidence` to "low", and record the gate block
-  in the output. The decision memo MUST then state that the verdict is
-  desk-limited and include the interview kit (see
-  `references/decision-memo.md`).
+  in the output. When the gate fires, condition (a) of the decision memo's
+  interview-kit rule is satisfied — see `references/decision-memo.md` for
+  the full rule and the watermark text.
 
 The gate caps, it never boosts — abundant evidence earns nothing extra here.
 
@@ -165,7 +165,7 @@ Every idea rests on assumptions. The RAT identifies the single assumption that, 
 
 1. **List all assumptions** embedded in the idea (drawn from dimension scores and source data):
    - Demand: "People actually have this problem and will seek a solution"
-   - Monetization: "Users will pay $X/mo for this"
+   - Monetization: "Users will pay €X/mo for this"
    - Distribution: "We can reach users via [channel] at acceptable cost"
    - Retention: "Users will come back [frequency]"
    - Competition: "Our differentiator matters to users"
@@ -184,7 +184,7 @@ For the identified RAT, design an experiment following these constraints:
 | Constraint | Requirement |
 |---|---|
 | Time to run | ≤ 2 weeks |
-| Cost to run | ≤ $100 (indie budget) |
+| Cost to run | ≤ €100 (indie budget) |
 | Signal type | Behavioral (what people DO, not what they SAY) |
 | Sample size | Minimum credible: 30 responses or 100 landing page visitors |
 
@@ -209,15 +209,15 @@ Define the threshold **before** running the experiment. The threshold is written
 
 0. If this is a screening request (fresh candidates with only `idea.md`), follow Screening Mode above and stop — none of the steps below apply.
 1. Load all available dimension files from `.idea-validation/ideas/<slug>/`.
-2. Check minimum viable input (≥ 3 dimensions, including Demand and Distribution). If not met, refuse and list missing inputs.
-3. Map each dimension's source data to a 0–100 sub-score using the target's rubric pack.
-4. Compute `floor_penalty` from any sub-scores below 25.
-5. Compute `base_score` using weighted sum.
-6. Apply `floor_penalty` and `missing_discount` to get `final_score`.
+2. Check minimum viable input; if not met, refuse and list missing inputs.
+3. Map sub-scores per the rubric pack.
+4. Compute the floor penalty.
+5. Compute the base score.
+6. Apply the floor penalty and missing-input discount.
 7. Determine `score_confidence`.
 7b. Apply the evidence-sufficiency gate if the target's rubric pack defines one (cap at 74 + confidence "low" when it fires).
-8. Issue `verdict` from threshold table.
-9. Identify `top_strengths` (top 2 dimensions) and `top_weaknesses` (bottom 2 dimensions).
+8. Issue the verdict from the threshold table.
+9. Identify `top_strengths` (top 3 dimensions) and `top_weaknesses` (bottom 3 dimensions).
 10. Run RAT identification: list assumptions, score criticality × uncertainty, select the riskiest.
 11. Design RAT experiment with pass/fail threshold.
 12. If this is a pivot re-score, write to `pivot_scores.json` instead.
@@ -288,5 +288,5 @@ Write to `.idea-validation/ideas/<slug>/scores.json` (or `pivot_scores.json` for
 ## Notes
 
 - **Re-scoring pivots**: When scoring a pivot variant from `pivot_options.json`, write output to `.idea-validation/ideas/<slug>/pivot_scores.json`. Include a `pivot_id` field referencing the option.
-- **Score decay**: If source data is older than 90 days (check `analyzed_at` or file timestamps), apply a 10% confidence penalty and flag stale inputs.
+- **Score decay**: If the newest dimension file is older than 90 days (a quarter — Italian pricing pages and regulatory deadlines routinely move within one), downgrade `score_confidence` one level (already "low" stays "low") and list the stale files in `missing_inputs` as "<file> (stale, analyzed <date>)".
 - **Geometric vs. additive**: The floor penalty provides multiplicative dynamics (one zero kills the score) while the weighted sum provides interpretable dimension contributions. This hybrid outperforms pure additive (hides fatal flaws) and pure geometric (too punishing for moderate weaknesses).

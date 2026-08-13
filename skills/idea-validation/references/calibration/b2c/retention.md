@@ -38,7 +38,7 @@ Use these as the starting range for D1/D7/D30 estimates. The D30 columns match t
 - Bottom of range: `habit_formation_score` < 2.5 OR `desire_strength_label` = "weak"
 - Midpoint otherwise
 
-Then shift D30 by the primary demand driver: survival or control primary → +2 percentage points (recurring stakes keep users returning); curiosity primary → −2 points (novelty decays). Clamp within sensible bounds (D30 never exceeds D7).
+Then shift D30 by the primary demand driver: survival or control primary → +2 percentage points (recurring stakes keep users returning); curiosity primary → −2 points (novelty decays).
 
 ## Churn Risk Factor Library
 

@@ -1,5 +1,5 @@
 ---
-description: "Distribution specialist for the idea-validation fan-out. Evaluates realistic acquisition paths for a B2C app idea — viral potential (k-factor), ASO, creator fit, paid feasibility, and founder edge — and writes distribution.json."
+description: "Distribution specialist for the idea-validation fan-out. Evaluates realistic acquisition paths for an idea in either target — growth loops (k-factor), platform-listing advantage, advocacy fit, paid feasibility, and founder edge — and writes distribution.json."
 display_name: "Validate · Distribution"
 model: openai-codex/gpt-5.6-terra
 thinking: low
@@ -30,6 +30,14 @@ be a trap for a beginner.
 - `.idea-validation/ideas/<slug>/idea.md` (app concept, key features, differentiator)
 - Optional: `.idea-validation/ideas/<slug>/competitors.json` (competitor distribution signals)
 - `.idea-validation/market_insights/<niche>-*-<YYYY>-<MM>.md` (platform activity signals)
+
+> **B2B target note:** for `TARGET: b2b` the platform files are
+> `<niche>-incumbents|communities|linkedin|g2-capterra|web-search-*.md`
+> (Italy-first evidence). Read the same signal classes from them — buyer
+> complaints and tool-seeking threads play the Reddit role, marketplace/
+> review listings play the App Store role, practitioner posts play the
+> TikTok-narrative role — and prefer findings labeled as Italian sources
+> over `geography: global` ones.
 
 ## Distribution Dimensions
 
@@ -69,7 +77,7 @@ Evaluate the app concept against the loop-type table in the calibration pack (ea
 | 0.1 ≤ k < 0.3 | **Marginal virality** — some word-of-mouth, not a growth driver |
 | k < 0.1 | **Non-viral** — growth depends entirely on other channels |
 
-> k ≥ 1.0 means every user brings in at least one more user on average — true exponential growth. This is rare for indie apps; be skeptical of estimates above 0.8 unless the concept matches one of the pack's highest-k loop types.
+> k ≥ 1.0 means every user brings in at least one more user on average — true exponential growth. This is rare for indie apps; be skeptical of estimates above 0.8 unless the concept matches one of the pack's highest-k loop types, and mark any estimate above 0.5 as "optimistic until validated" in `viral_loop_description`.
 
 ### Step 2 — Platform advantage scoring
 
@@ -158,9 +166,9 @@ After writing the file, return: the distribution verdict, the recommended first 
 
 ## Notes
 
-- The `recommended_first_channel` should always be the highest-viability channel the founder can realistically execute given their tier. A channel the founder has never touched (video creation, keyword research, cold outreach) is aspirational, not recommendable.
+- The `recommended_first_channel` should always be the highest-viability channel the founder can realistically execute given their tier. A channel the founder has never touched (video creation, keyword research, paid campaign management) is aspirational, not recommendable.
 - If `competitors.json` is available, check competitor distribution strategies — an app succeeding via a channel the founder can replicate is a strong positive signal.
-- k-factor estimates are inherently speculative pre-launch. Treat them as directional, not precise. Flag any estimate above 0.5 as "optimistic until validated."
+- k-factor estimates are inherently speculative pre-launch. Treat them as directional, not precise.
 
 ## Rules
 

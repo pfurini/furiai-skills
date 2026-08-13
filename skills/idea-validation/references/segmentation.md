@@ -32,7 +32,7 @@ founder can actually execute.
 
 | Field | Mapping |
 |---|---|
-| `budget_constraint` | ≤ $100/mo → `low` · $100–$500/mo → `medium` · > $500/mo → `high` (these bands align with the CAC specialist's Bootstrap/Lean/Moderate tiers) |
+| `budget_constraint` | ≤ €100/mo → `low` · €101–€500/mo → `medium` · > €500/mo → `high` (these bands align with the CAC specialist's Bootstrap/Lean/Moderate tiers) |
 | `time_per_week_hours` | The number the user gave; if a range, the low end (founders overestimate) |
 | `risk_tolerance` | `low` = needs results fast / income pressure · `medium` = can experiment for a few months · `high` = exploring, no deadline |
 
@@ -42,7 +42,7 @@ Write 2–3 recommendations matched to the tier:
 
 | Tier | Recommend |
 |---|---|
-| `beginner` | Channels with fast feedback (community posting, TikTok organic); ideas buildable in ≤ 4 weeks; validate before writing code (the RAT discipline) |
+| `beginner` | Channels with fast feedback (b2c: community posting, short-video organic; b2b: LinkedIn public commenting, intermediary introductions via `b2b_intermediary_access`); ideas buildable in ≤ 4 weeks; validate before writing code (the RAT discipline) |
 | `builder` | One organic channel executed consistently over spreading thin; scope MVPs to their strongest skill; charge from day one |
 | `growth` | Ideas where their distribution edge compounds; paid channels once LTV:CAC is modeled; portfolio thinking (kill fast, double down on winners) |
 
@@ -53,7 +53,7 @@ Write 2–3 recommendations matched to the tier:
 
 ## Output
 
-Merge into `.idea-validation/user_profile.md` (preserve existing fields):
+Merge into `.idea-validation/user_profile.md` (preserve existing fields) — parse the file's single JSON block, add these keys, rewrite it.
 
 ```json
 {
@@ -66,4 +66,4 @@ Merge into `.idea-validation/user_profile.md` (preserve existing fields):
 }
 ```
 
-`segmentation_basis` is one sentence naming the evidence behind the tier ("shipped two apps, one with $400 MRR → growth").
+`segmentation_basis` is one sentence naming the evidence behind the tier ("shipped two apps, one with €400 MRR → growth").

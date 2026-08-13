@@ -58,7 +58,7 @@ rationale):
 | **Keyword opportunity** | Marketplace/Capterra.it keywords with weak top results | Keywords exist but top results are solid | All relevant keywords owned by established vendors |
 | **Search intent match** | Italian buyers search the surface for this exact job ("solleciti automatici", "sync magazzino") | Buyers search the category but not this angle | Discovery-dependent — buyers don't know to search |
 | **Review velocity potential** | Natural review-ask moments in the core loop | Some ask moments, not in core loop | No natural moment; Italians under-review — expect slow accrual |
-| **Listing differentiation** | Listing can show a visibly different outcome, in Italian, compliance-aware | Decent but similar | Looks like every other listing |
+| **Listing differentiation** (schema key: `visual_differentiation`) | Listing can show a visibly different outcome, in Italian, compliance-aware | Decent but similar | Looks like every other listing |
 
 **Score bands** (sum 5–15): 12–15 → **high** (marketplace as primary
 acquisition) · 8–11 → **medium** (viable, not sole driver) · 5–7 → **low**.
@@ -114,7 +114,8 @@ Budget tiers use the same vocabulary as the CAC specialist:
 |---|---|---|
 | **Bootstrap** (≤ €100/mo) | Testing only | High-intent Italian niche keywords, exact match. Not a primary channel. |
 | **Lean** (€100–500/mo) | Narrow campaigns | Google Ads on Italian long-tail solution keywords; site retargeting (Meta, ~€0.43 CPC). LinkedIn NOT viable at this tier. |
-| **Moderate** (€500–2,000/mo) | Real optimization | Search + retargeting with tested landing pages; a yearly fair as a discrete bet. LinkedIn only above ~€2K/mo AND ACV > €1,000/yr. |
+| **Moderate** (€500–2,000/mo) | Real optimization | Search + retargeting with tested landing pages; a yearly fair as a discrete bet. |
+| **Serious** (> €2,000/mo) | Multi-channel | LinkedIn becomes testable, but only with ACV > €1,000/yr; keep search + retargeting running underneath. |
 
 If `budget_constraint` is "low", cap paid feasibility at "marginal"
 regardless of other factors.

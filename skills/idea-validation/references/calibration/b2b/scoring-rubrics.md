@@ -61,7 +61,7 @@ WK-class suite or the host platform ships the feature (absorption risk).
 
 | Condition | Score range |
 |---|---|
-| LTV:CAC ≥ 3:1 on at least 2 channels, WTP target ≥ €50/mo, viable SOM | 80–100 |
+| LTV:CAC ≥ 3:1 on at least 2 channels, WTP target €25–50/mo (at or below the self-serve ceiling), viable SOM | 80–100 |
 | LTV:CAC ≥ 3:1 on 1 channel, WTP target ≥ €25/mo (†: the B2B ARPA line) | 60–79 |
 | LTV:CAC ≥ 2:1, WTP target €10–25/mo, marginal unit economics | 35–59 |
 | LTV:CAC < 2:1 OR viability_verdict = "not-viable" | 10–34 |
@@ -71,7 +71,7 @@ Adjust: +10 if `freemium_conversion_estimate` ≥ 8% (†: the B2B median). +5
 if market_size_verdict = "large" after the buyer-redirection step. −10 if
 the plan depends on a card-required trial in a cold Italian audience. −5 if
 WTP target sits above €50/mo entry (sales-motion drift — should also show
-in the guardrail band).
+in the guardrail band, see b2b/pricing.md "The €50/month line").
 
 ## Distribution (0–100)
 
@@ -94,7 +94,7 @@ Uses the B2B semantics from the retention pack (monthly churn = 100 − `d7`):
 
 | Condition | Score range |
 |---|---|
-| `retention_verdict` = "sticky", projected monthly churn ≤ 2%, embedding score ≥ 4 (†) | 80–100 |
+| `retention_verdict` = "sticky", projected monthly churn ≤ 2%, `habit_formation_score` ≥ 4 (the workflow-embedding reading) (†) | 80–100 |
 | `retention_verdict` = "sticky" OR projected monthly churn ≤ 3% (†) | 60–79 |
 | `retention_verdict` = "moderate", monthly churn 3–5% (†: around the $25–100 ARPA median) | 40–59 |
 | `retention_verdict` = "disposable" OR monthly churn > 7% (†) | 15–39 |

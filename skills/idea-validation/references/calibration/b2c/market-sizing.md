@@ -69,3 +69,22 @@ Use the **upper end** when:
 ## Fallback Price (when pricing.json is absent)
 
 Use the median competitive price from `competitors.json` or a category benchmark ($3–$7/mo for typical B2C subscription apps).
+
+## Reality-check thresholds and SOM verdict bands (read by the market-sizer brief)
+
+Numeric reality checks (record every triggered check in `reality_checks_triggered`):
+
+| Check | Threshold | Action if triggered |
+|---|---|---|
+| TAM inflation | TAM > $10B for a niche indie app | Almost certainly top-down numbers; redo bottom-up only |
+| SAM too broad | SAM > 50% of TAM | Filters too loose; add platform/geography/niche constraints |
+| SOM fantasy | SOM year 1 > $500K for a solo developer | Reality-check the capture rate; most indie apps earn $0–$50K in year 1 |
+
+`market_size_verdict` from SOM year 1:
+
+| SOM year 1 | Verdict |
+|---|---|
+| > $200K | large — significant indie opportunity |
+| $50K–$200K | medium — viable as a primary project with good retention |
+| $10K–$50K | niche — side-project scale; viable if build cost is low |
+| < $10K | micro-niche — hobby scale unless the niche can expand |
