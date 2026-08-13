@@ -129,7 +129,7 @@ created_at: ""
 
 ## Verdict: <PURSUE / TEST / PIVOT / DROP>
 
-**Score: X/100** | Confidence: <high / medium / low>
+**Score: X/100** | Confidence: <high / medium / low><!-- b2b: append " | Sales-motion band: <band>" from scores.json -->
 
 <Validation watermark — only if confidence is medium or low>
 

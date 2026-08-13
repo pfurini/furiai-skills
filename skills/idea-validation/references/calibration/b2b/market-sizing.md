@@ -105,6 +105,11 @@ is proven (`confidence: low`):
 | Horizontal SMB tool, established competitors | 0.05–0.3% | 0.3–1.0% |
 | Category owned by a suite incumbent (TeamSystem/Zucchetti class) | 0.01–0.1% | 0.1–0.5% |
 
+When more than one row applies (e.g. a suite incumbent bundles the feature
+AND a marketplace listing is available), take the lowest applicable band; a
+proven distribution edge on the higher row's channel is the only reason to
+move up.
+
 ## Outcome Reality Check (mandatory)
 
 Cross-check every SOM estimate against indie cohort medians (TrustMRR via

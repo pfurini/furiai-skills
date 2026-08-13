@@ -25,6 +25,9 @@ verdict live in the agent brief.
 
 Map from `user_profile.md`: `budget_constraint` = "low" → Bootstrap.
 "medium" → Lean. "high" → Moderate or Serious (if ambiguous, model both).
+If `user_profile.md` is absent, default to Bootstrap (the conservative tier
+— it excludes paid channels, so it cannot overstate viability) and flag the
+gap in the artifact.
 
 ## Legal exclusion (Italy — overrides everything)
 

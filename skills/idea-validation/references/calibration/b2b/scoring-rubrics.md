@@ -96,7 +96,7 @@ Uses the B2B semantics from the retention pack (monthly churn = 100 − `d7`):
 |---|---|
 | `retention_verdict` = "sticky", projected monthly churn ≤ 2%, `habit_formation_score` ≥ 4 (the workflow-embedding reading) (†) | 80–100 |
 | `retention_verdict` = "sticky" OR projected monthly churn ≤ 3% (†) | 60–79 |
-| `retention_verdict` = "moderate", monthly churn 3–5% (†: around the $25–100 ARPA median) | 40–59 |
+| `retention_verdict` = "moderate", monthly churn 3–7% (†: around and below the $25–100 ARPA median; position 5–7% churn in the low end of the band) | 40–59 |
 | `retention_verdict` = "disposable" OR monthly churn > 7% (†) | 15–39 |
 | `churn_risk` = "high" AND no workflow embedding | 0–14 |
 

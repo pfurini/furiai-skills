@@ -86,6 +86,11 @@ adjusted_score = base_score * floor_penalty * missing_discount
 final_score = round(clamp(adjusted_score, 0, 100))
 ```
 
+A dimension scored with a rubric-pack *default* because its source file is
+absent (e.g. founder-market fit at neutral 50 with no `user_profile.md`)
+still contributes its default to the base score but counts as UNAVAILABLE
+for `missing_discount` — defaults are placeholders, not evidence.
+
 The missing-input discount caps what partial analysis can return: 3 of 6 dimensions ceilings the score at 50 ("pivot"), 4 of 6 at 67 ("test"). A "pursue" verdict requires all 6.
 
 ### Step 5 — Determine confidence level
@@ -255,6 +260,7 @@ Write to `.idea-validation/ideas/<slug>/scores.json` (or `pivot_scores.json` for
   },
   "final_score": 0,
   "verdict": "pursue | test | pivot | drop",
+  "sales_motion": "<b2b only: self-serve | assisted-self-serve | sales-led, from idea.md frontmatter — omit for b2c>",
   "score_confidence": "high | medium | low",
   "missing_inputs": [],
   "top_strengths": [
