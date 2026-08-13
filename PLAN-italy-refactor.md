@@ -270,6 +270,51 @@ Deferred (apply during Phase D or a later pass):
 Per the audit discipline, these edits are behavior changes tested against the
 pre-audit snapshot (`d9b1976`): the Phase C forward-tests are the test round.
 
+### Phase C log — Run 1 (Claude Code content test, done 2026-08-13)
+
+Setup: scratch project `~/tmp/iv-test-1`, idea "client document-collection
+portal beside TeamSystem for studi commercialisti", target b2b / micro /
+assisted-self-serve. All specialists ran as generic Sonnet subagents
+(executor-floor test; Fable Wave 1 was killed and redispatched on Sonnet
+before any file was written). All five b2b platforms + the optional market
+sizer. Full chain produced; verdict 45/100 pivot (v2, after market sizing),
+confidence medium, gate not fired (18 IT observations vs threshold 15).
+
+Checklist: 13/13 pass after two in-run patches (sales-motion band added to
+scores+memo; nothing else needed). Highlights: cold_outbound viable:false
+with art. 130 reason; intermediary_referral and events_fairs assessed;
+buyer redirection sized on 69,200 studi (CNDCEC 2024), never 4.27M; dead
+surfaces never cited live; Italian quotes carry parenthetical translations;
+LinkedIn-groups open item answered (see
+`research/idea-validation-italy-b2b/linkedin-groups-post-volume-note.md`).
+Audit-fix validation: the d7-churn seam, the split paid_social keys, the
+viable:false schema slot, the trend-velocity anchors, and the memo
+version-note slot were all exercised and behaved.
+
+Defects found and FIXED in this pass:
+1. Pack-defaulted dimension vs missing_discount was ambiguous (a 46→55 =
+   pivot→test swing): scoring.md now rules defaults count as UNAVAILABLE.
+2. Retention rubric band gap (churn 5–7% matched no row): moderate band now
+   3–7% with low-end positioning.
+3. No sales_motion slot anywhere: added to scores.json schema (b2b-only,
+   additive) and the memo score line.
+4. Capture-rate rows can overlap (10× apart): lowest-applicable-band
+   tie-break added to b2b/market-sizing.md.
+5. No budget-tier default without user_profile.md: b2b/cac.md now defaults
+   to Bootstrap and flags the gap (codifies what the CAC agent improvised).
+
+Open observations (decide after Run 2):
+- Evidence-label line format drifts per researcher (bulleted vs bracket
+  blocks) — gate counting is manual; consider mandating one exact format.
+- b2b monetization's top band needs "viable SOM" but the market sizer is
+  optional in the validation chain — consider making it default for b2b.
+- LinkedIn jobs actor failed 3× (group-posts actor fine); aggregator
+  fallback worked. Watch in Run 2 before changing tooling.md.
+- Pricing agent read the no-card-trial "Good" band at 5% — verify against
+  the pack's entry-model table wording.
+- Gate threshold 15: Run 1 counted 18 in an evidence-rich commercialisti
+  niche — the threshold looks sane there; Run 2 (generic PMI) probes lower.
+
 ### Phase D — B2C (after B2B sign-off; outline only)
 
 Ring policy: Italy → Europe-English → Western (NA, UK/IE, AU/NZ); Eastern excluded; app
