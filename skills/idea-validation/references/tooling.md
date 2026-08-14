@@ -19,7 +19,7 @@ and endpoint facts.
 | `anac_dataset.sh <dataset-id\|list>` | ANAC CKAN open data | nothing | Below-EU-threshold Italian procurement datasets |
 | `apify_run.sh <owner~actor> [input.json]` | Apify REST | `APIFY_TOKEN` | Any store actor: reviews (Capterra/Trustpilot/G2), job posts (LinkedIn/Indeed), LinkedIn group posts (cookieless actors only), Facebook public groups |
 | `exa_search.sh "<query>" [n]` (`EXA_MODE=answer` for cited answers) | Exa API | `EXA_API_KEY` | Semantic search / claim checking when no harness search tool is available |
-| Openapi.com `GET /impresa` (no script yet — call with curl) | Registro Imprese via Openapi.com | `OPENAPI_TOKEN` | Company counts/lists by ATECO × province × size; €0.001/request, up to 1,000 companies per request; free sandbox at `test.visurecamerali.openapi.it` |
+| Openapi.com `GET /impresa` (no script yet — call with curl) | Registro Imprese via Openapi.com | `OPENAPI_TOKEN` | Company counts/lists by ATECO × province × size; **count-only queries are free via the `dry_run` parameter (100/day, then €0.01/call; verified 2026-08)** — use it for ICP counts before pulling any list; list/profile calls from €0.001/request, up to 1,000 companies per request; free sandbox at `test.visurecamerali.openapi.it` |
 | DataForSEO (no script) | DataForSEO API (Basic auth) | `DATAFORSEO_LOGIN`/`_PASSWORD` ($50 minimum deposit) | Italian keyword/SERP volumes (SERP $0.0006/query); without it treat Italian search volume as unmeasured and say so |
 
 ## Hard-won endpoint facts (do not rediscover these)

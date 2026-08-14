@@ -139,7 +139,10 @@ outcomes in PLAN, propose commits, update this handoff.
    review→customer multipliers (none exist); indie capture rates (none
    exist anywhere).
 5. **Optional script:** `openapi_impresa_count.sh` (ATECO × province ×
-   size counts). Develop against the free sandbox first.
+   size counts). Develop against the free sandbox first. 2026-08-14
+   research find: the `/impresa` `dry_run` parameter returns count-only
+   results FREE (100/day, then €0.01/call) — the script may never need a
+   paid call; see `research/paid-data-providers-italy/firmographics.md`.
 6. **`prompts/b2b/README.md`** does not exist. Add one if prompt count
    grows again.
 
