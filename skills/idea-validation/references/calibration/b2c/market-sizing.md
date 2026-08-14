@@ -25,8 +25,10 @@ blended number:
 | **Ring 2 — Europe-English** | EU consumers reachable with an English-language app | EUR |
 | **Ring 3 — Western** | NA, UK/IE, AU/NZ | USD |
 
-- SAM and SOM are reported per ring, each in its ring currency. Never mix
-  currencies inside one table row.
+- SAM and SOM are reported per ring, each in its ring currency, in the
+  artifact's structured `rings` array (Italy first; n/a rings keep their
+  entry with nulls and a reason). Never mix currencies inside one table
+  row.
 - Ring 2 is the least instrumented ring (few EU-EN data cuts exist): derive
   it conservatively and mark it `confidence: low`.
 - If the idea is Italy-bound by nature (Italian-language content, Italian

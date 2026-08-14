@@ -41,7 +41,7 @@ Persistent state for this pack. All specialist inputs and outputs use this tree.
 - `user_profile.md` is updated incrementally (later steps merge fields).
 - `market_insights/` is append-only: new dated file per run, never overwrite.
 - Each `.json` artifact contains one JSON object and nothing else — no code fences, no commentary before or after.
-- Every artifact carries a top-level `confidence: high | medium | low` field (JSON key or YAML frontmatter): the writing agent's evidence confidence, defined in each agent file. Additive and target-neutral.
+- Every artifact carries a top-level `confidence: high | medium | low` field (JSON key or YAML frontmatter): the writing agent's evidence confidence, defined in each agent file. Additive and target-neutral. Exception: `scores.json` carries `score_confidence` (its own richer field) instead.
 
 ## Target (`idea.md` frontmatter)
 

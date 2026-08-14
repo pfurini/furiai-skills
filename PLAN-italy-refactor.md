@@ -676,6 +676,78 @@ validated. Remaining: optional pi acceptance run (same division as Phase
 C: content test in CC, acceptance in pi; export `EXA_API_KEY` in the
 launching shell).
 
+### Phase D-C — pi acceptance Run 2a (2026-08-13, INVALID — stale skill)
+
+A pi run in `~/tmp/iv-test-4` (idea "Sentiero", hiking companion, all five
+platforms + market sizer, 42/100 pivot) turned out to have loaded pi's
+installed skill copy at `~/.pi/agent/skills/idea-validation/`, a snapshot
+from before the Phase D-B commit — zero ring machinery in any artifact.
+Not an acceptance test of Phase D; discard for calibration purposes.
+Salvageable observations (harness behavior, skill-version-independent):
+the pi orchestrator resolved a cross-agent contradiction (AllTrails
+localization) in favor of the later, more specific finding; reported the
+sizing divergence honestly; handled late agent notifications without
+re-runs. **Lesson for every future pi run: verify the installed skill
+matches the repo before dispatching (`diff -rq`).** Skill re-synced by the
+user 2026-08-14; re-run scheduled in `~/tmp/iv-test-5` with the same
+Sentiero prompt.
+
+### Phase D-C log — Run 2 (pi acceptance test, done 2026-08-14)
+
+Setup: `~/tmp/iv-test-5`, pi with native dispatch, Opus 5 orchestrator at
+high thinking (verified in the transcript), same Sentiero prompt, all five
+platforms + market sizer, no user_profile.md. Verdict **23/100 drop** —
+first live b2c firing of the **floor penalty** (monetization 18 and
+retention 22 both < 25 → ×0.6336), confidence medium, `ring_coverage`
+{IT 88, EU-EN 8, Western 15}, NO-RING-1 silent. Same-idea comparison
+against the stale-skill control run (42/100 pivot in iv-test-4): the
+Phase D calibration is materially harsher on a seasonal, low-retention
+consumer idea, for stated reasons.
+
+Checklist: **10/13 PASS, 3 PARTIAL, 0 FAIL.**
+- Item 5 PARTIAL: trend files translate their Italian quotes, but the
+  memo carried one untranslated quote.
+- Item 7 PARTIAL: the sizer sized Ring 1 and Ring 2 (EU-EN, low
+  confidence) but had to embed the per-ring numbers in prose assumption
+  strings — the schema had no structured per-ring slot (both runs
+  confirmed the gap: the CC executor invented a `rings` object, the pi
+  executor used prose).
+- Item 11 PARTIAL: `ring_coverage` counted two stray `ring:` mentions
+  outside label lines (109 label lines vs 111 counted); scores.json has
+  no top-level `confidence` (memory.md's blanket rule conflicted with the
+  scoring schema's `score_confidence`).
+
+Everything else held under a fresh Opus orchestrator: 109 label lines
+with ZERO malformed (the all-five-slots fix worked), bilingual NICHE
+verbatim in all five files, keyword-unmeasured stated, disconfirming
+sections substantive, r/TrekkingItaly found and used (Run 1's
+absence-misreport did NOT recur), English trap subs labeled `Western`,
+retention floor path fired with the new `estimated_retention_rationale`
+populated and the +2pp driver shift stated, CAC applied the new
+annual-prepay rule verbatim (€39.99 prepaid, not amortized; install-level
+LTV €1.89 arithmetically consistent), `apple_search_ads` key used,
+Bootstrap default + structured `skipped_channels`, medium watermark in
+the memo, EUR throughout. Orchestrator behaviors worth keeping: resolved
+a cross-agent contradiction toward the later, more specific finding;
+skipped the platform menu under the user's "just validate it as it
+stands" phrasing but stated its target/ring inference for correction
+(defensible; watch), and scored the "logbook has no demand" feature-level
+risk from a community quote.
+
+Defects found and FIXED after this run:
+1. iv-market-sizer schema: structured `rings` array added (b2c-mandated,
+   Italy first, n/a entries carry a reason; omit for b2b) and the pack's
+   Step 0 now names it.
+2. decision-memo.md: Italian-quote translation rule added to the memo's
+   formatting constraints (repeat miss across runs).
+3. memory.md: scores.json exempted from the blanket `confidence` rule
+   (it carries `score_confidence`).
+4. b2c scoring-rubrics: ring counting tightened to lines starting
+   `labels —` only.
+
+**Phase D-C is COMPLETE (content test + pi acceptance).** Both runs pass;
+all fixes committed.
+
 ## Open decisions for the user
 
 1. **D4 threshold and mechanics** — cap-at-moderate vs. score-discount; the ~15-observation

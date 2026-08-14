@@ -41,11 +41,15 @@ write harness-specific tool names into skill files. Describe capabilities.
   `~/.pi/web-search.json` fine. Workaround: export `EXA_API_KEY` in the
   shell launching pi. Root-cause investigation belongs in a pi session
   (suspects: pi-subagents nested-tools, pi-claude-bridge worker env).
-- Phase D (B2C Italy-first refactor) is COMPLETE, 2026-08-13: D-A research
+- Phase D (B2C Italy-first refactor) is COMPLETE, 2026-08-14: D-A research
   pass (`research/idea-validation-italy-b2c/`, six reports), D-B rewrite
-  (DD1–DD5 approved; all ten steps), D-C forward test (Claude Code, Sonnet
-  executors: 45/100 pivot, checklist 11/13 pass + 2 partial, six defects
-  fixed). The optional pi acceptance run has NOT been done.
+  (DD1–DD5 approved; all ten steps), D-C forward tests BOTH done — Run 1
+  (Claude Code, Sonnet executors: 45/100 pivot, 11/13 + 2 partial, six
+  defects fixed) and Run 2 (pi acceptance, Opus 5/high: 23/100 drop,
+  10/13 + 3 partial, four more fixes; first live b2c floor-penalty
+  firing). CAUTION for pi runs: pi loads the skill from
+  `~/.pi/agent/skills/idea-validation/` — `diff -rq` it against the repo
+  before dispatching, or you test a stale snapshot (it happened).
 - The decision history is in `PLAN-italy-refactor.md` (decisions D1–D6 and
   DD1–DD5, tooling policy, phase logs). Read it if you need the "why".
 
@@ -109,20 +113,11 @@ write harness-specific tool names into skill files. Describe capabilities.
   `python3 ~/.claude/skills/pi-skill-creator/scripts/quick_validate.py skills/idea-validation`
   (run from the repo root).
 
-## Next task: pi acceptance run (optional) and open items
+## Next task: open items
 
-Phase D is complete on the Claude Code side. What remains:
-
-1. **Optional pi acceptance run** for b2c — same division as Phase C
-   (content test done in CC; acceptance in pi with native `iv-*` dispatch,
-   Opus orchestrator, Sonnet executors). Export `EXA_API_KEY` in the shell
-   launching pi (see the pi-stack issue above). Reuse the Phase D-C
-   checklist in PLAN; watch the three "open observations" logged there
-   (mirror-based subreddit discovery, grey-zone IT labels, translation
-   enforcement).
-2. Work the open-items list below.
-3. After any run: log outcomes in PLAN, propose commits, update this
-   handoff.
+Phase D is fully complete (both forward tests). What remains is the
+open-items list below, plus one standing practice: after any run, log
+outcomes in PLAN, propose commits, update this handoff.
 
 ## Open items (in priority order)
 

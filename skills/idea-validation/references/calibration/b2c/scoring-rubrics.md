@@ -13,9 +13,10 @@ signal, so a count threshold would misfire.
 
 It defines instead a **mandatory ring-coverage disclosure** (scoring.md
 Step 5b). Counting rule: across this niche's `market_insights/` files,
-count the per-finding label lines (`labels — ring: ...`) by ring value —
-`IT`, `EU-EN`, `Western` — and write the three counts to `ring_coverage`
-in `scores.json`. Count label lines only; prose mentions of Italy do not
+count the per-finding label lines by ring value — `IT`, `EU-EN`,
+`Western` — and write the three counts to `ring_coverage` in
+`scores.json`. Count ONLY lines that start with `labels —`; a `ring:`
+mention anywhere else (prose, summaries, sizing rationale) does not
 count. The disclosure caps nothing and boosts nothing. If the `IT` count
 is 0, the decision memo adds the NO-RING-1 watermark (see
 `references/decision-memo.md`).

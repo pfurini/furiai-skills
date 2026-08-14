@@ -40,6 +40,7 @@ Follow these rules:
 | Pre-mortem | 3 bullet points | Failure imagination exercise |
 | Recommended Next Step | 2–4 sentences with specifics | What to do this week |
 | Kill criteria | 1–2 sentences | When to walk away |
+| Italian quotes | verbatim + parenthetical English translation, always | Same rule as the artifacts (SKILL.md research language) |
 | Alternative Path | 1–2 sentences | Plan B |
 | Interview kit | 10 questions + 2–3 recruiting routes | Only when required (see below) — the desk-research escape hatch |
 

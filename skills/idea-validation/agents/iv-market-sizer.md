@@ -213,6 +213,7 @@ The top-level `confidence` field is the artifact's evidence confidence: **high**
     "growth_multiplier": 1.0,
     "growth_multiplier_source": ""
   },
+  "rings": "<only when the calibration pack mandates per-ring reporting (b2c): one entry per ring, ordered Italy first — {\"ring\": \"IT | EU-EN | Western\", \"currency\": \"EUR | USD\", \"tam\": 0, \"sam\": 0, \"som_year_1\": 0, \"som_year_3\": 0, \"confidence\": \"high | medium | low\", \"reason\": \"<why sized this way, or why n/a — n/a rings keep the entry with nulls and the reason>\"} — the top-level tam/sam/som then carry the pack-defined aggregate; omit for b2b>",
   "market_insights_used": [],
   "trend_velocity_observed": "rising-fast | rising | stable | declining",
   "monetization_evidence_found": true,
