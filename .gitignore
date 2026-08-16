@@ -3,3 +3,4 @@ wip/
 .claude/worktrees
 __pycache__/
 .skill-creator/
+*.key

@@ -20,7 +20,8 @@ and endpoint facts.
 | `apify_run.sh <owner~actor> [input.json]` | Apify REST | `APIFY_TOKEN` | Any store actor: reviews (Capterra/Trustpilot/G2), job posts (LinkedIn/Indeed), LinkedIn group posts (cookieless actors only), Facebook public groups |
 | `exa_search.sh "<query>" [n]` (`EXA_MODE=answer` for cited answers) | Exa API | `EXA_API_KEY` | Semantic search / claim checking when no harness search tool is available |
 | Openapi.com `GET /impresa` (no script yet — call with curl) | Registro Imprese via Openapi.com | `OPENAPI_TOKEN` | Company counts/lists by ATECO × province × size; **count-only queries are free via the `dry_run` parameter (100/day, then €0.01/call; verified 2026-08)** — use it for ICP counts before pulling any list; list/profile calls from €0.001/request, up to 1,000 companies per request; free sandbox at `test.visurecamerali.openapi.it` |
-| DataForSEO (no script) | DataForSEO API (Basic auth) | `DATAFORSEO_LOGIN`/`_PASSWORD` ($50 minimum deposit) | Italian keyword/SERP volumes (SERP $0.0006/query); without it treat Italian search volume as unmeasured and say so |
+| `dataforseo_volume.sh "kw1,kw2,..." [loc=2380] [lang=it]` | DataForSEO Google Ads API (Basic auth) | `DATAFORSEO_LOGIN`/`_PASSWORD` | Italian keyword volumes + CPC + competition, up to 1,000 kw per ~$0.09 live task (verified 2026-08); without credentials treat Italian search volume as unmeasured and say so |
+| `dataforseo_serp.sh "<query>" [depth=10] [loc=2380] [lang=it]` | DataForSEO SERP API live advanced | `DATAFORSEO_LOGIN`/`_PASSWORD` | google.it SERP observation (~$0.002/query, verified 2026-08): organic ranks, ads-present, People-Also-Ask, item-type mix (AI Overview visibility included) |
 
 ## Hard-won endpoint facts (do not rediscover these)
 
