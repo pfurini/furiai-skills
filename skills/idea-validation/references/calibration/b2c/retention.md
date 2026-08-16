@@ -6,9 +6,12 @@ library, and verdict thresholds for the B2C target. The scoring mechanics
 live in the agent brief.
 
 > Sources: retention benchmarks are global all-install data — Adjust
-> retention handbook (undated, flag), Statista 2024 study of 1,000+ apps via
-> 2024 roundups (stale, directional), AppsFlyer aggregates. **No
-> Italy-specific retention dataset exists** (say so if asked); retention is
+> Mobile App Trends 2026 (2025 full-year, read directly), Statista 2024
+> study of 1,000+ apps via 2024 roundups (stale, directional), AppsFlyer
+> aggregates. **No Italy-specific retention dataset exists** (say so if
+> asked), and **no primary source for a subscription-app retention premium
+> exists, gated or open** (verified against the gated AppsFlyer 2026
+> report: it carries no retention table at all); retention is
 > a product construct, not a geography construct, so the same table applies
 > across rings. The category-range table below is a **construct**
 > (`confidence: low`): it describes **well-executed subscription apps** —
@@ -51,8 +54,10 @@ change both.
 | Creative tools | 25–35% | 15–24% | 12–20% |
 
 **Published-median floor (sourced, use it when the concept is weak):** the
-all-install cross-industry D30 median is **3–7%** (Adjust ~7% global;
-Statista 5.7%; AppsFlyer 3.36%). When two or more churn-risk factors apply,
+all-install cross-industry D30 median is **2–7%** (Adjust 2026, 2025
+full-year global: gaming 5%, e-commerce 3%, finance 2%, marketplace 8% —
+stable vs 2024; Statista 5.7%; AppsFlyer 3.36%). When two or more
+churn-risk factors apply,
 or `habit_formation_score` < 2.5, estimate from this floor — below the pack
 range — and say so in the artifact's `estimated_retention_rationale` field.
 

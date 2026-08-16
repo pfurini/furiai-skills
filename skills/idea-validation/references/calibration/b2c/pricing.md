@@ -144,11 +144,22 @@ outside Apple billing, so those categories have no Italian-vendor anchor.
 
 ## Freemium Conversion Estimation
 
-The overall level is sourced; the per-category split is a construct. Watch
-the denominator: **free-user → paid** (OpenView: 3–5% good, 6–8% great,
-2023; ChartMogul median 8% across products, 2026) is a narrower funnel than
-**download → paid** (RevenueCat 2026: freemium apps 2.1% median at D35,
-hard-paywall apps 10.7%). State which funnel an estimate uses.
+The overall level is sourced; the per-category free-user→paid split below
+is a construct. Watch the denominator: **free-user → paid** (OpenView:
+3–5% good, 6–8% great, 2023; ChartMogul median 8% across products, 2026)
+is a narrower funnel than **download → paid** (RevenueCat 2026: freemium
+apps 2.1% median at D35, hard-paywall apps 10.7%). State which funnel an
+estimate uses.
+
+**Sourced per-category conversion (AppsFlyer 2026, 1.7B paid installs of
+subscription apps, Oct 2024–Feb 2026 — trial-model funnels, confidence
+high):** trial→paid: Education 42%, Lifestyle 41%, every non-gaming
+category ≥32%, Gaming 19% (its trials are discovery, not purchase
+intent). Direct install→paid without a trial: Health & Fitness 7.1%,
+Dating 6.5%, average 3.5%, Utility & Productivity 1.7%. High purchase
+intent categories (health, dating) convert without trials; use a trial
+where intent needs proving, and expect roughly a third of trialists to
+pay.
 
 If the recommended model includes a free tier, estimate conversion from
 these factors (qualitative — construct):

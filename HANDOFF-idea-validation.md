@@ -137,7 +137,13 @@ outcomes in PLAN, propose commits, update this handoff.
    software gestionale in Italia" (user must obtain); RPO tariff tables
    (only if the phone-consent bridge is ever modeled); Italian
    review→customer multipliers (none exist); indie capture rates (none
-   exist anywhere).
+   exist anywhere). DONE 2026-08-16: Adjust Mobile App Trends 2026 and
+   AppsFlyer Subscription Trends 2026 obtained and folded into the b2c
+   packs (see `research/idea-validation-italy-b2c/gated-report-digests.md`;
+   the retention-premium question is closed — no primary source exists).
+   SplitMetrics 2026 also obtained (browser export): Italy dropped out of
+   every top-15 ASA cost ranking — second-vendor bound corroborating
+   MobileAction's cheap-Italy finding (CPA < $2.42, CPT < $1.51).
 5. **Optional script:** `openapi_impresa_count.sh` (ATECO × province ×
    size counts). Develop against the free sandbox first. 2026-08-14
    research find: the `/impresa` `dry_run` parameter returns count-only

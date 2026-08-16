@@ -28,6 +28,13 @@ Ring 1 = Italy, Ring 2 = Europe-English, Ring 3 = Western (NA, UK/IE, AU/NZ).
 - `global-benchmarks-sourcing.md` (DA6) — annotate-and-source pass over every
   Ring-3 figure the b2c packs already carry: matches, divergences, constructs
   (feeds all packs; the rewrite's decision list).
+- `gated-report-digests.md` (2026-08-16) — extraction of the user-obtained
+  gated reports (AppsFlyer Subscription Trends 2026, Adjust Mobile App
+  Trends 2026 + its PDF): dated per-vertical D30 floors, Europe CPI cuts,
+  per-category conversion; closes the retention-premium question (no
+  primary source exists, gated or open). Includes the SplitMetrics 2026
+  markets section (browser export): Italy below every top-15 ASA cost
+  chart — second-vendor bound on MobileAction's Italy figures.
 
 ## Findings that change the packs (headline synthesis)
 

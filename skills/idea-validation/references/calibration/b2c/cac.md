@@ -53,12 +53,12 @@ measurement** — say so rather than relabeling a global figure.
 
 | Channel | Italy unit | Source (date) | Confidence |
 |---|---|---|---|
-| Apple Search Ads | CPT **$0.87** · CPA **$1.60** — the lowest CPA of all tracked markets; **Italy ≈ 0.42× US CPA** (same dataset) | MobileAction Apple Ads benchmark (full-year 2025) | medium — single vendor, uncorroborated; trust the cross-market ratio more than the absolute level |
+| Apple Search Ads | CPT **$0.87** · CPA **$1.60** — the lowest CPA of all tracked markets; **Italy ≈ 0.42× US CPA** (same dataset) | MobileAction Apple Ads benchmark (full-year 2025) | medium — absolute levels are single-vendor, but a second vendor corroborates the direction: SplitMetrics 2026 (CY2025, 91 markets) shows Italy dropping out of every top-15 cost ranking, bounding it at CPA < $2.42 and CPT < $1.51. Note: Apple adds a second search-results placement in March 2026 — re-check these units after it lands |
 | Meta (FB/IG) | CPM median **€10.48** (range €6.88–15.60); CPC median ~**0,43–0,50** with the currency basis unresolved — carry the ratio: **~50% below the global median**. All-industries, not consumer-specific. No Italy CPI is published. | Superads country cut (windows ending mid-2026) | medium |
 | Meta seasonality | Peak-to-trough **2.3×** within the year: autumn peak (Sep–Oct), troughs in April and mid-summer. Budget an autumn launch accordingly. | Superads Italy CPM series | medium |
 | TikTok Ads | **No Italy benchmark from a disclosed dataset exists** — report as unknown, never estimate. Circulating "Italy TikTok CPM" figures trace to an AI-content citation ring. Platform budget floor: $30/day per ad group (EMEA). | verified 2026-08 | — |
 | Google Ads (search) | Consumer-vertical planning ranges **€0.50–3.00** CPC (education/health toward the top, e-commerce the bottom); no disclosed-methodology Italy study exists; no Google App Campaigns CPI for Italy or Europe | Italian agency planning ranges (2026) | low |
-| Cross-channel CPI | **No MMP publishes an Italy CPI cut** (AppsFlyer rolls Italy into a 17-country Western Europe region). EMEA blended ~$1.03 is the nearest labeled comparator. | verified 2026-08 | low |
+| Cross-channel CPI | **No MMP publishes an Italy CPI cut** (AppsFlyer rolls Italy into a 17-country Western Europe region). Nearest labeled comparators: **Adjust 2026 Europe vertical CPIs** — e-commerce $2.25, finance $4.75 (2025; the only disclosed-methodology Europe cut found); global gaming $0.56, e-commerce $0.98, finance $1.13; EMEA blended ~$1.03. | Adjust Mobile App Trends 2026 (read directly) · verified 2026-08 | medium (Europe verticals) / low (blends) |
 | Creator / influencer | Nano/micro floor **€100–300 per Instagram post** (nano tier, DeRev bands); engagement falls with tier size — the cost-per-engagement optimum is nano/micro on TikTok/IG; January is the cheapest month (demand −⅓). **No Italian app-install creator data exists** (no CPI norms, no rate card); Amazon.it affiliate pays **0% on Android apps**; ad-disclosure liability falls on the commissioning advertiser (AGCM fines; require the IAP Digital Chart wording by contract). | DeRev listino 2026 · AGCM 2025 actions | medium (rates) / high (legal) |
 
 Planning assumption, label it as such: Italian consumer acquisition runs at
@@ -123,9 +123,9 @@ lifespan; the mapping is a churn-model heuristic:
 
 These mirror the D30 column in the retention pack's benchmark table — keep
 the two in sync. They describe **well-executed subscription apps**, not
-category medians (the published all-install D30 median is 3–7%); when the
-concept is visibly weak, fall back to that floor instead, per the retention
-pack's rules.
+category medians (the published all-install D30 median is 2–7%; Adjust
+2026: gaming 5%, e-commerce 3%, finance 2%); when the concept is visibly
+weak, fall back to that floor instead, per the retention pack's rules.
 
 | Category | Median D30 |
 |---|---|
