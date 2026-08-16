@@ -144,11 +144,12 @@ outcomes in PLAN, propose commits, update this handoff.
    SplitMetrics 2026 also obtained (browser export): Italy dropped out of
    every top-15 ASA cost ranking — second-vendor bound corroborating
    MobileAction's cheap-Italy finding (CPA < $2.42, CPT < $1.51).
-5. **Optional script:** `openapi_impresa_count.sh` (ATECO × province ×
-   size counts). Develop against the free sandbox first. 2026-08-14
-   research find: the `/impresa` `dry_run` parameter returns count-only
-   results FREE (100/day, then €0.01/call) — the script may never need a
-   paid call; see `research/paid-data-providers-italy/firmographics.md`.
+5. **Optional script:** DONE 2026-08-16 — `openapi_impresa_count.sh`
+   written and verified against the free sandbox
+   (`test.company.openapi.com`): `IT-search` with `dryRun` count-only
+   (free ~100/day in prod), employee/turnover filters, sample mode. A
+   production token with the company-API scope is needed for real counts
+   (the current token is sandbox-only; key file gitignored).
 6. **`prompts/b2b/README.md`** does not exist. Add one if prompt count
    grows again.
 
