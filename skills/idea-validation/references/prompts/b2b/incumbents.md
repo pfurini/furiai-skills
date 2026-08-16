@@ -43,7 +43,11 @@ Why this platform exists: in Italy, most professional and SMB workflows live ins
 
 **E. Absorption risk** — is the vendor shipping toward [NICHE]? Recent releases, acquisitions, AI features that could absorb the wedge natively.
 
-**F. Evidence labels** (mandatory — the shared label block) — **geography** (IT / non-IT) · **region** (national / North / Centre / South / province; "n/a" for non-IT) · **segment** (commercialista, avvocato, consulente del lavoro, artigiano, merchant, agency, generic PMI) · **firm-size proxy** · **stack** (the software the source uses, when stated) · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** (vendor page, forum, review, connector market, press) · **confidence** (high only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; medium for a single Italian source; low for non-IT or vendor-supplied).
+**F. Evidence labels** (mandatory, per finding — exactly one line, this exact shape, always with every slot — write `n/a` for a slot you cannot fill; the scoring step counts `geography: IT` label lines mechanically for the evidence gate):
+
+`labels — geography: <IT | non-IT> · region: <national | North | Centre | South | province name | n/a> · segment: <commercialista | avvocato | consulente del lavoro | artigiano | merchant | agency | generic PMI | other> · size: <firm-size proxy | n/a> · stack: <software named | n/a> · regdep: <SDI | PCT | PEC | AML | GDPR | conservazione | none> · switching: <constraint | n/a> · evidence: <vendor page | forum | review | connector market | press> · confidence: <high | medium | low>`
+
+Confidence: **high** only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; **medium** for a single Italian source; **low** for non-IT or vendor-supplied.
 
 3. **Wedge analysis (the core deliverable)**
 

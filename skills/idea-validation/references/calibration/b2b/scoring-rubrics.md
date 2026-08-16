@@ -24,12 +24,16 @@ bands, RAT, screening — lives in `references/scoring.md`.
 ## Evidence-sufficiency gate (this target defines one)
 
 **Counting rule:** across this niche's `market_insights/` files, count
-distinct findings whose evidence labels mark an **Italian source** — region
-label present (national/North/Centre/South/province), `geography: IT`, an
-Italian-language quote, or `evidence type: member-assisted`. Findings
-labeled `geography: non-IT` / global don't count. Count findings, not
-files; the same pain seen on two surfaces counts twice (cross-surface
-corroboration is signal).
+the per-finding label lines (lines starting `labels — `) whose value is
+`geography: IT`. Lines with `geography: non-IT` don't count, and a
+`ring:`/prose mention of Italy anywhere else does not count — the five
+b2b templates mandate one exact label-line shape precisely so this count
+is mechanical. Count label lines, not files; the same pain seen on two
+surfaces counts twice (cross-surface corroboration is signal). Fallback
+for legacy files without mandated label lines: fall back to the old
+judgment call (region label present, Italian-language quote, or
+member-assisted evidence marks an Italian source) and say so in the gate
+rationale.
 
 **Threshold: 15 Italian-source observations.** Below it the gate fires (see
 scoring.md: score capped at 74, confidence "low", memo must carry the

@@ -43,7 +43,11 @@ Measure **Italian query demand for the [NICHE] niche**: what buyers type into Go
 
    **D. Growth Analysis** — for rising clusters only: growth evidence with its date, and a velocity classification (slow / moderate / explosive).
 
-   **E. Evidence labels** (mandatory, per finding) — **geography** (IT / non-IT) · **region** (national / North / Centre / South / province; "n/a" for non-IT) · **segment** (commercialista, avvocato, consulente del lavoro, artigiano, merchant, agency, generic PMI) · **stack** (the software the source or SERP names, when stated) · **evidence type** (query, SERP observation, trends data, article, pricing page) · **confidence** (high only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; medium for a single Italian source; low for non-IT or vendor-supplied).
+   **E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape, always with every slot — write `n/a` for a slot you cannot fill; the scoring step counts `geography: IT` label lines mechanically for the evidence gate):
+
+   `labels — geography: <IT | non-IT> · region: <national | North | Centre | South | province name | n/a> · segment: <commercialista | avvocato | consulente del lavoro | artigiano | merchant | agency | generic PMI | other> · stack: <software named | n/a> · evidence: <query | SERP observation | trends data | article | pricing page> · confidence: <high | medium | low>`
+
+   Confidence: **high** only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; **medium** for a single Italian source; **low** for non-IT or vendor-supplied.
 
 4. **Structure the Output**
 

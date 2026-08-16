@@ -60,7 +60,11 @@ Identify and analyze **what Italian operators and practitioners are discussing, 
 
 **D. Growth Analysis** — for rising themes only: growth evidence (post-frequency change, new groups forming, spikes tied to a scadenza or platform change), timeframe, velocity (slow / moderate / explosive).
 
-**E. Evidence labels** (mandatory) — **geography** (IT / non-IT) · **region** (national / North / Centre / South / province; "n/a" for non-IT) · **segment** (commercialista, avvocato, consulente del lavoro, artigiano, merchant, agency, generic PMI) · **firm-size proxy** · **stack** (the software the source uses, when stated) · **regulatory dependency** (SDI, PCT, PEC, AML, GDPR, conservazione — or none) · **switching constraint** · **evidence type** · **confidence** (high only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; medium for a single Italian source; low for non-IT or vendor-supplied).
+**E. Evidence labels** (mandatory, per finding — exactly one line, this exact shape, always with every slot — write `n/a` for a slot you cannot fill; the scoring step counts `geography: IT` label lines mechanically for the evidence gate):
+
+`labels — geography: <IT | non-IT> · region: <national | North | Centre | South | province name | n/a> · segment: <commercialista | avvocato | consulente del lavoro | artigiano | merchant | agency | generic PMI | other> · size: <firm-size proxy | n/a> · stack: <software named | n/a> · regdep: <SDI | PCT | PEC | AML | GDPR | conservazione | none> · switching: <constraint | n/a> · evidence: <thread | post pattern | poll | member-assisted | article> · confidence: <high | medium | low>`
+
+Confidence: **high** only when two independent Italian-language sources agree, or one is interview-/association-research-confirmed; **medium** for a single Italian source; **low** for non-IT or vendor-supplied.
 
 5. **Structure the Output**
 

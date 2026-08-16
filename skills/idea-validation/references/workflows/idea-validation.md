@@ -58,7 +58,12 @@ Wave 4 — unit economics (needs Wave 3)
     reads: user_profile.md (if present), pricing.json, retention.json, distribution.json,
            competitors.json, market_insights
     writes: ideas/<slug>/cac.json
-  → present: Viability verdict, LTV:CAC for the recommended channel, payback months.
+  iv-market-sizer   (b2b: DEFAULT — the b2b Monetization top band requires a sized, viable SOM;
+                     b2c: dispatch only when the user asks for market size)
+    reads: idea.md, competitors.json, pricing.json, market_insights
+    writes: ideas/<slug>/market_size.json
+  → present: Viability verdict, LTV:CAC for the recommended channel, payback months;
+    market-size verdict and SOM year 1 when the sizer ran.
 
 Synthesis — main thread
   Score: Read references/scoring.md now and score the idea yourself.
@@ -83,4 +88,4 @@ If verdict is `pivot` or `drop`, offer the **pivot-optimization** workflow.
 
 ## Notes
 
-- The market-sizing agent (`iv-market-sizer`) is not part of this chain by default; scoring's Monetization rubric works from pricing + CAC. Add it to Wave 3 if the user asks for market size, and it will feed the Monetization dimension.
+- The market-sizing agent (`iv-market-sizer`) runs in Wave 4 **by default for `target: b2b`** — the b2b Monetization rubric's top band requires a viable sized SOM, which is unreachable without it. For b2c it stays on request: scoring's Monetization rubric works from pricing + CAC, and when the user asks for market size the sizer joins Wave 4 (after pricing, so it reads real prices instead of the pack fallback) and feeds the Monetization dimension.

@@ -125,14 +125,14 @@ outcomes in PLAN, propose commits, update this handoff.
    the gate stayed silent, as it should. Keep 15 until a low-signal
    vertical (avvocati) actually runs; the label-format drift mattered more
    than the number (fixed for web-search; watch the other templates).
-2. **Evidence-label format mandate.** Findings' label lines still vary in
-   shape per researcher (bulleted vs bracket blocks), making gate counting
-   manual. Consider mandating one exact label-line format across the five
-   b2b templates.
-3. **Market sizer default for b2b?** The b2b monetization top band requires
-   "viable SOM", but `iv-market-sizer` is optional in the validation chain.
-   Decide whether b2b validation runs should include it by default (Run 1
-   added it manually; Run 2 went without).
+2. **Evidence-label format mandate.** DONE 2026-08-16 (user approved): the
+   five b2b templates now mandate one exact `labels — …` line (all slots,
+   `n/a` for unknowns), and the b2b gate counts `geography: IT` label
+   lines mechanically (legacy-file fallback documented in the gate rule).
+   Untested by a forward run — verify at the next b2b validation.
+3. **Market sizer default for b2b.** DONE 2026-08-16 (user approved):
+   `iv-market-sizer` now runs in Wave 4 by default for `target: b2b`
+   (reads pricing.json; b2c stays on-request). Untested by a forward run.
 4. **Missing data, do not fabricate:** AssoSoftware/Osservatori "Il
    software gestionale in Italia" (user must obtain); RPO tariff tables
    (only if the phone-consent bridge is ever modeled); Italian
