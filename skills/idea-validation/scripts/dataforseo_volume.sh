@@ -24,7 +24,7 @@ RESP="$(curl -sS -u "${DATAFORSEO_LOGIN}:${DATAFORSEO_PASSWORD}" \
 STATUS="$(printf '%s' "$RESP" | jq -r '.status_code // 0')"
 if [ "$STATUS" != "20000" ]; then
   printf 'DataForSEO error %s: %s\n' "$STATUS" "$(printf '%s' "$RESP" | jq -r '.status_message // "no message"')" >&2
-  case "$STATUS" in 401*|403*) echo "hint: check DATAFORSEO_LOGIN / DATAFORSEO_PASSWORD (use the API password from app.dataforseo.com, not the account password; export with an absolute key-file path)" >&2;; esac
+  case "$STATUS" in 401*|403*) echo "hint: check that DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD are exported and non-empty (use the API password from app.dataforseo.com, not the account password)" >&2;; esac
   exit 1
 fi
 printf '%s' "$RESP" | jq '{cost: .tasks[0].cost, status: .tasks[0].status_message,

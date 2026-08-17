@@ -16,10 +16,11 @@ The research agents degrade gracefully without credentials (they say what is
 unmeasured instead of inventing it), but the full experience needs the
 providers below.
 
-**Secrets convention:** API keys live in `*.key` files (gitignored) —
-current convention keeps them under `research/`. Export the env vars in the
-shell that launches the agent session; never paste secrets into prompts or
-commit them.
+**Secrets convention:** the env vars below are the whole interface — the
+skill uses a provider when its variable is set and degrades gracefully
+(stating what is unmeasured) when it is not. Populate them however you
+manage secrets (shell profile, direnv, a secret manager); never paste
+them into prompts, commit them, or wire file paths into the skill.
 
 | Env var | Provider | Setup | Cost |
 |---|---|---|---|
@@ -39,10 +40,11 @@ with prices). Eurostat, TED, and ANAC endpoints are keyless.
 export EXA_API_KEY="..."
 export APIFY_TOKEN="..."
 export DATAFORSEO_LOGIN="<api login email>"
-export DATAFORSEO_PASSWORD="$(cat ~/Developer/ai/furiai-skills/research/dataforseo-api.key)"
-export OPENAPI_TOKEN="$(cat ~/Developer/ai/furiai-skills/research/openapi-prod.key)"
-# absolute paths on purpose: a relative path silently yields an EMPTY variable
-# when exported from another project dir, and the API answers 40100 unauthorized
+export DATAFORSEO_PASSWORD="..."   # the API password from app.dataforseo.com, not the account password
+export OPENAPI_TOKEN="..."
+# an empty or unset variable is a common failure: DataForSEO answers
+# 40100 unauthorized to blank credentials, and the scripts refuse to run
+# without their variables
 
 S=skills/idea-validation/scripts
 $S/dataforseo_volume.sh "riconoscimento piante"      # IT volumes (~$0.09/task)

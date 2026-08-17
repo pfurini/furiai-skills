@@ -152,7 +152,8 @@ outcomes in PLAN, propose commits, update this handoff.
    (`test.company.openapi.com`): `IT-search` with `dryRun` count-only
    (free ~100/day in prod), employee/turnover filters, sample mode. A
    production token with the company-API scope is needed for real counts
-   (the current token is sandbox-only; key file gitignored).
+   (the current token is sandbox-only; provide it via the OPENAPI_TOKEN
+   env var — env vars are the whole credentials interface, no files).
 6. **`prompts/b2b/README.md`** does not exist. Add one if prompt count
    grows again.
 
