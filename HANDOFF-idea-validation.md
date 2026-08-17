@@ -78,8 +78,11 @@ write harness-specific tool names into skill files. Describe capabilities.
   Do not mix them.
 - Each agent writes exactly one artifact into `.idea-validation/`. Agents
   do not call each other.
-- Interview, segmentation, scoring, and decision memo run on the main
-  thread (`references/*.md`). Do not delegate them.
+- Interview, segmentation, scoring, decision memo, and the optional PDF
+  report run on the main thread (`references/*.md`). Do not delegate
+  them. The PDF step (`references/pdf-report.md`) depends on the sibling
+  `creating-pdf-reports` skill (Typst + uv locally installed) and asks
+  EN / IT / both / skip after the verdict.
 - Coupled files. Change them together:
   - `retention.md` ↔ `cac.md` (d7/d30 semantics, lifespan mapping).
   - `demand-drivers.md` ↔ `pricing.md` (driver names key the multipliers).

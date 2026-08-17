@@ -748,6 +748,25 @@ Defects found and FIXED after this run:
 **Phase D-C is COMPLETE (content test + pi acceptance).** Both runs pass;
 all fixes committed.
 
+### PDF report step (added 2026-08-17)
+
+User-requested: validations and market deep-dives now end with an
+optional PDF report (`references/pdf-report.md`, main thread), rendered
+via the sibling `creating-pdf-reports` skill (Typst + matplotlib,
+locale-aware EN/IT). Decisions taken with the user: scope = validation +
+deep-dive; language question (EN / IT / both / skip) asked after the
+verdict; references = inline citations per claim PLUS the full
+deduplicated union of every artifact's Sources section as appendix.
+Spec: inverted pyramid (essentials in pages 1–2, hard cap), STE×ELI5
+register with technical terms kept and data never altered, 2–4
+spec-generated figures from a fixed menu, no-repetition rule, IT edition
+keeps labels/quotes/numbers verbatim. Content-tested on the iv-test-5
+Sentiero artifacts: report_en.pdf and report_it.pdf both compile at 12
+pages, 0 checker failures, 347-source appendix; two layout lessons
+folded back into the reference (2-page exec fit, ~13-char axis-label
+clip). Store contract: `report_en.pdf`/`report_it.pdf` +
+`report/` working dir under the idea slug, regenerate-in-place.
+
 ## Open decisions for the user
 
 1. **D4 threshold and mechanics** — cap-at-moderate vs. score-discount; the ~15-observation

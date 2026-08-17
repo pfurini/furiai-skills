@@ -123,6 +123,7 @@ Completion notifications arrive as each agent finishes — do not poll. Wait for
 | Segmentation | `references/segmentation.md` | May need direct questions |
 | Scoring & screening | `references/scoring.md` | Synthesis — auditable math over all artifacts |
 | Decision memo | `references/decision-memo.md` | Synthesis — needs conversation context |
+| PDF report (optional, post-verdict) | `references/pdf-report.md` | Synthesis + local rendering via the creating-pdf-reports skill |
 
 Read the reference when the workflow reaches that step, then do the work yourself.
 

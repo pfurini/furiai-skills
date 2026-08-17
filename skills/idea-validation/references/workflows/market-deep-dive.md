@@ -55,4 +55,9 @@ Write the briefing with these sections, in order: (1) trend verdict per platform
 
 It is written from the new/updated `.idea-validation/market_insights/<niche>-<platform>-<YYYY>-<MM>.md` files plus `market_size.json`, `competitors.json`, and `distribution.json` under `.idea-validation/ideas/<slug>/`.
 
+After presenting the briefing, read `references/pdf-report.md` and ask
+"PDF report? EN / IT / both / skip"; on anything but skip, generate it via
+the creating-pdf-reports skill (outputs `ideas/<slug>/report_en.pdf` and/or
+`report_it.pdf`).
+
 Offer idea-generation or idea-validation if the user wants to proceed.

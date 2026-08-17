@@ -72,6 +72,11 @@ Synthesis — main thread
   Memo: Read references/decision-memo.md now and write the memo yourself.
     writes: ideas/<slug>/decision_memo.md
   → present: The complete decision memo inline.
+  Report: Read references/pdf-report.md now — ask "PDF report? EN / IT /
+    both / skip", and on anything but skip generate it via the
+    creating-pdf-reports skill.
+    writes: ideas/<slug>/report_en.pdf and/or report_it.pdf (sources in ideas/<slug>/report/)
+  → present: The output path(s) and the validation result.
 ```
 
 After the memo, set `idea.md` status to `scored`.
