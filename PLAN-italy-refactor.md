@@ -767,6 +767,19 @@ folded back into the reference (2-page exec fit, ~13-char axis-label
 clip). Store contract: `report_en.pdf`/`report_it.pdf` +
 `report/` working dir under the idea slug, regenerate-in-place.
 
+### Italian-prose upgrade for reports (2026-08-17)
+
+The first IT render read as translated English. Fix, grounded in web
+research (Guida al linguaggio della PA, Treccani "Itangliano", Crivello,
+Cardinaletti & Garzone): new `creating-pdf-reports/references/
+italian-prose.md` (method rule: draft natively from the data, never
+translate the EN edition; impersonal register; translationese checklist;
+anglicism policy; Italian mechanics; AI-pattern bans incl. em-dash
+asides, per the user's rule). Wired into the pdf skill's SKILL.md +
+design-rules and into pdf-report.md (which now also applies the
+AI-pattern rules to the English edition). report_it.pdf regenerated
+natively from the artifacts: 12 pages, 0 checker failures.
+
 ## Open decisions for the user
 
 1. **D4 threshold and mechanics** — cap-at-moderate vs. score-discount; the ~15-observation

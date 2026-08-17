@@ -92,3 +92,6 @@ Designers Italia). In both locales:
   style, and "Figura"/"Tabella" labels follow), write dates as "17
   agosto 2026", and use the decimal comma in prose while keeping charts
   and tables consistent with the source data's notation.
+  The full native-register ruleset (translationese checklist, impersonal
+  register, anglicism policy, AI-pattern avoidance) is in
+  `italian-prose.md`: mandatory reading for `it`-locale reports.

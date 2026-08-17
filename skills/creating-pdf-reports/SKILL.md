@@ -73,7 +73,11 @@ composition is about content and order, not styling.
 Read [references/design-rules.md](references/design-rules.md) before
 writing the prose: it sets the figure-selection, truthful-encoding,
 layout, and plain-language rules (English and Italian) the report is
-reviewed against.
+reviewed against. For an Italian-locale report also read
+[references/italian-prose.md](references/italian-prose.md) — it is the
+difference between native Italian and translated English, and its method
+rule (draft from the data, never translate the English edition) applies
+before the first sentence is written.
 
 If the content already exists as HTML/CSS, render it with WeasyPrint
 instead: follow [references/weasyprint.md](references/weasyprint.md)

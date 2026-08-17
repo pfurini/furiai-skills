@@ -99,6 +99,11 @@ discipline with an explain-it-simply tone:
 - No repetition: the executive layer states conclusions; the deep layer
   carries their evidence. A number appears in both only when it is the
   load-bearing point of each.
+- No model tics, in either language: prefer parentheses or commas to
+  em-dash asides, no triad-for-rhythm lists, no "it is important to
+  note" throat-clearing, no connector-first sentence chains (the pdf
+  skill's `italian-prose.md` lists the full set — its AI-pattern section
+  applies to the English edition too).
 
 ## Figure rules
 
