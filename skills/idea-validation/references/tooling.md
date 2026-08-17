@@ -26,6 +26,15 @@ and endpoint facts.
 
 ## Hard-won endpoint facts (do not rediscover these)
 
+- **Openapi ATECO codes take no dots**: `atecoCode=6201` returns real counts
+  (7,699 IT companies, verified 2026-08-17); `62.01`, `620100` and `62.01.00`
+  all return `{"count":0,"success":true}` — a silent zero, not an error.
+  `openapi_impresa_count.sh` now strips dots for you.
+- **Openapi tokens are environment-scoped**: a production token is rejected by
+  `test.company.openapi.com` with `{"success":false,"message":"Wrong Token"}`.
+  Testing only the sandbox reports a working production token as broken;
+  `preflight_providers.sh` now tries both and names the proven scope.
+
 - **ISTAT SDMX is not a dependable source**: endpoint 302s to a maintenance
   page from public networks (verified 2026-08); a naive `curl -L` sees HTTP
   200 from the block page. Eurostat carries the same business-structure

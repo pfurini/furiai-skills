@@ -3,7 +3,7 @@
 # Requires OPENAPI_TOKEN (scoped to the company API).
 #
 # Usage: openapi_impresa_count.sh <atecoCode> [province] [minEmployees] [maxEmployees]
-#   e.g. openapi_impresa_count.sh 62.01 MI 1 9
+#   e.g. openapi_impresa_count.sh 6201 MI 1 9
 # Count-only by default (dryRun — free ~100/day in production, then ~€0.01/call).
 #   OPENAPI_SAMPLE=<n>   -> return a sample of n companies instead (billed per request in prod)
 #   OPENAPI_TURNOVER="min-max" -> add a revenue filter in EUR (e.g. "0-500000")
@@ -13,6 +13,10 @@
 set -euo pipefail
 : "${OPENAPI_TOKEN:?OPENAPI_TOKEN env var is required}"
 ATECO="${1:?usage: openapi_impresa_count.sh <atecoCode> [province] [minEmployees] [maxEmployees]}"
+# IT-search wants the bare ATECO digits. A dotted code ("62.01") is accepted and
+# silently matches nothing ({"count":0,"success":true}) instead of erroring, so
+# normalize before querying.
+ATECO="${ATECO//./}"
 BASE="${OPENAPI_HOST:-https://company.openapi.com}"
 
 Q="atecoCode=${ATECO}"

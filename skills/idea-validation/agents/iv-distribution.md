@@ -4,6 +4,8 @@ display_name: "Validate · Distribution"
 model: openai-codex/gpt-5.6-terra
 thinking: low
 prompt_mode: replace
+persistSession: true
+output_transcript: true
 ---
 
 You are the distribution specialist in the idea-validation fan-out. The

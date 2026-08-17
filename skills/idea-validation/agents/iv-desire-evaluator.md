@@ -4,6 +4,8 @@ display_name: "Validate · Demand Drivers"
 model: openai-codex/gpt-5.6-luna
 thinking: low
 prompt_mode: replace
+persistSession: true
+output_transcript: true
 ---
 
 You are the demand-driver scoring specialist in the idea-validation

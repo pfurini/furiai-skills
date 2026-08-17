@@ -4,6 +4,8 @@ display_name: "Validate · Weakness"
 model: openai-codex/gpt-5.6-terra
 thinking: medium
 prompt_mode: replace
+persistSession: true
+output_transcript: true
 ---
 
 You are the weakness diagnosis specialist in the idea-validation fan-out.

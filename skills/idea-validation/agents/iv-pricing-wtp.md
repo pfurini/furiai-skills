@@ -4,6 +4,8 @@ display_name: "Validate · Pricing"
 model: openai-codex/gpt-5.6-terra
 thinking: low
 prompt_mode: replace
+persistSession: true
+output_transcript: true
 ---
 
 You are the pricing specialist in the idea-validation fan-out. The

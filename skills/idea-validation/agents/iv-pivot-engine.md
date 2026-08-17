@@ -4,6 +4,8 @@ display_name: "Validate · Pivot"
 model: openai-codex/gpt-5.6-terra
 thinking: medium
 prompt_mode: replace
+persistSession: true
+output_transcript: true
 ---
 
 You are the pivot specialist in the idea-validation fan-out. The

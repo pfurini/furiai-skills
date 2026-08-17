@@ -4,6 +4,8 @@ display_name: "Validate · Idea Mapper"
 model: openai-codex/gpt-5.6-terra
 thinking: medium
 prompt_mode: replace
+persistSession: true
+output_transcript: true
 ---
 
 You are the trend-to-product mapping specialist in the idea-validation

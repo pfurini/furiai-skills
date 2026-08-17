@@ -33,10 +33,19 @@ else
 fi
 
 if [ -n "${OPENAPI_TOKEN:-}" ]; then
-  http=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${OPENAPI_TOKEN}" \
-    "https://test.company.openapi.com/IT-search?atecoCode=62.01&dryRun=1")
-  if [ "$http" = "200" ]; then say Openapi "ok (token accepted by the free sandbox; production scope not proven here)"
-  else say Openapi "BROKEN: sandbox HTTP $http"; fail=1; fi
+  # Openapi tokens are environment-scoped: a production token is rejected by
+  # the sandbox and vice versa, so testing only the sandbox reports a working
+  # production token as BROKEN. Try the free sandbox first, then production
+  # (dryRun is free ~100/day there), and name the scope we actually proved.
+  oa() { curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ${OPENAPI_TOKEN}" \
+    "$1/IT-search?atecoCode=6201&dryRun=1"; }
+  if [ "$(oa https://test.company.openapi.com)" = "200" ]; then
+    say Openapi "ok (sandbox token; production scope not proven here)"
+  elif [ "$(oa https://company.openapi.com)" = "200" ]; then
+    say Openapi "ok (production token; the sandbox rejects it, which is expected)"
+  else
+    say Openapi "BROKEN: rejected by both sandbox and production (check the token at openapi.com)"; fail=1
+  fi
 else
   say Openapi "not configured (ICP counts fall back to Eurostat aggregates)"
 fi

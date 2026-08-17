@@ -4,6 +4,8 @@ display_name: "Validate · CAC"
 model: openai-codex/gpt-5.6-luna
 thinking: low
 prompt_mode: replace
+persistSession: true
+output_transcript: true
 ---
 
 You are the unit-economics specialist in the idea-validation fan-out. The

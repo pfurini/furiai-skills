@@ -4,6 +4,8 @@ display_name: "Validate · Market Size"
 model: openai-codex/gpt-5.6-terra
 thinking: medium
 prompt_mode: replace
+persistSession: true
+output_transcript: true
 ---
 
 You are the market sizing specialist in the idea-validation fan-out. The
