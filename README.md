@@ -39,8 +39,10 @@ with prices). Eurostat, TED, and ANAC endpoints are keyless.
 export EXA_API_KEY="..."
 export APIFY_TOKEN="..."
 export DATAFORSEO_LOGIN="<api login email>"
-export DATAFORSEO_PASSWORD="$(cat research/dataforseo-api.key)"
-export OPENAPI_TOKEN="$(cat research/openapi-prod.key)"
+export DATAFORSEO_PASSWORD="$(cat ~/Developer/ai/furiai-skills/research/dataforseo-api.key)"
+export OPENAPI_TOKEN="$(cat ~/Developer/ai/furiai-skills/research/openapi-prod.key)"
+# absolute paths on purpose: a relative path silently yields an EMPTY variable
+# when exported from another project dir, and the API answers 40100 unauthorized
 
 S=skills/idea-validation/scripts
 $S/dataforseo_volume.sh "riconoscimento piante"      # IT volumes (~$0.09/task)

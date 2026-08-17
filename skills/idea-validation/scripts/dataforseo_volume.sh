@@ -18,9 +18,15 @@ PAYLOAD="$(jq -n --arg kws "$KEYWORDS" --argjson loc "$LOC" --arg lang "$LANG_CO
   '[{keywords: ($kws | split(",") | map(gsub("^\\s+|\\s+$";"")) | map(select(length>0))),
      location_code: $loc, language_code: $lang}]')"
 
-curl -sfS -u "${DATAFORSEO_LOGIN}:${DATAFORSEO_PASSWORD}" \
+RESP="$(curl -sS -u "${DATAFORSEO_LOGIN}:${DATAFORSEO_PASSWORD}" \
   -X POST "${BASE}/v3/keywords_data/google_ads/search_volume/live" \
-  -H "Content-Type: application/json" -d "$PAYLOAD" |
-jq '{cost: .tasks[0].cost, status: .tasks[0].status_message,
+  -H "Content-Type: application/json" -d "$PAYLOAD")"
+STATUS="$(printf '%s' "$RESP" | jq -r '.status_code // 0')"
+if [ "$STATUS" != "20000" ]; then
+  printf 'DataForSEO error %s: %s\n' "$STATUS" "$(printf '%s' "$RESP" | jq -r '.status_message // "no message"')" >&2
+  case "$STATUS" in 401*|403*) echo "hint: check DATAFORSEO_LOGIN / DATAFORSEO_PASSWORD (use the API password from app.dataforseo.com, not the account password; export with an absolute key-file path)" >&2;; esac
+  exit 1
+fi
+printf '%s' "$RESP" | jq '{cost: .tasks[0].cost, status: .tasks[0].status_message,
      results: [.tasks[0].result[]? | {keyword, search_volume, cpc, competition, competition_index,
        trend_last_month: (.monthly_searches[0].search_volume? // null)}]}'

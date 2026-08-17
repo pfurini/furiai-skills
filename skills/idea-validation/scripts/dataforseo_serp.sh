@@ -20,10 +20,16 @@ BASE="${DATAFORSEO_HOST:-https://api.dataforseo.com}"
 PAYLOAD="$(jq -n --arg q "$QUERY" --argjson d "$DEPTH" --argjson loc "$LOC" --arg lang "$LANG_CODE" \
   '[{keyword: $q, location_code: $loc, language_code: $lang, depth: $d}]')"
 
-curl -sfS -u "${DATAFORSEO_LOGIN}:${DATAFORSEO_PASSWORD}" \
+RESP="$(curl -sS -u "${DATAFORSEO_LOGIN}:${DATAFORSEO_PASSWORD}" \
   -X POST "${BASE}/v3/serp/google/organic/live/advanced" \
-  -H "Content-Type: application/json" -d "$PAYLOAD" |
-jq '{cost: .tasks[0].cost, status: .tasks[0].status_message,
+  -H "Content-Type: application/json" -d "$PAYLOAD")"
+STATUS="$(printf '%s' "$RESP" | jq -r '.status_code // 0')"
+if [ "$STATUS" != "20000" ]; then
+  printf 'DataForSEO error %s: %s\n' "$STATUS" "$(printf '%s' "$RESP" | jq -r '.status_message // "no message"')" >&2
+  case "$STATUS" in 401*|403*) echo "hint: check DATAFORSEO_LOGIN / DATAFORSEO_PASSWORD (use the API password from app.dataforseo.com, not the account password; export with an absolute key-file path)" >&2;; esac
+  exit 1
+fi
+printf '%s' "$RESP" | jq '{cost: .tasks[0].cost, status: .tasks[0].status_message,
      item_types: .tasks[0].result[0].item_types,
      ads_present: ([.tasks[0].result[0].items[]? | select(.type=="paid")] | length > 0),
      organic: [.tasks[0].result[0].items[]? | select(.type=="organic")
