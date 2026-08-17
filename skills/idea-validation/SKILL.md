@@ -107,6 +107,12 @@ Calibration packs (in `references/calibration/<target>/`, per agent): `demand-dr
 
 Give every trend researcher the same NICHE wording verbatim — five researchers reinterpreting the niche five ways poisons the whole evidence base.
 
+**Provider preflight:** before dispatching Wave 1 of any research run,
+run `scripts/preflight_providers.sh` and report its table. A BROKEN row
+is a user-fixable environment problem (typically a set-but-empty
+variable) — surface it and let the user fix or confirm the degraded path
+before five researchers run without the instrument.
+
 **Tool routing (all research dispatches):** Scripts first (this skill's `scripts/`, bash + curl + jq, keys via env vars) for any source with a stable API; otherwise your harness's web tools by capability (search, page fetch, claim check) — describe the capability in artifacts, never a harness-specific tool name; manual steps for gated sources — list them for the user, never automate logins. The b2b script index and endpoint facts are in `references/tooling.md`.
 
 **Fallbacks:**

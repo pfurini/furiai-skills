@@ -15,6 +15,7 @@ and endpoint facts.
 | Script | Source | Needs | Job |
 |---|---|---|---|
 | `eurostat_enterprises.sh <NACE> [year] [geo] [indic]` | Eurostat `sbs_sc_ovw` | nothing | Enterprise counts by size class (the ICP-universe backbone; e.g. `M69` = legal+accounting) |
+| `preflight_providers.sh` | free/cheapest call per provider | reads all provider env vars | Run BEFORE Wave 1 of any research run: verifies each configured credential and names the broken one (a set-but-empty var is the classic failure); unset vars are reported as not-configured with the degradation path |
 | `ted_tenders.sh <CPV8> [country] [days] [limit]` | TED Search API v3 | nothing | EU tender notices as market-language/deal-size signal |
 | `anac_dataset.sh <dataset-id\|list>` | ANAC CKAN open data | nothing | Below-EU-threshold Italian procurement datasets |
 | `apify_run.sh <owner~actor> [input.json]` | Apify REST | `APIFY_TOKEN` | Any store actor: reviews (Capterra/Trustpilot/G2), job posts (LinkedIn/Indeed), LinkedIn group posts (cookieless actors only), Facebook public groups |
