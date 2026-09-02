@@ -1,0 +1,9 @@
+{"command":"get_state","data":{"isStreaming":false,"model":{"id":"auto","provider":"openrouter"},"thinkingLevel":"high"},"id":"rpc-state-1","success":true,"type":"response"}
+{"command":"prompt","id":"rpc-prompt-1","success":true,"type":"response"}
+{"type":"agent_start"}
+{"message":{"content":[{"text":"separator and text","type":"text"}],"model":"auto","provider":"openrouter","role":"assistant","usage":{"cacheRead":0,"cacheWrite":0,"cost":{"cacheRead":0,"cacheWrite":0,"input":0.001,"output":0.002,"total":0.003},"input":100,"output":20,"reasoning":5,"totalTokens":125}},"type":"message_update"}
+{"args":{"name":"example-skill"},"toolCallId":"call-skill-1","toolName":"skill","type":"tool_execution_start"}
+{"isError":false,"result":{"content":[{"text":"Loaded explicit skill","type":"text"}]},"toolCallId":"call-skill-1","toolName":"skill","type":"tool_execution_end"}
+{"id":"notify-1","message":"fixture notice","method":"notify","notifyType":"info","type":"extension_ui_request"}
+{"message":{"content":[{"text":"fork ran without splitting records","type":"text"}],"model":"auto","provider":"openrouter","responseModel":"anthropic/claude-opus-4.1","role":"assistant","stopReason":"stop","usage":{"cacheRead":50,"cacheWrite":4,"cost":{"cacheRead":0.0001,"cacheWrite":0.0002,"input":0.001,"output":0.002,"total":0.0033},"input":100,"output":20,"reasoning":5,"totalTokens":179}},"type":"message_end"}
+{"messages":[],"type":"agent_end","willRetry":false}

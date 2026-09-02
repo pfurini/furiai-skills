@@ -1,0 +1,2 @@
+{"command":"get_state","data":{"model":{"id":"fixture-model","provider":"fixture"},"thinkingLevel":"low"},"id":"rpc-state-1","success":true,"type":"response"}
+{"command":"prompt","error":"model did not resolve","id":"rpc-prompt-1","success":false,"type":"response"}
