@@ -2,8 +2,8 @@
 """Improve a skill description based on eval results.
 
 Takes eval results (from run_eval.py) and generates an improved description
-by calling `pi -p` as a subprocess (same auth pattern as run_eval.py —
-uses the session's Pi auth, no separate API key needed).
+by calling Pi as an explicit no-session subprocess. The process may use configured
+authentication, but it never claims to inherit the caller's model or session.
 """
 
 import argparse
@@ -13,18 +13,34 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.run_eval import (
+    RoleConfigurationError,
+    RoleModelConfig,
+    add_role_arguments,
+    record_effective_from_event,
+    role_config_from_args,
+)
 from scripts.utils import parse_skill_md
 
 
-def _call_pi(prompt: str, model: str | None, timeout: int = 300) -> str:
-    """Run `pi -p` with the prompt on stdin and return the text response.
+def _call_pi(prompt: str, role_config: RoleModelConfig, timeout: int = 300) -> str:
+    """Run Pi JSON mode with the prompt on stdin and return the text response.
 
     Prompt goes over stdin (not argv) because it embeds the full SKILL.md
     body and can easily exceed comfortable argv length.
     """
-    cmd = ["pi", "-p", "--no-session"]
-    if model:
-        cmd.extend(["--model", model])
+    if role_config.role != "optimizer":
+        raise RoleConfigurationError("description improvement requires optimizer role configuration")
+    cmd = [
+        "pi",
+        "--mode",
+        "json",
+        "--no-session",
+        "--model",
+        role_config.requested_model,
+        "--thinking",
+        role_config.requested_thinking,
+    ]
 
     result = subprocess.run(
         cmd,
@@ -35,9 +51,40 @@ def _call_pi(prompt: str, model: str | None, timeout: int = 300) -> str:
     )
     if result.returncode != 0:
         raise RuntimeError(
-            f"pi -p exited {result.returncode}\nstderr: {result.stderr}"
+            f"pi optimizer exited {result.returncode}\nstderr: {result.stderr}"
         )
-    return result.stdout
+
+    responses: list[str] = []
+    for line_number, line in enumerate(result.stdout.splitlines(), start=1):
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError as error:
+            raise RuntimeError(
+                f"pi optimizer emitted malformed JSON on line {line_number}"
+            ) from error
+        record_effective_from_event(role_config, event)
+        if event.get("type") != "message_end":
+            continue
+        message = event.get("message")
+        if not isinstance(message, dict) or message.get("role") != "assistant":
+            continue
+        content = message.get("content")
+        if not isinstance(content, list):
+            continue
+        text = "".join(
+            part["text"]
+            for part in content
+            if isinstance(part, dict)
+            and part.get("type") == "text"
+            and isinstance(part.get("text"), str)
+        )
+        if text:
+            responses.append(text)
+    if not responses:
+        raise RuntimeError("pi optimizer emitted no authoritative assistant response")
+    return "\n".join(responses)
 
 
 def improve_description(
@@ -46,7 +93,7 @@ def improve_description(
     current_description: str,
     eval_results: dict,
     history: list[dict],
-    model: str,
+    role_config: RoleModelConfig,
     test_results: dict | None = None,
     log_dir: Path | None = None,
     iteration: int | None = None,
@@ -134,7 +181,7 @@ I'd encourage you to be creative and mix up the style in different iterations si
 
 Please respond with only the new description text in <new_description> tags, nothing else."""
 
-    text = _call_pi(prompt, model)
+    text = _call_pi(prompt, role_config)
 
     match = re.search(r"<new_description>(.*?)</new_description>", text, re.DOTALL)
     description = match.group(1).strip().strip('"') if match else text.strip().strip('"')
@@ -151,7 +198,7 @@ Please respond with only the new description text in <new_description> tags, not
     # Safety net: the prompt already states the 1024-char hard limit, but if
     # the model blew past it anyway, make one fresh single-turn call that
     # quotes the too-long version and asks for a shorter rewrite. (The old
-    # SDK path did this as a true multi-turn; `pi -p` is one-shot, so we
+    # SDK path did this as a true multi-turn; the Pi subprocess is one-shot, so we
     # inline the prior output into the new prompt instead.)
     if len(description) > 1024:
         shorten_prompt = (
@@ -164,7 +211,7 @@ Please respond with only the new description text in <new_description> tags, not
             f"important trigger words and intent coverage. Respond with only "
             f"the new description in <new_description> tags."
         )
-        shorten_text = _call_pi(shorten_prompt, model)
+        shorten_text = _call_pi(shorten_prompt, role_config)
         match = re.search(r"<new_description>(.*?)</new_description>", shorten_text, re.DOTALL)
         shortened = match.group(1).strip().strip('"') if match else shorten_text.strip().strip('"')
 
@@ -189,9 +236,13 @@ def main():
     parser.add_argument("--eval-results", required=True, help="Path to eval results JSON (from run_eval.py)")
     parser.add_argument("--skill-path", required=True, help="Path to skill directory")
     parser.add_argument("--history", default=None, help="Path to history JSON (previous attempts)")
-    parser.add_argument("--model", required=True, help="Model for improvement")
+    add_role_arguments(parser, "optimizer")
     parser.add_argument("--verbose", action="store_true", help="Print thinking to stderr")
     args = parser.parse_args()
+    try:
+        role_config = role_config_from_args(args, "optimizer")
+    except RoleConfigurationError as error:
+        parser.error(str(error))
 
     skill_path = Path(args.skill_path)
     if not (skill_path / "SKILL.md").exists():
@@ -216,7 +267,7 @@ def main():
         current_description=current_description,
         eval_results=eval_results,
         history=history,
-        model=args.model,
+        role_config=role_config,
     )
 
     if args.verbose:
@@ -225,6 +276,7 @@ def main():
     # Output as JSON with both the new description and updated history
     output = {
         "description": new_description,
+        "roles": {"optimizer": role_config.as_metadata()},
         "history": history + [{
             "description": current_description,
             "passed": eval_results["summary"]["passed"],
