@@ -10,7 +10,7 @@ Reference files, loaded when a step points at them:
 
 - [references/writing-principles.md](references/writing-principles.md) — the standard all skill prose is judged against: invocation economics, description doctrine, information hierarchy, leading words, failure modes, pruning.
 - [references/testing.md](references/testing.md) — baseline and forward-test procedure, pressure scenarios, closing loopholes.
-- [references/benchmarking.md](references/benchmarking.md) — the quantitative branch: eval harness, review viewer, blind comparison, description-trigger optimization, packaging.
+- [references/benchmarking.md](references/benchmarking.md) — the quantitative branch: eval harness, review viewer, blind comparison, and description-trigger optimization.
 
 Two branches:
 
@@ -97,7 +97,6 @@ Offer this branch when the user wants quantitative evidence — "is it actually 
 1. Validate the folder: `python scripts/quick_validate.py <path/to/skill>` (from this skill's directory). Fix and re-run until it passes.
 2. Final prune pass over SKILL.md, sentence by sentence: relevance, no-ops, duplication.
 3. Confirm the description obeys the doctrine (capability + triggers, no workflow summary) and the invocation choice from Step 1 is what shipped.
-4. If the skill needs distributing as a `.skill` file: `python scripts/package_skill.py <path/to/skill>`.
 
 Done when: validation passes and the user knows where the skill lives and how it fires.
 

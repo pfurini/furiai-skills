@@ -1,6 +1,6 @@
 # Benchmarking
 
-The quantitative branch: with/without pass rates with variance, a browser review viewer, blind A/B comparison, description-trigger optimization, and packaging. It drives the bundled harness — `scripts/`, `agents/`, `eval-viewer/`, and `assets/` in this skill's directory. Reach for it when the user wants numbers ("is it actually better?"), when the skill will be shared, or when qualitative iteration (testing.md) has plateaued and you need finer signal.
+The quantitative branch: with/without pass rates with variance, a browser review viewer, blind A/B comparison, and description-trigger optimization. It drives the bundled harness — `scripts/`, `agents/`, `eval-viewer/`, and `assets/` in this skill's directory. Reach for it when the user wants numbers ("is it actually better?"), when the skill will be shared, or when qualitative iteration (testing.md) has plateaued and you need finer signal.
 
 All `python -m scripts.<name>` commands run from this skill's directory. Exact JSON field names matter throughout — the viewer and aggregator read them literally; the full schemas are in [schemas.md](schemas.md).
 
@@ -14,7 +14,6 @@ All `python -m scripts.<name>` commands run from this skill's directory. Exact J
 - Reading feedback and iterating
 - Blind comparison
 - Description-trigger optimization
-- Packaging
 
 ## Setup: evals and workspace
 
@@ -96,7 +95,3 @@ Optimizes the description for triggering accuracy. Run it last, after the skill'
 
    Use this session's model ID so triggering matches what the user experiences. It splits 60/40 train/test, measures trigger rate (3 runs per query), proposes revised descriptions from the failures, and selects `best_description` by held-out test score. Tail the output periodically to report progress.
 4. **Apply**: update the frontmatter with `best_description`, show the user before/after with scores — then re-check it against the description doctrine in writing-principles.md (capability + triggers, no workflow summary) before accepting.
-
-## Packaging
-
-To distribute as an installable file: `python -m scripts.package_skill <path/to/skill>` → a `.skill` archive. When updating an installed skill, keep the original `name` and folder name unchanged, and copy to a writable location before editing if the installed path is read-only.

@@ -29,7 +29,7 @@ Supporting references load only when a step points at them:
 
 - `references/writing-principles.md`: the writing doctrine and failure catalog.
 - `references/testing.md`: baseline-first testing, anti-contamination hygiene, pressure scenarios, environment fidelity (in-situ vs clean-slate).
-- `references/benchmarking.md`: the quantitative branch (pass rates with variance, blind A/B comparison, description-trigger optimization, packaging), driving the bundled Python harness in `scripts/`, `agents/`, and `eval-viewer/`.
+- `references/benchmarking.md`: the quantitative branch (pass rates with variance, blind A/B comparison, and description-trigger optimization), driving the bundled Python harness in `scripts/`, `agents/`, and `eval-viewer/`.
 
 ## Good usage
 
@@ -97,7 +97,7 @@ Reading: at the weak authoring tier the producer dimension discriminates, and pi
 
 **Consumer-tier masking check.** The frozen pilot artifacts (all ten weak-author-pilot artifacts plus the A/B's worst Fable artifact) were re-consumed by Sonnet, 3 reps each, same pre-registered assertions, manual reads on every flag. Result by defect class: structural template defects (a breaking-changes section emitted above the version header) scored identically at both consumer tiers (3.00/5); the semantic trap (a source column renamed under a "snake_case aliases" rule) sprang in 3 of 3 Sonnet reps, matching an earlier independent Sonnet observation, so it is a model-family habit rather than a weak-model quirk; only the enumeration-gap class (PR types silently dropped) improved (4.00 to 5.00), and by mechanism inspection the improvement is disclosure, not repair: Sonnet still omits the content but volunteers an omitted-items note that the strict assertion credits. Consequence, measured rather than asserted: a forward-test above the executor floor passes artifacts that floor-tier consumers fail, because the silent-drop class is visible only at the floor. This is the evidence behind testing.md's rule that compliance by a model stronger than the floor is not evidence.
 
-Raw records (all run outputs, transcripts, fixtures, grading keys and results) live in `.skill-creator/pi-skill-creator/` at the repo root (the workspace container the skill's testing process uses; add `.skill-creator/` to your `.gitignore`) and in the session scratchpad; they are test records, not part of the installable skill.
+Raw records (all run outputs, transcripts, fixtures, grading keys and results) live in `.skill-creator/pi-skill-creator/` at the repo root (the workspace container the skill's testing process uses; add `.skill-creator/` to your `.gitignore`) and in the session scratchpad; they are test records, not part of the distributed skill directory.
 
 ## Layout
 
@@ -105,7 +105,7 @@ Raw records (all run outputs, transcripts, fixtures, grading keys and results) l
 opin-skill-creator/
 ├── SKILL.md                    # process spine (create + audit branches)
 ├── references/                 # writing-principles, testing, benchmarking, schemas
-├── scripts/                    # validator, benchmark aggregation, description optimizer, packaging
+├── scripts/                    # validator, benchmark aggregation, description optimizer
 ├── agents/                     # grader / comparator / analyzer subagent instructions
 ├── eval-viewer/                # browser review UI for benchmark iterations
 └── assets/                     # trigger-eval review template

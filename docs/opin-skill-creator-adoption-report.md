@@ -1,6 +1,6 @@
 # Pi Harness Adoption Report
 
-Status: implementation handoff
+Status: implementation handoff; F19 distribution-path removal applied
 Date: 2026-09-02, revised 2026-09-02 after review
 Scope: `skills/opin-skill-creator/`
 
@@ -10,7 +10,7 @@ This report records the gaps between the current `opin-skill-creator` implementa
 
 This file is an implementation artifact, not runtime skill guidance. Do not load it from `SKILL.md`, and never ship it inside the skill folder.
 
-It is deliberately process-agnostic. Findings cite the skill's own files and the two pinned upstream revisions below, and nothing else; no repository's workflow vocabulary, directory layout, or build commands are assumed. A fresh agent needs this file, the skill folder, and read access to the two upstream checkouts.
+It is deliberately process-agnostic. Implementation findings cite the skill's own files and the two pinned runtime revisions below. The later distribution decision also compares the Agent Skills specification with Anthropic's upstream `skill-creator` to distinguish the portable directory contract from the inherited archive convention. A fresh implementation agent needs this file, the skill folder, and read access to the two runtime checkouts.
 
 ## Review record
 
@@ -22,6 +22,7 @@ What changed:
 - **F17 through F37 are new.** The independent audit and the verification pass each found the workspace-layout defect (F17) separately, which is why it is recorded as blocking rather than as a documentation nit.
 - **Every citation was re-verified on 2026-09-02.** A second pass opened each source line that had been supplied by the audit rather than read directly, including F6, F24, F25, F27, F32, and F36. All held; no finding changed. F27's absence list should be trimmed to the seven unambiguous field spellings, since words like `agent` and `paths` are ordinary English and their absence is not checkable.
 - **Two defects in this report's own proposal**, recorded as F20 and F37. F20: the blind comparator model it recommended is extension-provided and cannot resolve in the hermetic environments the same report asks for. F37: the fork-test route it recommended first, a TypeScript SDK runner, is the one that does not deliver fork fidelity without an undocumented extra step, and it is also the expensive one. Both defaults were corrected in place, and WP8 was rewritten around RPC mode.
+- **The inherited `.skill` archive path was removed by user decision after review.** It is an Anthropic `skill-creator` convenience, not an Agent Skills or Pi distribution format. F19 is resolved by deletion rather than repair, tests move outside the distributable skill directory, and WP12 now validates directory-copy installation.
 
 Findings carrying `reproduced` in their evidence were executed at review time; the command and its output are the evidence, not a reading of the code.
 
@@ -32,6 +33,8 @@ Findings carrying `reproduced` in their evidence were executed at review time; t
 | Skill under analysis | `skills/opin-skill-creator/`, at its Pi-ported state of 2026-09-01 |
 | Pi fork | `0.84.4`, `a4043c1e332a61e4c8648b97b9b796c57f9db110` |
 | pi-subagents | `0.19.0`, `bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4` |
+| Agent Skills specification | `69ef37e9424c0a7ea9dd2293b559e43ec8176379`, directory contract checked 2026-09-02 |
+| Anthropic `skill-creator` | `53048666b05b4799081517d00e09e0a2dd688678`, `.skill` helper checked 2026-09-02 |
 | Current session model | `openai-codex/gpt-5.6-sol`, thinking `high` |
 | Configured startup default | `openai-codex/gpt-5.6-luna`, thinking `high` |
 
@@ -48,6 +51,8 @@ Primary references:
 - `../pi-subagents/src/skill-agents.ts`
 - `../pi-subagents/src/invocation-config.ts`
 - `../pi-subagents/src/model-resolver.ts`
+- `https://github.com/agentskills/agentskills/blob/69ef37e9424c0a7ea9dd2293b559e43ec8176379/docs/specification.mdx`
+- `https://github.com/anthropics/skills/blob/53048666b05b4799081517d00e09e0a2dd688678/skills/skill-creator/scripts/package_skill.py`
 
 ## Executive findings
 
@@ -71,7 +76,7 @@ The review pass added a second group, and three of them outrank most of the list
 
 12. The aggregator cannot read the workspace layout the skill tells the agent to build, and it fails open: no runs discovered, exit `0`, and a `benchmark.json` reporting a `+0.00` delta.
 13. `quick_validate.py` accepts a skill with an empty `name` or `description`, which Pi refuses to load. The validator's own gate passes an unloadable skill.
-14. The packaging command printed in `SKILL.md` Step 8 crashes on import.
+14. The inherited `.skill` archive path is not part of Agent Skills or Pi, and its printed command also crashes. The user chose removal rather than repair.
 15. The blind comparator model this report recommends is extension-provided and cannot resolve under `--no-extensions` or `isolated: true`, where it silently degrades to the parent model.
 16. Prose, schema, and viewer disagree on the configuration directory name, so the human review step renders both arms unlabeled.
 17. The doctrine the skill teaches predates Pi: it knows three frontmatter fields, names none of the pi-subagents mechanisms its own method depends on, and asserts that subagents cannot be sterilized when the extension provides exactly that.
@@ -84,15 +89,17 @@ The recommended target is a hybrid implementation:
 - Pass executor models explicitly because the executor floor is an experimental variable.
 - Use a bundled `SubagentWorkflow` for dynamic benchmark fan-out after explicit user approval.
 - Drive Pi over RPC mode for the behavioral tests that print and JSON mode cannot express, above all forked skills. This is a subprocess speaking JSON lines, so it adds no dependency and needs no new language. Reach for the TypeScript SDK only if something later needs in-process access, and read F37 first.
-- Stay in Python for everything the skill ships, and catch contract drift with a differential test rather than a port. See "Language and packaging decision" below, which settles this rather than leaving it to an implementer.
+- Stay in Python for everything the skill ships, catch contract drift with a differential test rather than a port, and distribute the skill as a copied directory rather than a custom archive. See "Language and distribution decision" below.
 
-## Language and packaging decision
+## Language and distribution decision
 
-Settled 2026-09-02, because the earlier wording ("keep Python only where it remains useful") implied a migration that no work package actually performs, and left the validator's language as a conditional clause an implementer would resolve by accident.
+Settled 2026-09-02, then revised after the user rejected the inherited `.skill` archive convention. The earlier wording ("keep Python only where it remains useful") implied a migration that no work package actually performs, while the archive path implied a Pi distribution format that does not exist.
 
-**Decision: everything the skill ships is Python, plus exactly one JavaScript file. No TypeScript, no npm dependency, no companion extension.**
+**Decision: the distributable artifact is the skill directory itself. Everything the skill ships is Python, plus exactly one JavaScript workflow file. No `.skill` archive, packaging helper, TypeScript, npm dependency, or companion extension.**
 
 The install model decides it. A skill is a folder you copy, and nothing about copying a folder makes Pi's TypeScript reachable:
+
+The deleted `package_skill.py` was byte-for-byte inherited from Anthropic's `skill-creator`. It created an ordinary ZIP with a `.skill` suffix, but neither the Agent Skills specification nor Pi defines that archive format. Pi loads skill directories. Retaining the helper would preserve a Claude-oriented convenience while adding a distribution path Pi cannot consume, so removal is the compatibility fix.
 
 - `@earendil-works/pi-coding-agent` does not resolve from an arbitrary directory. A Node script inside a skill folder fails with `ERR_MODULE_NOT_FOUND` unless the folder becomes an npm package with its own `node_modules`, which ends the zero-dependency property and requires network access at install time.
 - The published package is upstream Pi, not this fork. A validator installed from the registry would check skills against a contract that is not the one they will run under, and pi-subagents' skill-bundled agents are inert there (no A.9 seam), so agent-related checks would report clean rather than fail.
@@ -117,7 +124,7 @@ Ruled 2026-09-02, before any work package starts. These are the shared premises 
 
 A work order derived from this report **restates the decisions it depends on** rather than citing them. That duplication is deliberate: an executor that must come back here to learn the layout will either skip it or get it wrong.
 
-D11 in this list is the language and packaging decision recorded in the section above; it is not repeated here.
+D11 in this list is the language and distribution decision recorded in the section above; it is not repeated here.
 
 ### D1 — Workspace layout
 
@@ -191,11 +198,11 @@ The failure this guards against is not the merge conflict, which is visible. It 
 
 ### D9 — Test runner and development dependencies
 
-The **shipped** skill stays zero-dependency. The **test suite** may use development dependencies, because tests are never packaged.
+The distributable skill directory stays zero-dependency and contains runtime material only. Development tests and fixtures live at the project-level `tests/opin-skill-creator/`, outside `skills/opin-skill-creator/`.
 
 Runner: `pytest`, invoked through `uvx` so nothing is installed into the project and no `pip` is involved. The differential validator test is inherently parametrized over a fixture corpus, which is what pytest is good at and what `unittest` makes awkward.
 
-WP12's exclusion list must cover the test root, so the dependency never reaches a `.skill` archive.
+WP12 verifies the directory boundary directly: copying `skills/opin-skill-creator/` must include every runtime dependency and cannot include the external test tree, campaign records, this report, or its work orders.
 
 ### D10 — What a unit of work carries
 
@@ -294,7 +301,7 @@ The creator cannot both adopt current Pi capabilities and pass its own final val
 
 Required direction:
 
-Update the validator to the current Pi contract and add conformance tests. The validator stays Python: see "Language and packaging decision", which settles this rather than leaving the earlier "prefer Pi's exported parsing where practical" hedge for an implementer to resolve by accident. Its accepted fields and normalization rules are a **tested** copy contract, kept synchronized by the differential test in WP2 rather than by a recorded revision number.
+Update the validator to the current Pi contract and add conformance tests. The validator stays Python: see "Language and distribution decision", which settles this rather than leaving the earlier "prefer Pi's exported parsing where practical" hedge for an implementer to resolve by accident. Its accepted fields and normalization rules are a **tested** copy contract, kept synchronized by the differential test in WP2 rather than by a recorded revision number.
 
 ### F2. Benchmark delta can be reversed
 
@@ -606,31 +613,29 @@ Evidence:
 
 Impact:
 
-`quick_validate.py` is the Step 8 gate (`SKILL.md:97`, "Fix and re-run until it passes") and the pre-flight gate inside `package_skill.py:66-72`. It currently green-lights and packages a skill that Pi drops silently at startup. That is the one failure the validator exists to prevent.
+`quick_validate.py` is the Step 8 gate (`SKILL.md`, "Fix and re-run until it passes"). It currently green-lights a skill that Pi drops silently at startup. That is the one failure the validator exists to prevent. The former `.skill` packager also called this validator, but that unsupported distribution path has now been removed.
 
 Required direction:
 
 Presence and non-emptiness are the requirement. The checks must not be conditional on the value being truthy. Fold this into the WP2 parity work with its own fixture.
 
-### F19. The packaging command in `SKILL.md` crashes on import
+### F19. The inherited `.skill` packaging path does not belong in the Pi port
 
-Severity: blocking
+Severity: resolved by removal (previously blocking the documented lifecycle)
 
 Evidence:
 
-- `SKILL.md:100`: "If the skill needs distributing as a `.skill` file: `python scripts/package_skill.py <path/to/skill>`."
-- `scripts/package_skill.py:17` is `from scripts.quick_validate import validate_skill`. Running a file by path puts `<skill>/scripts` on `sys.path[0]`, not the skill root, so the `scripts` package is unimportable.
-- Reproduced: `python3 scripts/package_skill.py <skill> <dist>` raises `ModuleNotFoundError: No module named 'scripts'`.
-- `references/benchmarking.md:102` gives the working form, `python -m scripts.package_skill`. The two documents contradict each other and `SKILL.md` carries the broken one.
-- `scripts/package_skill.py:6`, `:9-10`, `:113`, `:115` additionally print usage strings naming `utils/package_skill.py`, a path that does not exist in this skill.
+- `scripts/package_skill.py` was byte-for-byte identical to `vendor/skill-creator/scripts/package_skill.py`, establishing that it was inherited from Anthropic's creator rather than designed for Pi.
+- The script created an ordinary ZIP file with a `.skill` suffix. Pi's documented skill inputs are directories and explicit skill paths; the pinned Pi checkout contains no `.skill` archive loader or installer.
+- The former `SKILL.md` command used direct script execution and crashed with `ModuleNotFoundError: No module named 'scripts'`; `references/benchmarking.md` used module execution instead.
 
 Impact:
 
-The final step of the documented lifecycle fails outright. `SKILL.md:97`'s `python scripts/quick_validate.py` works only because that module happens to have no intra-package import, so the failure looks arbitrary from the outside.
+Repairing the command would preserve a distribution artifact Pi cannot consume and would force a packaging exclusion policy solely to keep development files out of that unnecessary archive.
 
-Required direction:
+Decision:
 
-One invocation form across both documents, chosen so it works from the directory the documents tell the agent to stand in, and usage strings that name the real path.
+The user chose removal rather than repair. `scripts/package_skill.py` and all `.skill` packaging instructions are deleted. The skill directory is the distributable artifact, development tests stay outside it, and WP12 validates installation by copying that directory into a temporary Pi skill root.
 
 ### F20. This report's own comparator model cannot resolve in the environments this report requires
 
@@ -966,7 +971,7 @@ Recorded so a later pass does not re-derive them:
 - "Pi has no `--bare` mode" is correct.
 - `run_eval.py`'s trigger detection is sound in principle: `tool_execution_start` carrying `toolName` and `args` is a real Pi JSON event, and the `skill` tool takes `{name, args?}`.
 - `schemas.md`'s timing-capture claim is right: `<total_tokens>` and `<duration_ms>` exist only in the completion notification.
-- The zero-dependency claim holds; all eight scripts import stdlib only.
+- The zero-dependency claim holds; all seven remaining Python modules import the standard library only.
 - `quick_validate.py` and `utils.py` handle CRLF frontmatter correctly, because `Path.read_text()` applies universal newlines.
 - `LICENSE.txt` is the full unmodified Apache License 2.0, consistent with the provenance note in `README.md`.
 - The bundled-agent defaults table above was re-checked field by field against pi-subagents 0.19.0 and is accurate, including `backgroundByDefault` defaulting to `true`.
@@ -1181,7 +1186,7 @@ Dependencies: none
 
 Owned files:
 
-- New tests under `scripts/tests/` or another single test root chosen for the skill.
+- New tests and fixtures under the project-level `tests/opin-skill-creator/`, outside the distributable skill directory.
 - Minimal test configuration required to run them.
 
 Tasks:
@@ -1201,7 +1206,7 @@ Required tests:
 - A workspace in the documented layout produces a non-zero exit before WP3 lands, rather than a zeroed `benchmark.json`.
 - An empty-description skill is rejected before WP2 lands.
 - Tests run without network or model credentials. The only test permitted an external prerequisite is WP2's differential drift test, which needs a Pi source checkout and must skip with an explicit message when it is absent rather than fail.
-- Test discovery does not package fixtures into the final `.skill` artifact.
+- The distributable `skills/opin-skill-creator/` directory contains no test files or fixtures.
 
 Completion criterion:
 
@@ -1223,7 +1228,7 @@ Tasks:
 
 1. Support every current Pi skill frontmatter field.
 2. Match Pi's boolean forms and name rules.
-3. Preserve unknown fields as Pi does, or document and test any intentionally stricter packaging policy.
+3. Preserve unknown fields as Pi does, or document and test any intentionally stricter validation policy.
 4. Validate `context`, `background`, model and effort shape, tool lists, and compatibility limits.
 5. Handle multiline YAML without silently changing values.
 6. Add the differential drift test, which replaces the versioned contract note the earlier draft proposed. Run every validator fixture through both `quick_validate.py` and Pi's own loader (`loadSkillsFromDir()`, publicly exported, returning `{ skills, diagnostics }`), and assert the two verdicts agree per fixture. Resolve Pi's source from a configurable path with a sensible default, and skip the test with an explicit message when it is absent, so a machine without the Pi checkout still runs the rest of the suite. Record the Pi revision the corpus was last reconciled against as test output, not as a comment.
@@ -1572,7 +1577,7 @@ Dependencies: WP2 through WP10 as applicable
 Owned files:
 
 - `README.md`
-- New campaign records under the project-level `.skill-creator/` workspace, not the installable skill
+- New campaign records under the project-level `.skill-creator/` workspace, outside the distributable skill directory
 - Model defaults in agent and skill frontmatter if calibration supports them
 
 Tasks:
@@ -1599,38 +1604,38 @@ Completion criterion:
 
 The README's live recommendations and model pins are supported by Pi-native evidence rather than inherited Claude Code results.
 
-### WP12. Packaging and final cleanup
+### WP12. Validate directory distribution and finish cleanup
 
 Priority: P2
 Dependencies: all selected work packages
 
 Owned files:
 
-- `scripts/package_skill.py`
-- Packaging tests
+- Directory-boundary and installation smoke tests under `tests/opin-skill-creator/`
+- `README.md` distribution guidance
 - This report
 
 Tasks:
 
-1. Define the runtime artifact allowlist or development-artifact exclusion list.
-2. Exclude tests, eval fixtures, temporary reports, and this handoff from `.skill` archives.
-3. Confirm bundled agents and required workflow scripts remain included.
-4. Run final validator and package smoke tests.
-5. Remove this report if the user chooses a source tree containing runtime assets only.
-6. Make `SKILL.md` and `references/benchmarking.md` agree on one packaging invocation that works from the documented directory (F19), and correct `package_skill.py`'s usage strings, which name a `utils/` path that does not exist.
-7. Confirm the exclusion list actually covers this report. Today `package_skill.py:19-24` excludes only `__pycache__`, `node_modules`, `*.pyc`, `.DS_Store`, and a root `evals/`, so the handoff would ship.
+1. Treat `skills/opin-skill-creator/` as the complete distributable artifact; do not build a second archive representation.
+2. Keep tests, eval fixtures, campaign records, temporary reports, and implementation handoffs outside the skill directory.
+3. Confirm bundled agents, runtime references, Python helpers, viewer assets, and the approved workflow remain inside the skill directory.
+4. Copy the directory into a temporary Pi-owned skill root and run the real loader plus the standalone validator against that copy.
+5. Run the complete offline regression suite and the directory-install smoke test.
+6. Verify that no runtime documentation references `.skill` archives or the deleted `package_skill.py`.
+7. Keep this report and its work orders beside the skill, never inside it.
 
 Required tests:
 
-- Archive contains `SKILL.md`, runtime references, scripts, assets, bundled agents, and approved workflows.
-- Archive excludes evals, tests, caches, campaign results, and implementation handoffs.
-- Extracted archive validates and loads in Pi.
-- Bundled agents register from the extracted archive.
-- The packaging command printed in `SKILL.md` runs without raising.
+- The source skill directory contains every required runtime file and no tests, fixtures, campaign records, caches, or implementation handoffs.
+- A byte-for-byte copied directory validates and loads in Pi.
+- Bundled agents register from the copied directory.
+- Every runtime command printed by the skill works from its documented directory.
+- Repository checks find no `.skill` archive instruction or packaging helper under `skills/opin-skill-creator/`.
 
 Completion criterion:
 
-The distributed archive contains every runtime dependency and no development-only evidence or handoff material.
+The copied skill directory is self-contained, zero-dependency, loadable by Pi, and free of development-only material.
 
 ### WP13. Ground the authoring and testing doctrine on Pi
 
@@ -1689,10 +1694,10 @@ WP13 doctrine grounding (drafting half)   independent of WP1, and it gates WP8's
 
 WP2..WP10, WP13 selected scope
 └── WP11 Pi-native calibration
-    └── WP12 packaging and cleanup
+    └── WP12 directory distribution and cleanup
 ```
 
-**Land the three lifecycle breaks first.** F17, F18, and F19 each break a documented step outright rather than degrading it, and each is small. F19 in particular is a one-line agreement between two documents and needs nothing from WP1. Fixing them before the work is decomposed means the rest is done on a harness whose validator, aggregator, and packaging step at least run.
+**Land the remaining lifecycle breaks first.** F17 and F18 each break a documented step outright rather than degrading it. F19 has already been resolved by removing the unsupported `.skill` archive path. Fixing F17 and F18 before broader work means the rest proceeds on a harness whose validator and aggregator at least enforce real inputs.
 
 **The waves below are a dependency order, not a work partition.** Per D8, a wave may only run packages in parallel once each shared prose file has one owner in that wave. As drawn, wave 1 fails that test: `references/benchmarking.md` is contended by WP3, WP4, and WP13, `references/schemas.md` by WP2 and WP3, and `SKILL.md` by WP4 and WP13. Assigning those owners is the last step before the work orders are written, and it may move a task between packages.
 
@@ -1722,7 +1727,7 @@ Fourth wave, both gated on WP8:
 Final wave:
 
 - WP11 calibration
-- WP12 packaging and cleanup
+- WP12 directory distribution and cleanup
 
 ## Cross-package testing expectations
 
@@ -1766,8 +1771,8 @@ The adoption effort is complete only when all selected claims below are backed b
 - Quantitative reports contain no placeholders or fabricated run counts.
 - Every harness script has offline regression coverage.
 - Review output is safe to open locally.
-- The packaged `.skill` includes runtime resources and excludes development artifacts.
-- The packaged `.skill` installs by copying a folder: no npm dependency, no companion extension, and no import that resolves only on the maintainer's machine.
+- The distributed skill directory includes every runtime resource and excludes development artifacts.
+- A byte-for-byte copy of the skill directory loads in Pi: no custom archive, npm dependency, companion extension, or maintainer-only import path.
 - The validator's agreement with Pi's contract is asserted by a test, so drift fails rather than accumulates.
 - README claims distinguish historical Claude Code evidence from new Pi-native evidence.
 
@@ -1788,5 +1793,5 @@ Added by the 2026-09-02 review:
 - Do not use `context: fork` merely because Pi supports it.
 - Do not require workflows for a single trivial eval.
 - Do not preserve the current Python API or file layout unless a real external consumer requires compatibility.
-- Do not port any shipped script to TypeScript, add an npm dependency, or split a companion extension out beside the skill. The install model is a copied folder, and none of those survive it. "Language and packaging decision" records the evidence and the one condition that would reopen it.
+- Do not restore `.skill` packaging, port any shipped script to TypeScript, add an npm dependency, or split a companion extension out beside the skill. The install model is a copied folder; "Language and distribution decision" records the evidence and the conditions that could reopen it.
 - Do not claim one model is best before the calibration package is complete.
