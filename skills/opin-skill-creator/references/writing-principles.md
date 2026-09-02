@@ -6,6 +6,7 @@ The standard every skill draft and edit is judged against. Read it in full befor
 
 - Predictability, the root virtue
 - Invocation and the two loads
+- Pi authoring surface
 - The description
 - Information hierarchy
 - Steps and completion criteria
@@ -25,21 +26,34 @@ The context window is a public good: the skill shares it with the system prompt,
 
 ## Invocation and the two loads
 
-- A **model-invoked** skill keeps a `description` the agent sees every turn, so the agent can fire it autonomously and other skills can reach it. It pays permanent **context load** — tokens and attention spent on every turn, relevant or not.
+- A **model-invoked** skill makes its `description` eligible for the model listing, so the agent can fire it autonomously and other skills can reach it. It pays recurring **context load** whenever listed: tokens and attention spent whether relevant or not.
 - A **user-invoked** skill (`disable-model-invocation: true`) strips the description from the agent's reach: only the human, typing its name, can fire it — and no other skill can. Zero context load, but it spends **cognitive load**: the human is the index that must remember it exists. That cost is the price of human agency, not a defect — spend it where human judgement matters.
 
-Pick model-invocation only when the agent must reach the skill on its own or another skill must reach it. If it only ever fires by hand, make it user-invoked and pay nothing.
+Pick model-invocation only when the agent must reach the skill on its own or another skill must reach it. If it only ever fires by hand, make it user-invoked and pay nothing. Every model-visible entry spends the listing budget.
 
-**Granularity**: splitting into more skills spends one of the two loads, so split only when the cut earns it. Split off a model-invoked skill when a distinct leading word should trigger it independently; split a sequence of steps when the steps still ahead tempt the agent to rush the current one (and only a real context boundary — a subagent dispatch or a separate user-invoked hand-off — actually hides them). When user-invoked skills multiply past memory, the cure is a **router skill**: one user-invoked skill naming the others and when to reach for each.
+**Granularity**: splitting into more skills spends one of the two loads, so split only when the cut earns it. Split off a model-invoked skill when a distinct leading word should trigger it independently; split a sequence of steps when the steps still ahead tempt the agent to rush the current one (and only a real context boundary — a subagent dispatch, `context: fork`, or a separate user-invoked hand-off — actually hides them). When user-invoked skills multiply past memory, the cure is a **router skill**: one user-invoked skill naming the others and when to reach for each.
+
+## Pi authoring surface
+
+Choose Pi frontmatter and rendering features from an observed failure. These fields enable capabilities; their presence alone is not evidence that a skill improves artifact quality.
+
+- **The skill has the wrong visibility.** Put model-facing invocation guidance in `description` plus optional `when_to_use`; Pi joins them in the listing and caps the combined text at 1,536 UTF-16 code units. Set `disable-model-invocation: true` to remove the skill from the model listing and `skill` tool while retaining human `/skill:name` invocation. Set `user-invocable: false` only when slash-command invocation must also disappear.
+- **Arguments arrive without a usable contract.** `argument-hint` labels autocomplete but does not parse input. Declare positional aliases with `arguments`. For a message-initial invocation, `$ARGUMENTS` receives the raw remainder, `$ARGUMENTS[N]` and `$N` receive 0-based quoted tokens (`$0` is first), and `$name` receives its declared position; aliases are positional, not `name=value` bindings. Mid-prompt invocations receive no arguments. If a non-empty remainder matches no placeholder, Pi appends it as `ARGUMENTS: ...` rather than dropping it.
+- **The task needs a narrower tool surface.** `allowed-tools` is parsed and preserved but advisory only. `disallowed-tools` is enforced for the active turn and also blocks matching render-time shell commands. Use registered Pi tool names.
+- **The executor needs a measured runtime override.** `model` and `effort` apply ephemeral per-invocation overrides; `effort` is clamped to the effective model's supported reasoning levels and is available as `${PI_EFFORT}`. Add either only when floor testing or calibration establishes the need; an uncalibrated pin is not a capability claim.
+- **The body would pollute the parent context or needs a specialist.** `context: inline` is the default. Set `context: fork` to run a sole message-initial invocation through pi-subagents so the body stays out of the parent context. `agent` selects the forked subagent type and is ignored inline. `background` defaults to `true`; set it to `false` when the parent must await the result. Forking falls back to inline with a diagnostic when pi-subagents is absent, spawning fails, or Pi runs headless.
+- **A relevant skill is lost in a crowded listing.** Inspect effective visibility and estimated listing cost in Pi's `/skills` overlay. `paths` globs boost a skill after successful touches to matching files, sorting it earlier and trimming it later. They do not auto-invoke the skill or load references.
+- **Rendering needs a trusted shell result or a local file.** `` !`command` `` runs at render time only when `bash` is active and not disallowed; `shell` chooses `bash` (default) or `powershell`. Treat project trust as authorization for these commands. When the agent must read a bundled file, point to `@${PI_SKILL_DIR}/references/<file>.md`; Pi substitutes the absolute skill directory, while bare `@references/<file>.md` is left unresolved.
+- **A hook is expected to run.** Pi keeps `hooks` parsed and preserved, never executed. Do not design a skill whose completion depends on one.
 
 ## The description
 
 The description is the skill's trigger and its single largest lever. Doctrine:
 
 1. **Capability first, in one clause** — what the skill does, front-loading its leading word. Third person, always ("Extracts text and tables from PDFs…", never "I can help you…" or "You can use this to…").
-2. **Then one trigger per branch.** Each distinct way the skill is invoked gets one trigger phrase, worded with the vocabulary the user actually uses. Synonyms that rename the same branch are duplication — collapse them.
+2. **Then one trigger per branch in listing metadata.** Each distinct way the skill is invoked gets one trigger phrase, worded with the vocabulary the user actually uses. Keep it in `description`, or move the trigger-only tail to `when_to_use` when that makes the capability easier to scan. Synonyms that rename the same branch are duplication — collapse them.
 3. **Never summarize the workflow.** A description that sketches the skill's process ("dispatches a subagent per task with review between tasks") becomes a shortcut: the agent follows the sketch and skips the body. Testing has shown this concretely — a workflow-summarizing description caused agents to perform one review where the body's flowchart required two; removing the summary fixed it. State what the skill does and when to reach for it; how it works lives only in the body.
-4. **All "when to use" information lives here, not in the body.** The body loads only after triggering, so a "When to Use" section in the body triggers nothing.
+4. **All "when to use" information lives in model-visible listing metadata, not in the body.** The body loads only after triggering, so a "When to Use" section there triggers nothing.
 5. Limits: description ≤1024 characters, no angle brackets; `name` ≤64 characters, kebab-case.
 
 For a user-invoked skill the description is human-facing: a one-line summary for the human scanning a list. Trigger phrasing does no work there — strip it.
@@ -56,11 +70,11 @@ A skill's content sits on a ladder ranked by how immediately the agent needs it:
 
 **Progressive disclosure** is the move down the ladder so the top stays legible. Branching is the cleanest test: inline what every branch needs; push behind a pointer what only some branches reach. When a skill supports variants (frameworks, providers, domains), keep the workflow and selection logic in SKILL.md and give each variant its own reference file — the agent reads only the one the task needs.
 
-A pointer's _wording_, not its target, decides when and how reliably the agent reaches the material. A must-have file behind a weak pointer ("see also testing.md") is a variance bug: sharpen the wording ("Read testing.md now, before dispatching any subagent") first; inline the material only if sharpening fails.
+A pointer's _wording_, not its target, decides when and how reliably the agent reaches the material. A must-have file behind a weak pointer ("see also the testing reference") is a variance bug: sharpen the wording ("Read the testing reference disclosed by SKILL.md now, before dispatching any subagent") first; inline the material only if sharpening fails.
 
 Mechanics that keep disclosure working:
 
-- **One level deep.** Every reference file links directly from SKILL.md. Nested references (SKILL.md → advanced.md → details.md) get partially read via `head` and information is lost.
+- **One level deep.** Every reference file is disclosed directly from SKILL.md with `@${PI_SKILL_DIR}/...`. Nested references (SKILL.md → advanced.md → details.md) get partially read and information is lost. `paths` can boost the skill listing and `context: fork` can isolate its body, but neither repairs a nested disclosure chain.
 - **Table of contents** at the top of any reference file over ~100 lines, so a partial read still reveals the full scope.
 - **Co-location**: keep a concept's definition, rules, and caveats under one heading rather than scattered. The hierarchy decides how far down a piece sits; co-location decides what sits beside it. The test: the skill should read like documentation written for the agent.
 - SKILL.md body under ~500 lines; split when approaching the limit.
@@ -96,7 +110,7 @@ Classify the baseline failure before writing guidance — the form that fixes on
 
 | Baseline failure | Right form | Wrong form |
 |---|---|---|
-| Skips/violates a rule under pressure (knows better, does it anyway) | Prohibition + rationalization counters + red flags (see testing.md) | Soft guidance ("prefer…", "consider…") |
+| Skips/violates a rule under pressure (knows better, does it anyway) | Prohibition + rationalization counters + red flags from the directly disclosed testing procedure | Soft guidance ("prefer…", "consider…") |
 | Complies, but the output has the wrong shape | Positive recipe or contract: state what the output IS — its parts, in order | Prohibition list ("don't restate", "never narrate") |
 | Omits a required element from something it already produces | Structural: a required slot in the template it fills | Prose reminders near the template |
 | Behaviour should depend on a condition | Conditional keyed to an observable predicate ("if the brief exists, reference it") | Unconditional rule + exemption clauses |
