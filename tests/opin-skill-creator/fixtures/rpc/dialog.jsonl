@@ -1,0 +1,3 @@
+{"command":"get_state","data":{"model":{"id":"fixture-model","provider":"fixture"},"thinkingLevel":"low"},"id":"rpc-state-1","success":true,"type":"response"}
+{"command":"prompt","id":"rpc-prompt-1","success":true,"type":"response"}
+{"id":"dialog-1","method":"confirm","message":"Continue?","title":"Blocked dialog","type":"extension_ui_request"}
