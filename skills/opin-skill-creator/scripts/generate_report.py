@@ -16,18 +16,31 @@ from pathlib import Path
 def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") -> str:
     """Generate HTML report from loop output data. If auto_refresh is True, adds a meta refresh tag."""
     history = data.get("history", [])
-    holdout = data.get("holdout", 0)
     title_prefix = html.escape(skill_name + " \u2014 ") if skill_name else ""
 
-    # Get all unique queries from train and test sets, with should_trigger info
+    # Final-test results are intentionally absent from candidate rows.
     train_queries: list[dict] = []
-    test_queries: list[dict] = []
+    validation_queries: list[dict] = []
     if history:
-        for r in history[0].get("train_results", history[0].get("results", [])):
-            train_queries.append({"query": r["query"], "should_trigger": r.get("should_trigger", True)})
-        if history[0].get("test_results"):
-            for r in history[0].get("test_results", []):
-                test_queries.append({"query": r["query"], "should_trigger": r.get("should_trigger", True)})
+        for result in history[0].get(
+            "train_results", history[0].get("results", [])
+        ):
+            train_queries.append(
+                {
+                    "query": result["query"],
+                    "should_trigger": result.get("should_trigger", True),
+                }
+            )
+        validation_results = history[0].get(
+            "validation_results", history[0].get("test_results", [])
+        )
+        for result in validation_results or []:
+            validation_queries.append(
+                {
+                    "query": result["query"],
+                    "should_trigger": result.get("should_trigger", True),
+                }
+            )
 
     refresh_tag = '    <meta http-equiv="refresh" content="5">\n' if auto_refresh else ""
 
@@ -148,19 +161,20 @@ def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") 
 <body>
     <h1>""" + title_prefix + """Skill Description Optimization</h1>
     <div class="explainer">
-        <strong>Optimizing your skill's description.</strong> This page updates automatically as Pi tests different versions of your skill's description. Each row is an iteration — a new description attempt. The columns show test queries: green checkmarks mean the skill triggered correctly (or correctly didn't trigger), red crosses mean it got it wrong. The "Train" score shows performance on queries used to improve the description; the "Test" score shows performance on held-out queries the optimizer hasn't seen. When it's done, Pi will apply the best-performing description to your skill.
+        <strong>Optimizing your skill's description.</strong> This page updates automatically as Pi tests candidate descriptions. Training results guide improvements and validation results select the candidate. The final-test set runs once after selection and never appears in candidate rows.
     </div>
 """]
 
     # Summary section
-    best_test_score = data.get('best_test_score')
-    best_train_score = data.get('best_train_score')
+    best_validation_score = data.get("best_validation_score")
+    selection_label = "validation" if best_validation_score else "train"
     html_parts.append(f"""
     <div class="summary">
         <p><strong>Original:</strong> {html.escape(data.get('original_description', 'N/A'))}</p>
         <p class="best"><strong>Best:</strong> {html.escape(data.get('best_description', 'N/A'))}</p>
-        <p><strong>Best Score:</strong> {data.get('best_score', 'N/A')} {'(test)' if best_test_score else '(train)'}</p>
-        <p><strong>Iterations:</strong> {data.get('iterations_run', 0)} | <strong>Train:</strong> {data.get('train_size', '?')} | <strong>Test:</strong> {data.get('test_size', '?')}</p>
+        <p><strong>Selection Score:</strong> {data.get('best_score', 'N/A')} ({selection_label})</p>
+        <p><strong>Final Test:</strong> {data.get('final_test_score', 'not run')}</p>
+        <p><strong>Iterations:</strong> {data.get('iterations_run', 0)} | <strong>Train:</strong> {data.get('train_size', '?')} | <strong>Validation:</strong> {data.get('validation_size', '?')} | <strong>Final Test:</strong> {data.get('final_test_size', '?')}</p>
     </div>
 """)
 
@@ -171,7 +185,7 @@ def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") 
         <span class="legend-item"><span class="legend-swatch swatch-positive"></span> Should trigger</span>
         <span class="legend-item"><span class="legend-swatch swatch-negative"></span> Should NOT trigger</span>
         <span class="legend-item"><span class="legend-swatch swatch-train"></span> Train</span>
-        <span class="legend-item"><span class="legend-swatch swatch-test"></span> Test</span>
+        <span class="legend-item"><span class="legend-swatch swatch-test"></span> Validation</span>
     </div>
 """)
 
@@ -183,7 +197,7 @@ def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") 
             <tr>
                 <th>Iter</th>
                 <th>Train</th>
-                <th>Test</th>
+                <th>Validation</th>
                 <th class="query-col">Description</th>
 """)
 
@@ -192,8 +206,8 @@ def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") 
         polarity = "positive-col" if qinfo["should_trigger"] else "negative-col"
         html_parts.append(f'                <th class="{polarity}">{html.escape(qinfo["query"])}</th>\n')
 
-    # Add column headers for test queries (different color)
-    for qinfo in test_queries:
+    # Add column headers for validation queries (different color)
+    for qinfo in validation_queries:
         polarity = "positive-col" if qinfo["should_trigger"] else "negative-col"
         html_parts.append(f'                <th class="test-col {polarity}">{html.escape(qinfo["query"])}</th>\n')
 
@@ -202,26 +216,46 @@ def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") 
         <tbody>
 """)
 
-    # Find best iteration for highlighting
-    if test_queries:
-        best_iter = max(history, key=lambda h: h.get("test_passed") or 0).get("iteration")
+    # Find best iteration for highlighting. Empty history is a valid skipped result.
+    if not history:
+        best_iter = None
+        html_parts.append(
+            '            <tr><td colspan="4">No optimization iterations were run.</td></tr>\n'
+        )
+    elif validation_queries:
+        best_iter = max(
+            history,
+            key=lambda item: (
+                item.get("validation_passed", item.get("test_passed")) or 0,
+                item.get("train_passed", item.get("passed", 0)),
+                -item.get("iteration", 0),
+            ),
+        ).get("iteration")
     else:
-        best_iter = max(history, key=lambda h: h.get("train_passed", h.get("passed", 0))).get("iteration")
+        best_iter = max(
+            history,
+            key=lambda item: (
+                item.get("train_passed", item.get("passed", 0)),
+                -item.get("iteration", 0),
+            ),
+        ).get("iteration")
 
     # Add rows for each iteration
     for h in history:
         iteration = h.get("iteration", "?")
-        train_passed = h.get("train_passed", h.get("passed", 0))
-        train_total = h.get("train_total", h.get("total", 0))
-        test_passed = h.get("test_passed")
-        test_total = h.get("test_total")
         description = h.get("description", "")
         train_results = h.get("train_results", h.get("results", []))
-        test_results = h.get("test_results", [])
+        validation_results = h.get(
+            "validation_results", h.get("test_results", [])
+        )
 
         # Create lookups for results by query
         train_by_query = {r["query"]: r for r in train_results}
-        test_by_query = {r["query"]: r for r in test_results} if test_results else {}
+        validation_by_query = (
+            {result["query"]: result for result in validation_results}
+            if validation_results
+            else {}
+        )
 
         # Compute aggregate correct/total runs across all retries
         def aggregate_runs(results: list[dict]) -> tuple[int, int]:
@@ -238,7 +272,7 @@ def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") 
             return correct, total
 
         train_correct, train_runs = aggregate_runs(train_results)
-        test_correct, test_runs = aggregate_runs(test_results)
+        validation_correct, validation_runs = aggregate_runs(validation_results)
 
         # Determine score classes
         def score_class(correct: int, total: int) -> str:
@@ -251,14 +285,14 @@ def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") 
             return "score-bad"
 
         train_class = score_class(train_correct, train_runs)
-        test_class = score_class(test_correct, test_runs)
+        validation_class = score_class(validation_correct, validation_runs)
 
         row_class = "best-row" if iteration == best_iter else ""
 
         html_parts.append(f"""            <tr class="{row_class}">
                 <td>{iteration}</td>
                 <td><span class="score {train_class}">{train_correct}/{train_runs}</span></td>
-                <td><span class="score {test_class}">{test_correct}/{test_runs}</span></td>
+                <td><span class="score {validation_class}">{validation_correct}/{validation_runs}</span></td>
                 <td class="description">{html.escape(description)}</td>
 """)
 
@@ -274,9 +308,9 @@ def generate_html(data: dict, auto_refresh: bool = False, skill_name: str = "") 
 
             html_parts.append(f'                <td class="result {css_class}">{icon}<span class="rate">{triggers}/{runs}</span></td>\n')
 
-        # Add result for each test query (with different background)
-        for qinfo in test_queries:
-            r = test_by_query.get(qinfo["query"], {})
+        # Add result for each validation query (with different background)
+        for qinfo in validation_queries:
+            r = validation_by_query.get(qinfo["query"], {})
             did_pass = r.get("pass", False)
             triggers = r.get("triggers", 0)
             runs = r.get("runs", 0)

@@ -23,6 +23,15 @@ from scripts.run_eval import (
 from scripts.utils import parse_skill_md
 
 
+DESCRIPTION_DOCTRINE = """Description doctrine:
+- Capability first, in one clause, front-loading the skill's leading word.
+- Third person throughout (for example, "Extracts text and tables from PDFs").
+- Include one trigger phrase per distinct invocation branch, using the user's vocabulary.
+- State what the skill does and when it applies, not how it works.
+- Keep the description at or below 1024 characters and omit angle brackets.
+"""
+
+
 def _call_pi(prompt: str, role_config: RoleModelConfig, timeout: int = 300) -> str:
     """Run Pi JSON mode with the prompt on stdin and return the text response.
 
@@ -97,6 +106,7 @@ def improve_description(
     test_results: dict | None = None,
     log_dir: Path | None = None,
     iteration: int | None = None,
+    transcript_history: list[dict] | None = None,
 ) -> str:
     """Call Pi to improve the description based on eval results."""
     failed_triggers = [
@@ -108,13 +118,9 @@ def improve_description(
         if not r["should_trigger"] and not r["pass"]
     ]
 
-    # Build scores summary
+    # Held-out outcomes are never optimizer inputs, even for legacy callers.
     train_score = f"{eval_results['summary']['passed']}/{eval_results['summary']['total']}"
-    if test_results:
-        test_score = f"{test_results['summary']['passed']}/{test_results['summary']['total']}"
-        scores_summary = f"Train: {train_score}, Test: {test_score}"
-    else:
-        scores_summary = f"Train: {train_score}"
+    scores_summary = f"Train: {train_score}"
 
     prompt = f"""You are optimizing a skill description for a Pi skill called "{skill_name}". A "skill" is sort of like a prompt, but with progressive disclosure -- there's a title and description that Pi sees when deciding whether to use the skill, and then if it does use the skill, it reads the .md file which has lots more details and potentially links to other resources in the skill folder like helper files and scripts and additional documentation or examples.
 
@@ -144,9 +150,7 @@ Current scores ({scores_summary}):
         prompt += "PREVIOUS ATTEMPTS (do NOT repeat these — try something structurally different):\n\n"
         for h in history:
             train_s = f"{h.get('train_passed', h.get('passed', 0))}/{h.get('train_total', h.get('total', 0))}"
-            test_s = f"{h.get('test_passed', '?')}/{h.get('test_total', '?')}" if h.get('test_passed') is not None else None
-            score_str = f"train={train_s}" + (f", test={test_s}" if test_s else "")
-            prompt += f'<attempt {score_str}>\n'
+            prompt += f'<attempt train={train_s}>\n'
             prompt += f'Description: "{h["description"]}"\n'
             if "results" in h:
                 prompt += "Train results:\n"
@@ -171,13 +175,8 @@ Based on the failures, write a new and improved description that is more likely 
 
 Concretely, your description should not be more than about 100-200 words, even if that comes at the cost of accuracy. There is a hard limit of 1024 characters — descriptions over that will be truncated, so stay comfortably under it.
 
-Here are some tips that we've found to work well in writing these descriptions:
-- The skill should be phrased in the imperative -- "Use this skill for" rather than "this skill does"
-- The skill description should focus on the user's intent, what they are trying to achieve, vs. the implementation details of how the skill works.
-- The description competes with other skills for Pi's attention — make it distinctive and immediately recognizable.
-- If you're getting lots of failures after repeated attempts, change things up. Try different sentence structures or wordings.
-
-I'd encourage you to be creative and mix up the style in different iterations since you'll have multiple opportunities to try different approaches and we'll just grab the highest-scoring one at the end. 
+{DESCRIPTION_DOCTRINE}
+The description competes with other skills for Pi's attention, so make its capability distinctive and immediately recognizable. Generalize from the observed failures instead of enumerating them. If repeated attempts fail, vary sentence structure while preserving the doctrine.
 
 Please respond with only the new description text in <new_description> tags, nothing else."""
 
@@ -222,6 +221,9 @@ Please respond with only the new description text in <new_description> tags, not
         description = shortened
 
     transcript["final_description"] = description
+
+    if transcript_history is not None:
+        transcript_history.append(transcript)
 
     if log_dir:
         log_dir.mkdir(parents=True, exist_ok=True)
