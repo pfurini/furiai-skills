@@ -35,7 +35,7 @@ Done when: the user has confirmed the capability sentence, one example prompt pe
 
 ## Step 2 — Baseline
 
-Run the example prompts _without_ the skill before writing it. Dispatch one fresh subagent per example prompt, worded exactly as a user would word it (hygiene rules in @${PI_SKILL_DIR}/references/testing.md), and read the transcripts — not just the outputs.
+Choose `in-situ`, `hermetic-core`, or `declared-dependencies` from @${PI_SKILL_DIR}/references/testing.md before running anything; never compare different profiles. After explicit user approval for multi-agent execution, use direct `Agent` calls for the known small qualitative set of example prompts, one fresh agent per prompt. Run each prompt without the skill, worded exactly as a user would word it, and read the returned `.output` JSONL transcripts, not just the outputs.
 
 Document verbatim where each run diverges from what the user wants: wrong approach, missed constraint, re-derived knowledge, reinvented boilerplate, rationalized shortcut. These failures are the skill's reason to exist; the draft will address them and nothing else.
 
@@ -71,7 +71,7 @@ Done when: every baseline failure from Step 2 maps to a specific line, script, o
 
 ## Step 5 — Forward-test
 
-Run the same example prompts _with_ the skill, using fresh subagents that don't know they are testing anything — the prompt is `Use <skill> at <path> to <task>`, never "review this skill". Pass raw artifacts, not your diagnosis; a test that only passes because the subagent saw your conclusions is contamination, not evidence. Read and follow @${PI_SKILL_DIR}/references/testing.md for the full procedure and hygiene rules.
+Use the same environment profile and prompts as the baseline. After explicit user approval for multi-agent execution, make direct `Agent` calls for the known small qualitative set, one fresh agent per prompt. Give each the realistic task as `Use <skill> at <path> to <task>`, never "review this skill"; pass raw artifacts rather than your diagnosis. Read each top-level `.output` JSONL transcript and follow @${PI_SKILL_DIR}/references/testing.md for the full hygiene, telemetry, and worktree-isolation rules.
 
 Compare each transcript against its baseline. If the skill enforces a discipline (a rule the agent will be tempted to break under pressure), also run the pressure scenarios described there — compliance on an easy prompt proves nothing about compliance under a deadline.
 
@@ -90,7 +90,7 @@ Done when: forward-test runs comply, the user is satisfied, or an iteration prod
 
 ## Step 7 — Benchmark (optional)
 
-Offer this branch when the user wants quantitative evidence — "is it actually better?", a with/without pass-rate comparison, description-trigger accuracy — or when the skill will be shared beyond this machine. Read @${PI_SKILL_DIR}/references/benchmarking.md and follow it; it drives the bundled harness in `scripts/`, `agents/`, and `eval-viewer/`.
+Offer this branch when the user wants quantitative evidence (with/without pass rates, variance, or description-trigger accuracy) or when the skill will be shared beyond this machine. Get explicit user approval before any multi-agent tool call. Use `SubagentWorkflow` for dynamic or staged fan-out, while fork and declared-dependency executors run through measured Pi RPC; workflow-child or launcher telemetry is never executor evidence. Read @${PI_SKILL_DIR}/references/benchmarking.md and follow it for the quantitative procedure.
 
 ## Step 8 — Finish
 

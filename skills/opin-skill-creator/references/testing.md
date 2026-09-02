@@ -7,7 +7,9 @@ The procedure behind Steps 2, 5, and 6 of the spine: baseline runs, forward-test
 - Why baseline first
 - Hygiene: keeping tests uncontaminated
 - Environment fidelity
+- Campaign workspace
 - The test loop
+- Measured-run evidence
 - What to test, by skill type
 - Pressure scenarios (discipline skills)
 - Closing loopholes
@@ -37,28 +39,81 @@ A test only measures generalization if the subagent can't reconstruct the answer
 - **Clean up between iterations.** Outputs a previous run left on disk are leaked context for the next one — remove them before re-dispatching.
 - **Keep control copies and planted fixtures in paths the subagent has no reason to visit.** A subject that can see the `baseline/` twin of its own input has learned it is inside a harness.
 - **Run test subagents in a working directory that contains neither the skill corpus nor its authoring guides.** A baseline that can read the doctrine under test isn't a baseline.
-- Tell each run where to save outputs, and keep a simple workspace outside the skill, under a single container at the project root: `.skill-creator/<skill-name>/iteration-N/<eval-name>/{with_skill,baseline}/outputs/`. One container means one `.gitignore` line (`.skill-creator/`) and one place to delete when a campaign ends.
+- **Keep authoring material outside the evaluation cwd.** The subject must not be able to discover the skill corpus, this doctrine, or control artifacts by walking its working tree. Store durable records in the campaign workspace described below.
 
 If a forward-test only succeeds when the subagent sees leaked context, tighten the skill or the test setup before trusting the result.
 
 ## Environment fidelity
 
-Match the test environment to the deployment claim:
+Choose exactly one environment profile for every run and match it to the claim being tested:
 
-- **A personal skill is tested in-situ.** The user's global instructions, memory, and installed skills are part of the environment the skill will really run in — leave them in place. A behaviour those rules already enforce is a no-op *for this user*: cut the line from the skill rather than crediting the skill for it.
-- **A skill meant for distribution is tested clean-slate.** Its lift must survive an environment without the author's rules or guidance docs. Subagents dispatched in-session inherit the harness and the user's global instructions and cannot be sterilized; use the subprocess route in [benchmarking.md](benchmarking.md).
-- **When contamination is unavoidable, note which way it biases.** A baseline that benefits from the environment understates the skill's lift — safe to report. A with-skill run that benefits from material a stranger won't have overstates it — invalid; fix before trusting.
+- **`in-situ`**: Run in the real evaluation cwd with user, global, and project instructions plus installed and competing skills present. Use this profile for trigger behavior, record the exact competing set, and treat behavior already enforced by the environment as a no-op for that user.
+- **`hermetic-core`**: Use an in-harness subagent configured with `prompt_mode: replace`, `inherit_context: false`, `isolated: true`, `skills: false`, and built-in tools only. Add `isolation: worktree` whenever it writes so parallel writers have worktree isolation.
+- **`declared-dependencies`**: Start from the hermetic resource baseline and add only the absolute extensions or skills declared in `campaign.json`. Use it for fork and bundled-agent behavioral claims, launching through Pi RPC with pi-subagents explicitly loaded as `-e <pi-subagents>/src/index.ts`.
+
+Never aggregate different profiles into one comparison. A profile mismatch is fatal: invalidate the run rather than relabeling, repairing, or comparing it.
+
+## Campaign workspace
+
+Put durable test records under the exact campaign root `<project-root>/.skill-creator/<skill-name>/campaign-<campaign-id>/`. The caller supplies `campaign-id`; evaluation directories use a descriptive `<human-readable-eval-name>`. Use the treatment name `with_skill`, the control name `without_skill`, and the mandatory `run-N` repetition layer:
+
+```text
+campaign-<campaign-id>/
+├── campaign.json
+├── evals.json
+├── trigger/
+│   ├── train.json
+│   ├── validation.json
+│   ├── final-test.json
+│   └── results.json
+└── iteration-N/
+    ├── benchmark.json
+    ├── benchmark.md
+    ├── feedback.json
+    ├── viewer.pid
+    └── <human-readable-eval-name>/
+        ├── eval_metadata.json
+        ├── with_skill/
+        │   └── run-N/
+        │       ├── outputs/
+        │       ├── transcript.jsonl
+        │       ├── transcript-metrics.json
+        │       ├── run.json
+        │       ├── timing.json
+        │       └── grading.json
+        └── without_skill/
+            └── run-N/
+                ├── outputs/
+                ├── transcript.jsonl
+                ├── transcript-metrics.json
+                ├── run.json
+                ├── timing.json
+                └── grading.json
+```
+
+Keep tests, fixtures, reports, and campaign records outside the distributable skill directory. Quantitative campaign commands and schemas belong to [benchmarking.md](benchmarking.md).
 
 ## The test loop
 
-1. **Dispatch all runs for the iteration in one turn** — with-skill and baseline for each example prompt — so they finish together and neither waits on the other. Run forward-tests on the executor floor from Step 1 (compliance by a model stronger than the floor is not evidence), and include at least one single-pass consumer when the output has a required shape.
-2. **Read the transcripts, not just the outputs.** The output shows whether it worked; the transcript shows _how_, and the how is what you're iterating on.
-3. **Compare each with-skill transcript to its baseline** and collect three kinds of signal:
-   - **Baseline failures now fixed** — the evidence the skill works. Quote it.
-   - **Repeated work across runs** — multiple runs independently writing the same helper script or taking the same multi-step detour means that code or knowledge belongs in the skill's `scripts/` or `references/`.
-   - **Skill-induced waste** — the agent doing something unproductive _because the skill told it to_. Delete the instruction and re-test; the transcript, not the prose, decides what stays.
-4. **Show the user the outputs** and gather their reactions before revising — their complaints, not your inference, set the next iteration's priorities. Empty feedback on a run means it was fine; focus where they had specific complaints.
-5. Revise, then re-run into a new `iteration-N+1/` directory. Baselines for a new skill stay "no skill"; for an edited skill, use the snapshot.
+1. **Choose the supported execution mechanism and get approval.** Use direct `Agent` calls for a known small qualitative set. Use `SubagentWorkflow` for dynamic or staged fan-out. Any multi-agent execution requires explicit user approval before the tool call. If multiple agents write in parallel, give each writer worktree isolation; never let parallel writers share a checkout.
+2. **Dispatch every run for the iteration together**: treatment and control for each example prompt. Use one fresh subject per run so neither arm waits on or contaminates the other. Run forward-tests on the executor floor from Step 1 (compliance by a stronger model is not evidence), and include at least one single-pass consumer when the output has a required shape.
+3. **Read the transcripts, not just the outputs.** The output shows whether it worked; the transcript shows how, and the process is what the skill is changing.
+4. **Compare each `with_skill` transcript to its `without_skill` control** and collect three kinds of signal:
+   - **Baseline failures now fixed**: the evidence the skill works. Quote it.
+   - **Repeated work across runs**: multiple runs independently writing the same helper script or taking the same multi-step detour means that code or knowledge belongs in the skill's `scripts/` or `references/`.
+   - **Skill-induced waste**: the agent doing something unproductive because the skill told it to. Delete the instruction and re-test; the transcript, not the prose, decides what stays.
+5. **Show the user the outputs** and gather reactions before revising. Their complaints, not your inference, set the next iteration's priorities. Empty feedback on a run means it was fine; focus where they had specific complaints.
+6. Revise, then re-run into a new `iteration-N+1/` directory. Controls for a new skill stay `without_skill`; for an edited skill, use the snapshot.
+
+## Measured-run evidence
+
+Use only the telemetry seam supported by the execution mechanism:
+
+- **Direct measured runs**: top-level `Agent` `.output` paths are returned by results and completion notifications. Each file contains JSONL message snapshots, not tool lifecycle events. Parse it as `pi-subagents-output-v1`; derive tool calls from assistant `toolCall` content and usage or effective model from authoritative assistant messages.
+- **Workflow orchestration**: `SubagentWorkflow` children return final text or validated structured output. Workflow children do not expose an `.output` path or top-level lifecycle events. Do not claim per-child transcripts or cost, and do not substitute launcher-agent telemetry for executor evidence.
+- **Fork or dependency measured runs**: use Pi RPC with the declared dependencies loaded explicitly. Preserve the Pi JSON event stream in `transcript.jsonl`, parse it as `pi-json-events-v3`, and use its `run.json` and `transcript-metrics.json` records as executor evidence.
+
+Capture `total_tokens` and `duration_ms` when a direct task's completion notification arrives so notification-only timing is not lost. Notification capture is not the only recoverable usage source: authoritative transcript messages supply usage and effective-model evidence. Treat absent or mismatched effective profile, model, thinking, usage, or completion metadata as an invalid run.
 
 ## What to test, by skill type
 
