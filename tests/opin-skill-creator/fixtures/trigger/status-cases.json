@@ -1,0 +1,40 @@
+{
+  "triggered": {
+    "returncode": 0,
+    "stderr": "",
+    "events": [
+      {"type": "tool_execution_start", "toolName": "skill", "args": {"name": "real-trigger-skill"}},
+      {"type": "message_end", "effective_thinking": "low", "message": {"role": "assistant", "provider": "fixture", "responseModel": "effective-trigger", "content": []}}
+    ]
+  },
+  "not_triggered": {
+    "returncode": 0,
+    "stderr": "",
+    "events": [
+      {"type": "message_end", "effective_thinking": "low", "message": {"role": "assistant", "provider": "fixture", "responseModel": "effective-trigger", "content": []}}
+    ]
+  },
+  "process_error": {
+    "returncode": 17,
+    "stderr": "fixture process failed",
+    "events": []
+  },
+  "model_error": {
+    "returncode": 1,
+    "stderr": "model provider rejected the request",
+    "events": []
+  },
+  "auth_error": {
+    "returncode": 1,
+    "stderr": "authentication failed: invalid API key",
+    "events": []
+  },
+  "invalid_output": {
+    "returncode": 0,
+    "stderr": "",
+    "events": [
+      {"type": "message_end"}
+    ],
+    "stdout_file": "malformed.jsonl"
+  }
+}

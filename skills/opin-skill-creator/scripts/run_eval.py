@@ -6,14 +6,12 @@ for a set of queries. Outputs results as JSON.
 """
 
 import argparse
+import hashlib
 import json
 import os
-import select
 import subprocess
 import sys
 import tempfile
-import time
-import uuid
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,7 +22,32 @@ from scripts.utils import parse_skill_md
 
 RoleName = Literal["trigger_consumer", "optimizer"]
 EffectiveEvidence = Literal["pi_event", "pi_subagents_invocation"]
+TriggerStatus = Literal[
+    "triggered",
+    "not_triggered",
+    "timeout",
+    "process_error",
+    "model_error",
+    "auth_error",
+    "invalid_output",
+]
+InvocationMechanism = Literal["skill_tool", "skill_md_read"]
 THINKING_LEVELS = frozenset({"off", "minimal", "low", "medium", "high", "xhigh", "max"})
+TRIGGER_STATUSES = frozenset(
+    {
+        "triggered",
+        "not_triggered",
+        "timeout",
+        "process_error",
+        "model_error",
+        "auth_error",
+        "invalid_output",
+    }
+)
+ACCURACY_STATUSES = frozenset({"triggered", "not_triggered"})
+INFRASTRUCTURE_STATUSES = TRIGGER_STATUSES - ACCURACY_STATUSES
+MAX_STDERR_CHARS = 4096
+PI_REVISION = "a4043c1e332a61e4c8648b97b9b796c57f9db110"
 _ROLE_ENV = {
     "trigger_consumer": (
         "OPIN_TRIGGER_CONSUMER_MODEL",
@@ -120,12 +143,50 @@ class RoleModelConfig:
         }
 
 
-@dataclass(frozen=True)
+@dataclass
 class TriggerInvocationResult:
-    """Boolean trigger result paired with model evidence from that invocation."""
+    """One trigger attempt result with complete process and environment evidence."""
 
-    triggered: bool
+    status: TriggerStatus
+    attempts: int
+    exit_code: int | None
+    stderr: str
     role_config: RoleModelConfig
+    environment_profile: Literal["in-situ"]
+    evaluation_cwd: str
+    skill_name: str
+    competing_skills: tuple[str, ...]
+    pi_revision: str
+    events: tuple[dict, ...]
+    invocation_mechanism: InvocationMechanism | None
+    transient_error: bool = False
+    attempt_statuses: tuple[TriggerStatus, ...] = ()
+
+    @property
+    def triggered(self) -> bool:
+        """Preserve the former convenience property without collapsing errors."""
+        return self.status == "triggered"
+
+    def as_dict(self) -> dict[str, object]:
+        """Return the durable trigger-result record."""
+        return {
+            "status": self.status,
+            "attempts": self.attempts,
+            "attempt_statuses": list(self.attempt_statuses or (self.status,)),
+            "exit_code": self.exit_code,
+            "stderr": self.stderr,
+            "requested_model": self.role_config.requested_model,
+            "effective_model": self.role_config.effective_model,
+            "requested_thinking": self.role_config.requested_thinking,
+            "effective_thinking": self.role_config.effective_thinking,
+            "environment_profile": self.environment_profile,
+            "evaluation_cwd": self.evaluation_cwd,
+            "skill_name": self.skill_name,
+            "competing_skills": list(self.competing_skills),
+            "pi_revision": self.pi_revision,
+            "events": list(self.events),
+            "invocation_mechanism": self.invocation_mechanism,
+        }
 
 
 def add_role_arguments(parser: argparse.ArgumentParser, role: RoleName) -> None:
@@ -255,8 +316,392 @@ def record_effective_from_event(config: RoleModelConfig, event: object) -> None:
 
 
 def find_project_root() -> Path:
-    """Return the current project root used for in-situ trigger evaluation."""
+    """Return the current directory for legacy callers that already run in-situ."""
     return Path.cwd()
+
+
+def _bounded_stderr(stderr: str) -> str:
+    """Keep the diagnostic tail, where subprocesses normally report the cause."""
+    return stderr[-MAX_STDERR_CHARS:]
+
+
+def _decode_stream(value: str | bytes | None) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    return value
+
+
+def _parse_events(output: str) -> tuple[tuple[dict, ...], bool]:
+    """Parse LF-delimited Pi events without skipping malformed records."""
+    events: list[dict] = []
+    for raw_line in output.split("\n"):
+        line = raw_line[:-1] if raw_line.endswith("\r") else raw_line
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            return tuple(events), False
+        if not isinstance(event, dict):
+            return tuple(events), False
+        events.append(event)
+    return tuple(events), True
+
+
+def _error_text(events: tuple[dict, ...], stderr: str) -> str:
+    error_events: list[dict] = []
+    for event in events:
+        message = event.get("message")
+        message_failed = (
+            isinstance(message, dict)
+            and (message.get("stopReason") in {"error", "aborted"} or "errorMessage" in message)
+        )
+        if (
+            event.get("type") in {"error", "agent_error", "model_error"}
+            or "error" in event
+            or message_failed
+        ):
+            error_events.append(event)
+    return (stderr + "\n" + json.dumps(error_events, sort_keys=True)).lower()
+
+
+def _is_transient_provider_error(error_text: str) -> bool:
+    signals = (
+        "rate limit",
+        "rate_limit",
+        "status 429",
+        '"status": 429',
+        "retryable=true",
+        '"retryable": true',
+        "temporarily unavailable",
+        "service unavailable",
+        "provider overloaded",
+    )
+    return any(signal in error_text for signal in signals)
+
+
+def _classify_error(events: tuple[dict, ...], stderr: str) -> tuple[TriggerStatus | None, bool]:
+    error_text = _error_text(events, stderr)
+    auth_signals = (
+        "authentication",
+        "unauthorized",
+        "forbidden",
+        "invalid api key",
+        "api key",
+        "auth_error",
+    )
+    if any(signal in error_text for signal in auth_signals):
+        return "auth_error", False
+
+    transient = _is_transient_provider_error(error_text)
+    model_signals = (
+        "model error",
+        "model_error",
+        "model provider",
+        "provider error",
+        "unknown model",
+        "model not found",
+        "failed to resolve model",
+    )
+    if transient or any(signal in error_text for signal in model_signals):
+        return "model_error", transient
+    return None, False
+
+
+def _normalize_competing_skills(
+    competing_skills: tuple[str, ...],
+    skill_name: str,
+) -> tuple[str, ...]:
+    """Validate the explicit set and exclude installed copies of the target."""
+    normalized: list[str] = []
+    for value in competing_skills:
+        skill_path = Path(value)
+        if not skill_path.is_absolute():
+            raise ValueError("competing skill paths must be absolute")
+        skill_file = skill_path if skill_path.name == "SKILL.md" else skill_path / "SKILL.md"
+        if not skill_file.is_file():
+            raise ValueError(f"competing skill has no SKILL.md: {skill_path}")
+        competing_name, _, _ = parse_skill_md(skill_file.parent)
+        if competing_name != skill_name:
+            normalized.append(os.fspath(skill_path))
+    return tuple(normalized)
+
+
+def _candidate_skill_file(
+    skill_name: str,
+    skill_description: str,
+    evaluation_cwd: str,
+    competing_skills: tuple[str, ...],
+) -> Path:
+    """Materialize the candidate at a stable path while preserving its real name."""
+    identity = json.dumps(
+        [skill_name, skill_description, evaluation_cwd, *competing_skills],
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:24]
+    skill_dir = Path(tempfile.gettempdir()) / "opin-skill-creator-trigger" / digest / "candidate"
+    skill_dir.mkdir(parents=True, exist_ok=True)
+    skill_file = skill_dir / "SKILL.md"
+    indented_description = "\n  ".join(skill_description.split("\n"))
+    skill_file.write_text(
+        f"---\n"
+        f"name: {skill_name}\n"
+        f"description: |\n"
+        f"  {indented_description}\n"
+        f"---\n\n"
+        f"# {skill_name}\n\n"
+        f"This skill handles: {skill_description}\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    return skill_file
+
+
+def _invocation_mechanism(
+    events: tuple[dict, ...],
+    skill_name: str,
+    skill_file: Path,
+) -> InvocationMechanism | None:
+    direct_read = False
+    for event in events:
+        if event.get("type") != "tool_execution_start":
+            continue
+        tool_name = event.get("toolName", event.get("tool_name"))
+        arguments = event.get("args", event.get("arguments", {}))
+        if not isinstance(arguments, dict):
+            continue
+        if tool_name == "skill" and arguments.get("name") == skill_name:
+            return "skill_tool"
+        if tool_name == "read" and os.fspath(skill_file) in json.dumps(arguments):
+            direct_read = True
+    return "skill_md_read" if direct_read else None
+
+
+def _result(
+    *,
+    status: TriggerStatus,
+    attempts: int,
+    exit_code: int | None,
+    stderr: str,
+    role_config: RoleModelConfig,
+    evaluation_cwd: str,
+    skill_name: str,
+    competing_skills: tuple[str, ...],
+    events: tuple[dict, ...] = (),
+    invocation_mechanism: InvocationMechanism | None = None,
+    transient_error: bool = False,
+    attempt_statuses: tuple[TriggerStatus, ...] = (),
+) -> TriggerInvocationResult:
+    return TriggerInvocationResult(
+        status=status,
+        attempts=attempts,
+        exit_code=exit_code,
+        stderr=_bounded_stderr(stderr),
+        role_config=role_config,
+        environment_profile="in-situ",
+        evaluation_cwd=evaluation_cwd,
+        skill_name=skill_name,
+        competing_skills=competing_skills,
+        pi_revision=PI_REVISION,
+        events=events,
+        invocation_mechanism=invocation_mechanism,
+        transient_error=transient_error,
+        attempt_statuses=attempt_statuses or (status,),
+    )
+
+
+def _run_query_attempt(
+    query: str,
+    skill_name: str,
+    skill_description: str,
+    timeout: int,
+    evaluation_cwd: str,
+    role_config: RoleModelConfig,
+    competing_skills: tuple[str, ...],
+    pi_executable: str,
+) -> TriggerInvocationResult:
+    skill_file = _candidate_skill_file(
+        skill_name, skill_description, evaluation_cwd, competing_skills
+    )
+    command = [
+        pi_executable,
+        "--mode",
+        "json",
+        "--no-session",
+        "--no-skills",
+        "--skill",
+        os.fspath(skill_file),
+    ]
+    for competitor in competing_skills:
+        command.extend(("--skill", competitor))
+    command.extend(
+        (
+            "--model",
+            role_config.requested_model,
+            "--thinking",
+            role_config.requested_thinking,
+        )
+    )
+
+    try:
+        process = subprocess.Popen(
+            command,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=evaluation_cwd,
+            text=True,
+        )
+    except OSError as error:
+        return _result(
+            status="process_error",
+            attempts=1,
+            exit_code=None,
+            stderr=f"{type(error).__name__}: {error}",
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+        )
+
+    if (
+        getattr(process, "stdin", None) is None
+        or getattr(process, "stdout", None) is None
+        or getattr(process, "stderr", None) is None
+    ):
+        if hasattr(process, "kill"):
+            process.kill()
+        return _result(
+            status="process_error",
+            attempts=1,
+            exit_code=getattr(process, "returncode", None),
+            stderr="Pi subprocess did not expose all required standard streams",
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+        )
+
+    try:
+        stdout, stderr = process.communicate(input=query, timeout=timeout)
+    except subprocess.TimeoutExpired as error:
+        process.kill()
+        final_stdout, final_stderr = process.communicate()
+        stdout = _decode_stream(final_stdout) or _decode_stream(error.output)
+        stderr = _decode_stream(final_stderr) or _decode_stream(error.stderr)
+        events, _ = _parse_events(stdout)
+        return _result(
+            status="timeout",
+            attempts=1,
+            exit_code=None,
+            stderr=stderr,
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+            events=events,
+        )
+    except (OSError, subprocess.SubprocessError) as error:
+        if process.poll() is None:
+            process.kill()
+            process.wait()
+        return _result(
+            status="process_error",
+            attempts=1,
+            exit_code=getattr(process, "returncode", None),
+            stderr=f"{type(error).__name__}: {error}",
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+        )
+
+    events, output_is_valid = _parse_events(stdout)
+    if not output_is_valid:
+        return _result(
+            status="invalid_output",
+            attempts=1,
+            exit_code=process.returncode,
+            stderr=stderr,
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+            events=events,
+        )
+
+    try:
+        for event in events:
+            record_effective_from_event(role_config, event)
+    except RoleConfigurationError as error:
+        return _result(
+            status="invalid_output",
+            attempts=1,
+            exit_code=process.returncode,
+            stderr=f"{stderr}\n{error}",
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+            events=events,
+        )
+
+    error_status, transient = _classify_error(events, stderr)
+    if error_status is not None:
+        return _result(
+            status=error_status,
+            attempts=1,
+            exit_code=process.returncode,
+            stderr=stderr,
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+            events=events,
+            transient_error=transient,
+        )
+    if process.returncode != 0:
+        return _result(
+            status="process_error",
+            attempts=1,
+            exit_code=process.returncode,
+            stderr=stderr,
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+            events=events,
+        )
+
+    mechanism = _invocation_mechanism(events, skill_name, skill_file)
+    if role_config.effective_model is None or role_config.effective_thinking is None:
+        return _result(
+            status="invalid_output",
+            attempts=1,
+            exit_code=process.returncode,
+            stderr=f"{stderr}\nPi emitted no complete effective model/thinking evidence",
+            role_config=role_config,
+            evaluation_cwd=evaluation_cwd,
+            skill_name=skill_name,
+            competing_skills=competing_skills,
+            events=events,
+            invocation_mechanism=mechanism,
+        )
+    return _result(
+        status="triggered" if mechanism is not None else "not_triggered",
+        attempts=1,
+        exit_code=process.returncode,
+        stderr=stderr,
+        role_config=role_config,
+        evaluation_cwd=evaluation_cwd,
+        skill_name=skill_name,
+        competing_skills=competing_skills,
+        events=events,
+        invocation_mechanism=mechanism,
+    )
 
 
 def run_single_query(
@@ -266,95 +711,65 @@ def run_single_query(
     timeout: int,
     project_root: str,
     role_config: RoleModelConfig,
+    competing_skills: tuple[str, ...] = (),
+    pi_executable: str = "pi",
 ) -> TriggerInvocationResult:
-    """Run a single query and return whether the skill was triggered.
+    """Run one in-situ trigger query with one bounded transient retry."""
+    if role_config.role != "trigger_consumer":
+        raise RoleConfigurationError("trigger evaluation requires trigger_consumer role configuration")
+    evaluation_path = Path(project_root)
+    if not evaluation_path.is_absolute() or not evaluation_path.is_dir():
+        raise ValueError("evaluation cwd must be an absolute existing directory")
+    normalized_competitors = _normalize_competing_skills(competing_skills, skill_name)
 
-    Creates a temporary SKILL.md, loads it with `pi --skill`, then runs
-    `pi --mode json -p` with the raw query. The temporary skill appears in
-    Pi's available_skills list. JSON `tool_execution_start` events reveal
-    whether Pi invoked the `skill` tool or read that SKILL.md directly.
-    """
-    clean_name = f"eval-skill-{uuid.uuid4().hex[:8]}"
+    first = _run_query_attempt(
+        query,
+        skill_name,
+        skill_description,
+        timeout,
+        os.fspath(evaluation_path),
+        role_config,
+        normalized_competitors,
+        pi_executable,
+    )
+    if first.status != "model_error" or not first.transient_error:
+        return first
 
-    with tempfile.TemporaryDirectory(prefix="opin-skill-creator-eval-") as temp_dir:
-        skill_file = Path(temp_dir) / "SKILL.md"
-        indented_desc = "\n  ".join(skill_description.split("\n"))
-        skill_file.write_text(
-            f"---\n"
-            f"name: {clean_name}\n"
-            f"description: |\n"
-            f"  {indented_desc}\n"
-            f"---\n\n"
-            f"# {skill_name}\n\n"
-            f"This skill handles: {skill_description}\n"
-        )
+    second = _run_query_attempt(
+        query,
+        skill_name,
+        skill_description,
+        timeout,
+        os.fspath(evaluation_path),
+        role_config,
+        normalized_competitors,
+        pi_executable,
+    )
+    second.attempts = 2
+    second.attempt_statuses = (first.status, second.status)
+    second.stderr = _bounded_stderr(f"{first.stderr}\n--- retry ---\n{second.stderr}")
+    second.events = first.events + second.events
+    return second
 
-        cmd = [
-            "pi",
-            "--mode", "json",
-            "-p", query,
-            "--no-session",
-            "--skill", str(skill_file),
-            "--model", role_config.requested_model,
-            "--thinking", role_config.requested_thinking,
-        ]
 
-        process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            cwd=project_root,
-        )
-        if process.stdout is None:
-            return TriggerInvocationResult(False, role_config)
-
-        start_time = time.time()
-        buffer = ""
-
-        try:
-            while time.time() - start_time < timeout:
-                if process.poll() is not None:
-                    remaining = process.stdout.read()
-                    if remaining:
-                        buffer += remaining.decode("utf-8", errors="replace")
-                    break
-
-                ready, _, _ = select.select([process.stdout], [], [], 1.0)
-                if not ready:
-                    continue
-
-                chunk = os.read(process.stdout.fileno(), 8192)
-                if not chunk:
-                    break
-                buffer += chunk.decode("utf-8", errors="replace")
-
-                while "\n" in buffer:
-                    line, buffer = buffer.split("\n", 1)
-                    line = line.strip()
-                    if not line:
-                        continue
-
-                    try:
-                        event = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-
-                    record_effective_from_event(role_config, event)
-                    if event.get("type") != "tool_execution_start":
-                        continue
-
-                    tool_name = event.get("toolName", "")
-                    args = event.get("args", {})
-                    if tool_name == "skill" and args.get("name") == clean_name:
-                        return TriggerInvocationResult(True, role_config)
-                    if tool_name == "read" and str(skill_file) in json.dumps(args):
-                        return TriggerInvocationResult(True, role_config)
-        finally:
-            if process.poll() is None:
-                process.kill()
-                process.wait()
-
-        return TriggerInvocationResult(False, role_config)
+def _worker_error_result(
+    error: Exception,
+    *,
+    role_config: RoleModelConfig,
+    evaluation_cwd: str,
+    skill_name: str,
+    competing_skills: tuple[str, ...],
+) -> TriggerInvocationResult:
+    return _result(
+        status="process_error",
+        attempts=1,
+        exit_code=None,
+        stderr=f"worker {type(error).__name__}: {error}",
+        role_config=role_config,
+        evaluation_cwd=evaluation_cwd,
+        skill_name=skill_name,
+        competing_skills=competing_skills,
+    )
 
 
 def run_eval(
@@ -367,11 +782,15 @@ def run_eval(
     role_config: RoleModelConfig,
     runs_per_query: int = 1,
     trigger_threshold: float = 0.5,
+    competing_skills: tuple[str, ...] = (),
+    pi_executable: str = "pi",
 ) -> dict:
-    """Run the full eval set and return results."""
+    """Run the full eval set and invalidate summaries on infrastructure results."""
     if role_config.role != "trigger_consumer":
         raise RoleConfigurationError("run_eval requires trigger_consumer role configuration")
-    results = []
+    evaluation_cwd = os.fspath(project_root)
+    normalized_competitors = _normalize_competing_skills(competing_skills, skill_name)
+    results: list[dict] = []
 
     with ProcessPoolExecutor(max_workers=num_workers) as executor:
         future_to_info = {}
@@ -383,27 +802,33 @@ def run_eval(
                     skill_name,
                     description,
                     timeout,
-                    str(project_root),
+                    evaluation_cwd,
                     role_config,
+                    normalized_competitors,
+                    pi_executable,
                 )
                 future_to_info[future] = (item, run_idx)
 
-        query_triggers: dict[str, list[bool]] = {}
+        query_invocations: dict[str, list[TriggerInvocationResult]] = {}
         query_items: dict[str, dict] = {}
         invocation_configs: list[RoleModelConfig] = []
         for future in as_completed(future_to_info):
             item, _ = future_to_info[future]
             query = item["query"]
             query_items[query] = item
-            if query not in query_triggers:
-                query_triggers[query] = []
+            query_invocations.setdefault(query, [])
             try:
                 invocation = future.result()
-                query_triggers[query].append(invocation.triggered)
-                invocation_configs.append(invocation.role_config)
-            except Exception as e:
-                print(f"Warning: query failed: {e}", file=sys.stderr)
-                query_triggers[query].append(False)
+            except Exception as error:
+                invocation = _worker_error_result(
+                    error,
+                    role_config=role_config,
+                    evaluation_cwd=evaluation_cwd,
+                    skill_name=skill_name,
+                    competing_skills=normalized_competitors,
+                )
+            query_invocations[query].append(invocation)
+            invocation_configs.append(invocation.role_config)
 
     effective_models = {
         config.effective_model
@@ -423,35 +848,61 @@ def run_eval(
         evidence="pi_event",
     )
 
-    for query, triggers in query_triggers.items():
+    infrastructure_failures = 0
+    for query, invocations in query_invocations.items():
         item = query_items[query]
-        trigger_rate = sum(triggers) / len(triggers)
+        valid_invocations = [
+            invocation for invocation in invocations if invocation.status in ACCURACY_STATUSES
+        ]
+        invalid_invocations = [
+            invocation for invocation in invocations if invocation.status in INFRASTRUCTURE_STATUSES
+        ]
+        infrastructure_failures += len(invalid_invocations)
+        query_is_valid = not invalid_invocations and len(valid_invocations) == runs_per_query
+        trigger_count = sum(invocation.triggered for invocation in valid_invocations)
+        trigger_rate = trigger_count / len(valid_invocations) if query_is_valid else None
         should_trigger = item["should_trigger"]
-        if should_trigger:
-            did_pass = trigger_rate >= trigger_threshold
-        else:
-            did_pass = trigger_rate < trigger_threshold
-        results.append({
-            "query": query,
-            "should_trigger": should_trigger,
-            "trigger_rate": trigger_rate,
-            "triggers": sum(triggers),
-            "runs": len(triggers),
-            "pass": did_pass,
-        })
+        did_pass = False
+        if trigger_rate is not None:
+            did_pass = (
+                trigger_rate >= trigger_threshold
+                if should_trigger
+                else trigger_rate < trigger_threshold
+            )
+        results.append(
+            {
+                "query": query,
+                "should_trigger": should_trigger,
+                "trigger_rate": trigger_rate,
+                "triggers": trigger_count,
+                "runs": len(valid_invocations),
+                "pass": did_pass,
+                "valid": query_is_valid,
+                "invocations": [invocation.as_dict() for invocation in invocations],
+            }
+        )
 
-    passed = sum(1 for r in results if r["pass"])
+    passed = sum(1 for result in results if result["valid"] and result["pass"])
+    failed = sum(1 for result in results if result["valid"] and not result["pass"])
+    invalid = sum(1 for result in results if not result["valid"])
     total = len(results)
 
     return {
         "skill_name": skill_name,
         "description": description,
+        "environment_profile": "in-situ",
+        "evaluation_cwd": evaluation_cwd,
+        "competing_skills": list(normalized_competitors),
+        "pi_revision": PI_REVISION,
         "roles": {"trigger_consumer": role_config.as_metadata()},
         "results": results,
         "summary": {
+            "valid": invalid == 0,
             "total": total,
             "passed": passed,
-            "failed": total - passed,
+            "failed": failed,
+            "invalid": invalid,
+            "infrastructure_failures": infrastructure_failures,
         },
     }
 
@@ -460,6 +911,19 @@ def main():
     parser = argparse.ArgumentParser(description="Run trigger evaluation for a skill description")
     parser.add_argument("--eval-set", required=True, help="Path to eval set JSON file")
     parser.add_argument("--skill-path", required=True, help="Path to skill directory")
+    parser.add_argument(
+        "--evaluation-cwd",
+        required=True,
+        help="Absolute project directory whose in-situ skill set is evaluated",
+    )
+    parser.add_argument(
+        "--competing-skills",
+        nargs="*",
+        required=True,
+        metavar="ABSOLUTE_SKILL_PATH",
+        help="Explicit in-situ competing set (pass the option alone for an empty set)",
+    )
+    parser.add_argument("--pi-executable", default="pi", help="Pi executable")
     parser.add_argument("--description", default=None, help="Override description to test")
     parser.add_argument("--num-workers", type=int, default=10, help="Number of parallel workers")
     parser.add_argument("--timeout", type=int, default=30, help="Timeout per query in seconds")
@@ -473,16 +937,22 @@ def main():
     except RoleConfigurationError as error:
         parser.error(str(error))
 
-    eval_set = json.loads(Path(args.eval_set).read_text())
+    eval_set = json.loads(Path(args.eval_set).read_text(encoding="utf-8"))
     skill_path = Path(args.skill_path)
+    evaluation_cwd = Path(args.evaluation_cwd)
 
     if not (skill_path / "SKILL.md").exists():
-        print(f"Error: No SKILL.md found at {skill_path}", file=sys.stderr)
-        sys.exit(1)
+        parser.error(f"No SKILL.md found at {skill_path}")
+    if not evaluation_cwd.is_absolute() or not evaluation_cwd.is_dir():
+        parser.error("--evaluation-cwd must be an absolute existing directory")
+    competing_skills = tuple(args.competing_skills)
+    for competitor in competing_skills:
+        competitor_path = Path(competitor)
+        if not competitor_path.is_absolute() or not competitor_path.exists():
+            parser.error("--competing-skills entries must be absolute existing paths")
 
-    name, original_description, content = parse_skill_md(skill_path)
+    name, original_description, _content = parse_skill_md(skill_path)
     description = args.description or original_description
-    project_root = find_project_root()
 
     if args.verbose:
         print(f"Evaluating: {description}", file=sys.stderr)
@@ -493,10 +963,12 @@ def main():
         description=description,
         num_workers=args.num_workers,
         timeout=args.timeout,
-        project_root=project_root,
+        project_root=evaluation_cwd,
         role_config=role_config,
         runs_per_query=args.runs_per_query,
         trigger_threshold=args.trigger_threshold,
+        competing_skills=competing_skills,
+        pi_executable=args.pi_executable,
     )
 
     if args.verbose:
