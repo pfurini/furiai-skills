@@ -17,7 +17,14 @@ from pathlib import Path
 
 from scripts.generate_report import generate_html
 from scripts.improve_description import improve_description
-from scripts.run_eval import find_project_root, run_eval
+from scripts.run_eval import (
+    RoleConfigurationError,
+    RoleModelConfig,
+    add_role_arguments,
+    find_project_root,
+    role_config_from_args,
+    run_eval,
+)
 from scripts.utils import parse_skill_md
 
 
@@ -54,12 +61,17 @@ def run_loop(
     runs_per_query: int,
     trigger_threshold: float,
     holdout: float,
-    model: str,
+    trigger_config: RoleModelConfig,
+    optimizer_config: RoleModelConfig,
     verbose: bool,
     live_report_path: Path | None = None,
     log_dir: Path | None = None,
 ) -> dict:
     """Run the eval + improvement loop."""
+    if trigger_config.role != "trigger_consumer":
+        raise RoleConfigurationError("run_loop requires trigger_consumer role configuration")
+    if optimizer_config.role != "optimizer":
+        raise RoleConfigurationError("run_loop requires optimizer role configuration")
     project_root = find_project_root()
     name, original_description, content = parse_skill_md(skill_path)
     current_description = description_override or original_description
@@ -93,9 +105,9 @@ def run_loop(
             num_workers=num_workers,
             timeout=timeout,
             project_root=project_root,
+            role_config=trigger_config,
             runs_per_query=runs_per_query,
             trigger_threshold=trigger_threshold,
-            model=model,
         )
         eval_elapsed = time.time() - t0
 
@@ -171,7 +183,7 @@ def run_loop(
                     print(f"  [{status}] rate={rate_str} expected={r['should_trigger']}: {r['query'][:60]}", file=sys.stderr)
 
             print_eval_stats("Train", train_results["results"], eval_elapsed)
-            if test_summary:
+            if test_summary and test_results is not None:
                 print_eval_stats("Test ", test_results["results"], 0)
 
         if train_summary["failed"] == 0:
@@ -202,7 +214,7 @@ def run_loop(
             current_description=current_description,
             eval_results=train_results,
             history=blinded_history,
-            model=model,
+            role_config=optimizer_config,
             log_dir=log_dir,
             iteration=iteration,
         )
@@ -228,6 +240,10 @@ def run_loop(
     return {
         "exit_reason": exit_reason,
         "original_description": original_description,
+        "roles": {
+            "trigger_consumer": trigger_config.as_metadata(),
+            "optimizer": optimizer_config.as_metadata(),
+        },
         "best_description": best["description"],
         "best_score": best_score,
         "best_train_score": f"{best['train_passed']}/{best['train_total']}",
@@ -252,11 +268,17 @@ def main():
     parser.add_argument("--runs-per-query", type=int, default=3, help="Number of runs per query")
     parser.add_argument("--trigger-threshold", type=float, default=0.5, help="Trigger rate threshold")
     parser.add_argument("--holdout", type=float, default=0.4, help="Fraction of eval set to hold out for testing (0 to disable)")
-    parser.add_argument("--model", required=True, help="Model for improvement")
+    add_role_arguments(parser, "trigger_consumer")
+    add_role_arguments(parser, "optimizer")
     parser.add_argument("--verbose", action="store_true", help="Print progress to stderr")
     parser.add_argument("--report", default="auto", help="Generate HTML report at this path (default: 'auto' for temp file, 'none' to disable)")
     parser.add_argument("--results-dir", default=None, help="Save all outputs (results.json, report.html, log.txt) to a timestamped subdirectory here")
     args = parser.parse_args()
+    try:
+        trigger_config = role_config_from_args(args, "trigger_consumer")
+        optimizer_config = role_config_from_args(args, "optimizer")
+    except RoleConfigurationError as error:
+        parser.error(str(error))
 
     eval_set = json.loads(Path(args.eval_set).read_text())
     skill_path = Path(args.skill_path)
@@ -300,7 +322,8 @@ def main():
         runs_per_query=args.runs_per_query,
         trigger_threshold=args.trigger_threshold,
         holdout=args.holdout,
-        model=args.model,
+        trigger_config=trigger_config,
+        optimizer_config=optimizer_config,
         verbose=args.verbose,
         live_report_path=live_report_path,
         log_dir=log_dir,
