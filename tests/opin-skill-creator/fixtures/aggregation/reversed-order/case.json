@@ -1,0 +1,8 @@
+{
+  "configuration_order": [
+    "without_skill",
+    "with_skill"
+  ],
+  "evals": true,
+  "repetitions": 1
+}

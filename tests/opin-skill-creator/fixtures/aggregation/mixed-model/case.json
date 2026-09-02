@@ -1,0 +1,9 @@
+{
+  "configuration_order": [
+    "with_skill",
+    "without_skill"
+  ],
+  "evals": true,
+  "mixed_model": true,
+  "repetitions": 1
+}

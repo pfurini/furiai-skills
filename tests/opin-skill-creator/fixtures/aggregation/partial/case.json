@@ -1,0 +1,14 @@
+{
+  "configuration_order": [
+    "with_skill",
+    "without_skill"
+  ],
+  "evals": true,
+  "omit_runs": [
+    [
+      "without_skill",
+      2
+    ]
+  ],
+  "repetitions": 2
+}
