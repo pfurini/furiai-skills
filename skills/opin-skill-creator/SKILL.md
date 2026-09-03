@@ -10,7 +10,8 @@ Reference files, loaded when a step points at them:
 
 - @${PI_SKILL_DIR}/references/writing-principles.md — the standard all skill prose is judged against: Pi authoring capabilities, invocation economics, description doctrine, information hierarchy, leading words, failure modes, pruning.
 - @${PI_SKILL_DIR}/references/testing.md — baseline and forward-test procedure, pressure scenarios, closing loopholes.
-- @${PI_SKILL_DIR}/references/benchmarking.md — the quantitative branch: eval harness, review viewer, blind comparison, and description-trigger optimization.
+- @${PI_SKILL_DIR}/references/benchmarking.md — the quantitative branch: approved runtime workflow, review viewer, blind comparison, and description-trigger optimization.
+- `${PI_SKILL_DIR}/references/schemas.md` — strict campaign, run, transcript, grading, and benchmark artifact contracts; read it directly before creating campaign records.
 
 Two branches:
 
@@ -90,7 +91,7 @@ Done when: forward-test runs comply, the user is satisfied, or an iteration prod
 
 ## Step 7 — Benchmark (optional)
 
-Offer this branch when the user wants quantitative evidence (with/without pass rates, variance, or description-trigger accuracy) or when the skill will be shared beyond this machine. Get explicit user approval before any multi-agent tool call. Use `SubagentWorkflow` for dynamic or staged fan-out, while fork and declared-dependency executors run through measured Pi RPC; workflow-child or launcher telemetry is never executor evidence. Read @${PI_SKILL_DIR}/references/benchmarking.md and follow it for the quantitative procedure.
+Offer this branch when the user wants quantitative evidence (with/without pass rates, variance, or description-trigger accuracy) or when the skill will be shared beyond this machine. Read @${PI_SKILL_DIR}/references/benchmarking.md and `${PI_SKILL_DIR}/references/schemas.md`, prepare every explicit campaign input, and show the user the evals, repetitions, profile, and role configurations. After the user approves that dynamic or staged fan-out, invoke `SubagentWorkflow` with the absolute `scriptPath` `${PI_SKILL_DIR}/workflows/benchmark.js` and `approved: true`; never invoke it by saved-workflow name. Fork and declared-dependency executors run through measured Pi RPC, and workflow-child or launcher telemetry is never executor evidence.
 
 ## Step 8 — Finish
 
