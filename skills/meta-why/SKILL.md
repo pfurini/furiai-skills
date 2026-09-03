@@ -1,12 +1,16 @@
 ---
 name: meta-why
 description: >
-    Five-Whys Root-Cause Analysis.
+    Runs a Five-Whys root-cause analysis on an observed fact, optionally
+    widening and backtracking the causality chain, and proposes a
+    solution addressing the root cause.
+argument-hint: "[--help|-h] [--depth|-d <N>] [--width|-w <M>] <fact>"
+disable-model-invocation: true
 ---
 
 # meta-why
 
-Five-Whys root-cause analysis.
+Five-Whys root-cause analysis: iteratively ask "why" to drill down from the observed `fact` to the fundamental cause of a problem rather than just its surface-level symptoms, then propose a solution addressing that cause.
 
 ## Usage
 
@@ -14,17 +18,17 @@ Five-Whys root-cause analysis.
 /meta-why [--help|-h] [--depth|-d <N>] [--width|-w <M>] <fact>
 ```
 
-- `--depth`|`-d` *N*: the *maximum* number of "why" iterations (the chain length), acting as an *upper bound* only. The analysis still stops early once the root cause is reached. Defaults to *5*. A non-numeric or non-positive value falls back to the default.
-- `--width`|`-w` *M*: the *maximum* number of *candidate sub-causes* to surface per "why" level. With the default *1*, the skill walks a single causality chain (classic Five-Whys); with *M* > 1, each level surfaces up to *M* candidate sub-causes, descends into the single most significant one (justifying the choice), and retains the rest as *fallbacks*. A non-numeric or non-positive value falls back to the default.
+- `--depth`|`-d` *N*: the *maximum* number of "why" iterations (the chain length), acting as an *upper bound* only; the analysis still stops early once the root cause is reached. Defaults to *5*.
+- `--width`|`-w` *M*: the *maximum* number of *candidate sub-causes* to surface per "why" level. Defaults to *1*. With *M* > 1, each level surfaces up to *M* candidate sub-causes, descends into the single most significant one (justifying the choice), and retains the rest as *fallbacks* for backtracking.
 - `--help`|`-h`: show the manual page instead of running the analysis.
-- *fact*: the observed fact (symptom, problem, or surprising outcome) whose root cause should be investigated. The skill implicitly prepends "Why" to form the initial question.
+- *fact*: the observed fact (symptom, problem, or surprising outcome) whose root cause should be investigated.
 
 ## Argument Parsing
 
 Parse `$ARGUMENTS` before doing anything else:
 
 1. Tokenize `$ARGUMENTS` on whitespace, treating a quoted (`"..."`/`'...'`) span as one token.
-2. If the *first* token is `--help` or `-h`, ignore everything else: read the bundled `help.md` and output its content verbatim, then *immediately stop* (do not run any analysis).
+2. If the *first* token is `--help` or `-h`, ignore everything else: read `@${PI_SKILL_DIR}/help.md` and output its content verbatim, then *immediately stop* (do not run any analysis).
 3. Otherwise scan the remaining tokens left to right, recognizing:
    - `--depth=N`, `--depth N`, `-d=N`, `-d N` → sets the raw depth value to `N` (consumes one extra token for the space-separated forms).
    - `--width=M`, `--width M`, `-w=M`, `-w M` → sets the raw width value to `M` (consumes one extra token for the space-separated forms).
@@ -34,10 +38,6 @@ Parse `$ARGUMENTS` before doing anything else:
 4. Determine `depth`: parse the raw depth value as an integer. If no `--depth`/`-d` was given, or the value is non-numeric or ≤ 0, use the default *5*.
 5. Determine `width`: parse the raw width value as an integer. If no `--width`/`-w` was given, or the value is non-numeric or ≤ 0, use the default *1*.
 6. Join the remaining non-option tokens with single spaces to form `fact`.
-
-## Objective
-
-Apply the *Five-Whys* *root-cause analysis* technique to investigate the problem "Why `<fact>`?". Iteratively ask "why" to drill down from symptoms to the root cause. This helps identify the fundamental reason behind a problem rather than just addressing surface-level symptoms.
 
 ## Output Contract
 
@@ -108,9 +108,15 @@ Output *only* the bullet lines specified by the steps below, in order, and nothi
 
     Validate the root cause by working backwards along the chosen causality chain: check, level by level, that each chosen sub-cause genuinely *causes* the fact above it (and that fixing the final root cause would dissolve the whole chain up to the original `problem`).
 
-    When `width` is *greater than 1* and this backward validation *fails* at some level `m` (i.e. the chosen sub-cause does *not* adequately explain the fact above it), *backtrack*: discard the chosen sub-cause (and every chosen sub-cause below it) from level `m` downward, pick the next-best candidate from level `m`'s `fallbacks`, and resume the widened descent from step 2. Set `n` to `m` (reset the iteration counter to the failed level), set `question` to the picked candidate, and re-enter step 2's `while n ≤ depth` loop at that level, so the original `depth` budget is honored from `m` downward. Repeat until a chain survives backward validation or level `m`'s `fallbacks` are exhausted (then report the strongest chain found and note that no candidate fully validated). This is the payoff of `width` *greater than 1*: the enumerated alternatives let the analysis *recover* from a wrong turn instead of committing to a mis-rooted chain.
+    When `width` is *greater than 1* and this backward validation *fails* at some level `m` (i.e. the chosen sub-cause does *not* adequately explain the fact above it), *backtrack*: discard the chosen sub-cause (and every chosen sub-cause below it) from level `m` downward, pick the next-best candidate from level `m`'s `fallbacks`, and resume the widened descent from step 2. Set `n` to `m` (reset the iteration counter to the failed level), set `question` to the picked candidate, and re-enter step 2's `while n ≤ depth` loop at that level, so the original `depth` budget is honored from `m` downward. Repeat until a chain survives backward validation or level `m`'s `fallbacks` are exhausted. This is the payoff of `width` *greater than 1*: the enumerated alternatives let the analysis *recover* from a wrong turn instead of committing to a mis-rooted chain.
 
-    Propose a solution that addresses and solves the validated root cause. For the proposed solution, optionally directly propose corresponding source code changes.
+    When every level's `fallbacks` are exhausted without a chain surviving backward validation, output the following note line (then continue with the strongest chain found):
+
+    ```
+    ⚪ **NOTE**: no candidate chain fully validated; reporting the strongest chain found
+    ```
+
+    Propose a solution that addresses and solves the root cause the analysis landed on: when that root cause lives in source code, include the corresponding concrete code change in the solution; otherwise propose the process or organizational fix.
 
     ```
     🟠 **SOLUTION**: <solution>

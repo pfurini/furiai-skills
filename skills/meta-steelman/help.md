@@ -1,8 +1,8 @@
-##  NAME
+## NAME
 
 `meta-steelman` - Build the "Steelman" Argument
 
-##  SYNOPSIS
+## SYNOPSIS
 
 `meta-steelman`
     [`--help`|`-h`]
@@ -10,7 +10,7 @@
     [`--rounds`|`-r` *rounds*]
     *thesis*
 
-##  DESCRIPTION
+## DESCRIPTION
 
 The `meta-steelman` skill builds the strongest possible case
 *for* a supplied *thesis* - the constructive mirror of its adversarial
@@ -47,7 +47,7 @@ The intent is constructive: building the best honest case for the
 thesis to arrive at a better final decision, not overselling or merely
 cheerleading.
 
-##  OPTIONS
+## OPTIONS
 
 -   `--count`|`-c` *count*:
     Surface at least *count* strong pro-theses (default *10*) per defense
@@ -60,20 +60,20 @@ cheerleading.
     round's *FORTIFICATION* in as the next round's *thesis*. An invalid
     or non-positive *rounds* reverts to the default *1*.
 
-##  ARGUMENTS
+## ARGUMENTS
 
 -   *thesis*:
     The statement, claim, or position to be charitably strengthened.
     It may be technical, factual, or opinion-based; the skill defends
     its strongest ("steelman") interpretation.
 
-##  SCENARIOS
+## SCENARIOS
 
 -   You want the strongest possible case built for a thesis
 -   You want supporting arguments ranked plus a fortification
 -   You want a charitable defense before pitching a decision
 
-##  EXAMPLES
+## EXAMPLES
 
 Strengthen a technology-choice claim:
 
@@ -93,6 +93,6 @@ Strengthen across five iterative rounds:
 ❯ /meta-steelman --rounds 5 We should rewrite the service in Rust.
 ```
 
-##  SEE ALSO
+## SEE ALSO
 
 [`meta-diaboli`](../meta-diaboli/help.md), [`meta-why`](../meta-why/help.md).

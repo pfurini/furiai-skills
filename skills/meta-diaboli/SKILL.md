@@ -1,14 +1,16 @@
 ---
 name: meta-diaboli
 description: >
-    Challenge a thesis by playing "Devil's Advocate" (Latin: "Advocatus
-    Diaboli"). Use when the user wants a thesis or statement
-    relentlessly challenged or criticised.
+    Plays "Devil's Advocate": relentlessly challenges a thesis, ranks
+    the strongest anti-theses, and resolves them into a dialectical
+    synthesis.
+argument-hint: "[--help|-h] [--count|-c <count>] <thesis>"
+disable-model-invocation: true
 ---
 
 # meta-diaboli
 
-Play "Devil's Advocate" (Latin: "Advocatus Diaboli").
+Play "Devil's Advocate" (Latin: "Advocatus Diaboli"): relentlessly challenge `thesis`, surface at least `count` strong anti-theses, and resolve `thesis` and its antitheses into a synthesis via Hegelian dialectics.
 
 ## Usage
 
@@ -16,16 +18,16 @@ Play "Devil's Advocate" (Latin: "Advocatus Diaboli").
 /meta-diaboli [--help|-h] [--count|-c <count>] <thesis>
 ```
 
-- `--count`|`-c` *count*: Surface at least *count* strong anti-theses (default *10*) before sorting and reporting the top *count* and deriving the *SYNTHESIS*. An invalid or non-positive *count* reverts to the default *10*.
+- `--count`|`-c` *count*: the minimum number of strong anti-theses to surface (default *10*).
 - `--help`|`-h`: show the manual page instead of running the challenge.
-- *thesis*: the statement, claim, or position to be relentlessly challenged. It may be technical, factual, or opinion-based; the skill attacks its strongest ("steelman") interpretation.
+- *thesis*: the statement, claim, or position to be relentlessly challenged.
 
 ## Argument Parsing
 
 Parse `$ARGUMENTS` before doing anything else:
 
 1. Tokenize `$ARGUMENTS` on whitespace, treating a quoted (`"..."`/`'...'`) span as one token.
-2. If the *first* token is `--help` or `-h`, ignore everything else: read the bundled `help.md` and output its content verbatim, then *immediately stop* (do not run any challenge).
+2. If the *first* token is `--help` or `-h`, ignore everything else: read `@${PI_SKILL_DIR}/help.md` and output its content verbatim, then *immediately stop* (do not run any challenge).
 3. Otherwise scan the remaining tokens left to right, recognizing:
    - `--count=N`, `--count N`, `-c=N`, `-c N` → sets the raw count value to `N` (consumes one extra token for the space-separated forms).
    - Any other token starting with `-` that is not one of the above → *unknown option*: output `ERROR (meta-diaboli): unknown option "<token>"` and stop.
@@ -33,10 +35,6 @@ Parse `$ARGUMENTS` before doing anything else:
    - Any non-option token is appended, in order, to the *thesis* text.
 4. Determine `count`: parse the raw count value as an integer. If no `--count`/`-c` was given, or the value is non-numeric or ≤ 0, use the default *10*.
 5. Join the remaining non-option tokens with single spaces to form `thesis`.
-
-## Objective
-
-Play "Devil's Advocate" (Latin: "Advocatus Diaboli") by relentlessly challenging or criticising `thesis`, surfacing at least `count` strong anti-theses, then resolving `thesis` and its antitheses into a synthesis via Hegelian dialectics.
 
 ## Output Contract
 
@@ -99,5 +97,3 @@ Output *only* the bullet lines specified by the steps below, in order, and nothi
     ```
     🔵 **SYNTHESIS**: <synthesis>
     ```
-
-    Do not output any further explanations.
