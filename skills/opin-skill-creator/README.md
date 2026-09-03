@@ -2,9 +2,11 @@
 
 A skill for creating, improving, and testing agent skills. It merges four sources into one process: the lifecycle and eval harness of Anthropic's official `skill-creator`, the writing doctrine of `writing-great-skills` (invocation economics, information hierarchy, leading words, pruning), the baseline-first testing discipline of superpowers' `writing-skills`, and the forward-testing hygiene of OpenAI's `codex-skill-creator`.
 
-It is **user-invoked** (`disable-model-invocation: true`): type `/opin-skill-creator` or name it explicitly. It never fires on its own and costs zero context when unused.
+It is **model-hidden and user-invoked** (`disable-model-invocation: true`): invoke it with `/opin-skill-creator` or `/skill:opin-skill-creator`. Prose naming alone cannot invoke a model-hidden skill. It never fires on its own and costs zero context when unused.
 
-## Evals at a glance
+All quantitative results in this README are historical Claude Code evidence inherited from the pre-port artifact, not Pi measurements. No Pi-native numeric claim or permanent model pin will be added before approved calibration and human review.
+
+## Historical evals at a glance
 
 | Campaign | Author / consumer models | Key result |
 |---|---|---|
@@ -33,32 +35,40 @@ Supporting references load only when a step points at them:
 
 ## Good usage
 
-- "Use opin-skill-creator to create a skill called `release-notes-writer`. My conventions are: ... A typical way I would invoke it: '...'. I want it model-invoked."
+- "/opin-skill-creator Create a skill called `release-notes-writer`. My conventions are: ... A typical way I would invoke it: '...'. I want it model-invoked."
   (Concrete conventions plus one realistic example prompt per branch is the ideal input. The interview step fills gaps, but everything you state up front saves a round trip.)
-- "Use opin-skill-creator to improve my `release-email` skill at `<path>`. It has been accumulating cruft."
+- "/skill:opin-skill-creator Improve my `release-email` skill at `<path>`. It has been accumulating cruft."
   (The audit branch shines on old skills: it reliably finds stale time-bound rules, dead file references, duplicated rules, and filler.)
-- "Is version B of my skill actually better than version A?"
+- "/opin-skill-creator Is version B of my skill actually better than version A?"
   (The benchmarking branch answers this with blind comparison and pass rates instead of opinion.)
 - If you are away from the keyboard, say so and grant assumptions explicitly; the process is interactive by default and will otherwise wait for your confirmations.
 
 ## Bad usage (and what happens instead)
 
 - "Just bang out the skill file quickly, no testing." It will comply, but it will also tell you, correctly, that you now own an untested guess, and name exactly which verification steps were skipped. That disclosure is by design and survived pressure testing; do not expect it to silently pretend the skill is verified.
-- Expecting automatic triggering. The skill is user-invoked on purpose; "make me a skill" in a fresh session will not fire it unless you name it.
-- Authoring with a weak model. At Haiku tier the with-skill process still runs, but test depth degrades (skipped test cycles with disclosure, stray files, shallower checks). Author with a strong model; consume with any.
+- Expecting automatic triggering. The skill is model-hidden on purpose; "make me a skill" or "use opin-skill-creator" in prose will not fire it. Start the request with `/opin-skill-creator` or `/skill:opin-skill-creator`.
+- Treating historical model tiers as Pi calibration. The inherited Claude Code runs found that Haiku-tier authoring reduced test depth and artifact quality, but that evidence does not select or permanently pin a Pi model. Choose explicit Pi role models for each campaign and treat their behavior as uncalibrated until approved calibration and human review.
 - Treating the audit branch as a formatter. It reports findings for your approval before editing, and it will test its edit against the pre-edit snapshot; if you want a blind rewrite with no evidence, that is the "no testing" case above.
+
+## Runtime requirements
+
+The runtime skill uses Python 3.10+ standard library code plus one plain-JavaScript runtime workflow. It bundles no npm package, TypeScript code, or third-party Python dependency.
+
+Pi and pi-subagents are optional feature dependencies supplied through absolute paths rather than bundled into the skill:
+
+- Deterministic validation, report generation, aggregation, and transcript parsing need only Python 3.10+ and its standard library.
+- Trigger evaluation and measured RPC execution need an absolute Pi executable path and an absolute Pi 0.84.4 checkout path.
+- The quantitative benchmark workflow needs those Pi paths plus an absolute pi-subagents 0.19.0 checkout path; it loads pi-subagents explicitly as an extension for declared-dependency runs.
 
 ## Honest caveats
 
-- **On fully-specified tasks with a strong authoring model, the creator skill does not measurably improve the artifact.** Our own clean-slate pilot shows all four creator skills and a no-skill control tying at 5/5 when the user's conventions are fully enumerated in the prompt. What the skill measurably adds at strong tiers is process evidence: baseline transcripts proving the skill is needed, forward-test results proving it works, snapshots making edits comparable, and a validator pass. The artifact-quality gap appears at weaker authoring tiers and (untested so far) on underspecified authoring tasks where knowledge must be mined rather than transcribed.
-- The full loop spawns subagents (baselines, forward-tests, graders). Without subagent capability the loop degrades to self-testing, which is weaker evidence.
-- The bundled scripts are zero-dependency (Python 3 standard library only); description-trigger optimization additionally requires the `pi` CLI.
-- The clean-slate recipe in `benchmarking.md` (scrubbed `PI_CODING_AGENT_DIR` profile) is **ported but not yet verified under Pi**: the Claude Code original was verified on macOS, and the Pi rewrite has not been run. Its profile holds an `auth.json` copy rather than Keychain-stored credentials. Pi has no `--bare` mode.
+- **On fully-specified tasks with a strong authoring model, the creator skill does not measurably improve the artifact.** The historical Claude Code clean-slate pilot shows all four creator skills and a no-skill control tying at 5/5 when the user's conventions are fully enumerated in the prompt. What the skill measurably adds at strong tiers is process evidence: baseline transcripts proving the skill is needed, forward-test results proving it works, snapshots making edits comparable, and a validator pass. The artifact-quality gap appears at weaker authoring tiers and (untested so far) on underspecified authoring tasks where knowledge must be mined rather than transcribed.
+- Qualitative baseline and forward tests require the Pi `Agent` tool. Quantitative campaigns additionally require the pi-subagents `SubagentWorkflow` tool and the explicit Pi RPC paths above. If those optional feature dependencies are unavailable, the affected branch cannot produce its claimed evidence.
 - A README inside a skill folder contradicts the skill's own "ship only what the executing agent needs" rule. This file is deliberately exempt as distribution documentation: it is never loaded into an agent's context at runtime.
 
 ## Method and raw results, concisely
 
-All evals ran as blind subagent or subprocess runs: the executing agent receives a realistic user task (never "review this skill"), with-skill and baseline arms launch in the same wave with identical wording, and grading reads transcripts and artifacts, not the agents' self-reports. Planted-flaw fixtures use a pre-registered grading key kept outside any path the subjects can reach.
+All historical Claude Code evals ran as blind subagent or subprocess runs: the executing agent receives a realistic user task (never "review this skill"), with-skill and baseline arms launch in the same wave with identical wording, and grading reads transcripts and artifacts, not the agents' self-reports. Planted-flaw fixtures use a pre-registered grading key kept outside any path the subjects can reach.
 
 - **Iterations 1 to 4 (in-session)**: 3 evals (create, improve-with-planted-flaws, pressure-shortcut) times 2 arms, run on Fable, Sonnet (twice: before and after a doctrine edit), and Haiku. Headline numbers: audit flaw detection 10/10 with skill vs 6 to 7.5/10 baseline; Sonnet baselines shipped three latent defects their with-skill twins avoided; Haiku baselines produced files that fail `quick_validate.py` and one canonical example teaching syntactically invalid SQL, while Haiku with-skill artifacts validated cleanly.
 - **Clean-slate distribution test**: a Fable-authored artifact consumed via `claude -p` under a scrubbed profile; surfaced that in-session forward-tests are gentler than single-pass deployment consumers.
@@ -99,15 +109,23 @@ Reading: at the weak authoring tier the producer dimension discriminates, and pi
 
 Raw records (all run outputs, transcripts, fixtures, grading keys and results) live in `.skill-creator/pi-skill-creator/` at the repo root (the workspace container the skill's testing process uses; add `.skill-creator/` to your `.gitignore`) and in the session scratchpad; they are test records, not part of the distributed skill directory.
 
+## Distribution
+
+Install the skill as a byte-for-byte copy of `skills/opin-skill-creator/` into a Pi-owned skill root. The copied directory is the distribution unit, not an archive. Repository tests, fixtures, work orders, campaign records, reports, caches, and `.pi/` development workflows stay outside that copy.
+
 ## Layout
 
 ```
 opin-skill-creator/
 ├── SKILL.md                    # process spine (create + audit branches)
-├── references/                 # writing-principles, testing, benchmarking, schemas
-├── scripts/                    # validator, benchmark aggregation, description optimizer
-├── agents/                     # grader / comparator / analyzer subagent instructions
+├── README.md                   # distribution documentation
+├── LICENSE.txt                 # Apache License 2.0
+├── references/                 # writing principles, testing, benchmarking, schemas
+├── scripts/                    # validator, RPC runner, metrics, benchmark helpers
+├── agents/                     # grader, comparator, comparison and benchmark analyzers
 ├── eval-viewer/                # browser review UI for benchmark iterations
+├── workflows/
+│   └── benchmark.js            # approved runtime benchmark orchestration
 └── assets/                     # trigger-eval review template
 ```
 
@@ -117,6 +135,6 @@ Derived in part from Anthropic's `skill-creator` plugin (eval harness, agents, v
 
 ### Pi port provenance
 
-Measured results above are left exactly as they were recorded: short model names, and the artifact's original `pi-skill-creator` name. Those evals ran under Claude Code against that artifact, and a record of what was measured is not rewritten when the thing it measured is renamed. Live guidance uses Pi's canonical `provider/model-id` form.
+Measured results above are left exactly as they were recorded: short model names, and the artifact's original `pi-skill-creator` name. Every number and model-quality observation above is historical Claude Code evidence from that artifact, not a result produced by Pi. A record of what was measured is not rewritten when the thing it measured is renamed. Current Pi guidance uses Pi's canonical `provider/model-id` form.
 
 Ported from `/Users/paolof/Developer/ai/furiai-skills/skills/pi-skill-creator` at `ca2bf4ddc9a46efa8f9eba99fb6d6e29179c4967` on 2026-09-01. Retains the Apache License 2.0 in `LICENSE.txt`.
