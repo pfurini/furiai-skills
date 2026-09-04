@@ -8,8 +8,10 @@ Executors implement these contracts exactly. A conflict discovered against the p
 - Adoption implementation start: the caller supplies a full `implementationStartCommit` naming the later clean current `HEAD` that contains this contract, the index, all 17 OSC orders, and both project workflows. It must descend from or equal the source baseline. All isolated implementation worktrees branch from this handoff-containing commit, and all adoption branch/integration diff gates use `implementationStartCommit..HEAD`.
 - Pi checkout: `/absolute/path` supplied by workflow input, revision `a4043c1e332a61e4c8648b97b9b796c57f9db110`, version `0.84.4`.
 - Pi executable: a separate absolute `piExecutable` workflow input; preflight requires it to be executable and report Pi `0.84.4`.
-- pi-subagents checkout: `/absolute/path` supplied by workflow input, revision `bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4`, version `0.19.0`.
-- Runtime skill code remains Python 3.10+ standard library plus one plain-JavaScript runtime workflow.
+- pi-subagents checkout: `/absolute/path` supplied by workflow input, revision `7f569969445bf8bc6fbd7757f18db80b35de0ba9`, version `0.19.0`. This revision differs from `bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4` only by the case-insensitive workflow-tool collision check in `src/workflow/collisions.ts`, which lets `SubagentWorkflow` stand down beside pi-dynamic-workflows' `workflow` tool.
+- pi-dynamic-workflows checkout: `/absolute/path` supplied by the `PI_DYNAMIC_WORKFLOWS_CHECKOUT` test input and by the runtime workflow's `runtimeCheckout` argument, revision `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`, version `3.10.0`. Tests that execute through it require `node_modules/.bin/tsx` produced by `npm ci` in that checkout; that directory is covered by the checkout's `.gitignore` and is the only permitted change there.
+- pi-claude-bridge: loaded in the host session from `/absolute/path/pi-claude-bridge` through `~/.pi/agent/settings.json` `packages`, revision `c1d8b24a57e15bc8acc9d673f2804ab7227978ae`, version `0.7.0`. Its extension allowlist name under pi-subagents is `pi-claude-bridge`, the package manifest name (`src/agent-runner.ts:85-126`).
+- Runtime skill code remains Python 3.10+ standard library plus one plain-JavaScript runtime workflow that runs unchanged on both pinned workflow runtimes.
 - No TypeScript, npm dependency, companion extension, or imports from maintainer checkouts enter `skills/pi-skill-creator/`.
 - External immutable revisions may be cited with line numbers. Mutable repository files are addressed by path, symbol, and test name.
 
@@ -91,7 +93,9 @@ The experiment roles are:
   "created_at": "2026-09-02T12:00:00Z",
   "repository_revision": "<40-hex>",
   "pi_revision": "a4043c1e332a61e4c8648b97b9b796c57f9db110",
-  "pi_subagents_revision": "bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4",
+  "pi_subagents_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
+  "workflow_runtime": "pi-subagents",
+  "workflow_runtime_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
   "skill_name": "example-skill",
   "skill_path": "/absolute/path/to/example-skill",
   "evaluation_cwd": "/absolute/path/to/deployment-project",
@@ -110,7 +114,7 @@ The experiment roles are:
       "requested_thinking": "high"
     },
     "comparator": {
-      "requested_model": "openrouter/~anthropic/claude-opus-latest",
+      "requested_model": "claude-bridge/claude-opus-5",
       "requested_thinking": "high"
     },
     "optimizer": {
@@ -127,7 +131,7 @@ The experiment roles are:
 }
 ```
 
-`created_at` is an input, not generated inside a workflow. Role entries not used by a campaign are omitted. All paths in durable metadata are absolute or campaign-root-relative as shown; ambiguous cwd-relative paths are rejected.
+`created_at` is an input, not generated inside a workflow. `workflow_runtime` is `pi-subagents` or `pi-dynamic-workflows` and names the runtime that executed `workflows/benchmark.js`; `workflow_runtime_revision` is the lowercase 40-hex `HEAD` of that runtime's checkout, read with `git -C <runtimeCheckout> rev-parse HEAD` by the setup launcher, never invented. Both fields are required. A campaign supports claims only for the runtime it records; a run under the other runtime is a new campaign. The schema id stays `pi-skill-creator.campaign/v1` because no v1 record exists outside test fixtures. Role entries not used by a campaign are omitted. All paths in durable metadata are absolute or campaign-root-relative as shown; ambiguous cwd-relative paths are rejected.
 
 Every `run.json` has schema id `pi-skill-creator.run/v1` and requires:
 
@@ -190,6 +194,8 @@ Different profiles are never aggregated into one comparison. A profile mismatch 
 ### Source evidence and boundary
 
 pi-subagents `SubagentWorkflow.agent()` returns only final text or validated structured output. Workflow-owned children emit no top-level `subagents:started/completed/failed/compacted` events. `src/workflow/host.ts` returns aggregate tokens/tool-call counts to workflow progress but does not attach the `.output` transcript used by the top-level `Agent` tool. Therefore no implementation may claim a workflow-child transcript path or per-child cost.
+
+The same boundary holds for pi-dynamic-workflows: a `workflow` child returns only the value its runner produced, and the script receives no transcript path, usage, or effective model (`docs/parity/gap-analysis.md` section 7 in that checkout). Both runtimes therefore treat RPC `run.json` and `transcript-metrics.json` as the only executor evidence.
 
 Measured in-harness executions use the top-level `Agent` tool, whose result/notification exposes the `.output` path. Measured fork/dependency executions use the Python RPC runner, which writes the Pi JSON event stream. `workflows/benchmark.js` may orchestrate RPC-launcher agents for fork/dependency campaigns, but it treats RPC `run.json` and `transcript-metrics.json` as executor evidence. The launcher agent's own usage is orchestration overhead, not executor usage; the workflow returns `workflow_output_tokens: budget.spent()` and explicitly marks per-launcher cost unavailable. It never substitutes launcher telemetry for executor telemetry.
 
@@ -271,15 +277,21 @@ benchmark-analyzer
 
 `agents/analyzer.md` is deleted after its two roles move. Skill prose names the bare identities; Pi/pi-subagents qualifies them on collision. All four set `prompt_mode: replace`, `inherit_context: false`, `skills: false`, `persist_session: false`, and `output_transcript: true`. Grader/comparator run in background; analyzers run foreground. Executor model is never pinned in an agent file.
 
-The provisional comparator is `openrouter/~anthropic/claude-opus-latest` at high thinking. Campaign preflight must prove it resolves in the selected profile. Failure to resolve is fatal; fallback-to-parent is not accepted.
+The comparator is `claude-bridge/claude-opus-5` at `high` thinking (`max` may be requested per campaign for critical skills). `agents/comparator.md` sets `extensions: [pi-claude-bridge]`, because a pi-subagents child with `extensions: false` has no `claude-bridge` provider in its registry. The grader and both analyzers keep `extensions: false`. Campaign preflight must prove the pin resolves in the selected profile; requested and effective model must both equal `claude-bridge/claude-opus-5`. Failure to resolve is fatal; fallback-to-parent is not accepted. For outputs produced by Claude-family executors this comparator is not family-independent; the campaign record states this, and no audit campaign is added.
+
+Agent frontmatter (`tools`, `extensions`, `max_turns`, and the rest) governs the top-level `Agent` path only. The runtime workflow does not dispatch bundled agents by `agentType`; see C11.
 
 ## C11. Runtime benchmark workflow boundary
 
 `skills/pi-skill-creator/workflows/benchmark.js` is runtime skill machinery. `.pi/workflows/pi-skill-creator-adoption.js` and `pi-skill-creator-calibration.js` are repository-development workflows. They do not invoke one another and are not distributed together.
 
-The runtime workflow requires caller-provided `campaignId`, `createdAt`, absolute project/skill/Pi/pi-subagents paths, environment profile, eval array, repetitions, role models/thinking, and `approved: true`. The skill obtains approval before the tool call; the workflow also refuses absent approval.
+The runtime workflow requires caller-provided `campaignId`, `createdAt`, absolute `projectRoot`, `skillPath`, `skillCreatorPath`, `piExecutable`, `piCheckout`, `piSubagentsCheckout`, and `runtimeCheckout`, a `runtime` from the closed enum `pi-subagents` | `pi-dynamic-workflows`, environment profile, eval array, iteration, repetitions, role models/thinking, and `approved: true`. When `runtime` is `pi-subagents`, `runtimeCheckout` must equal `piSubagentsCheckout`. Requested thinking for every role is one of `minimal, low, medium, high, xhigh, max`; `off` is refused. The skill obtains approval before the tool call; the workflow also refuses absent approval and an unknown runtime. `piSubagentsCheckout` stays required because `declared-dependencies` still loads pi-subagents through `scripts.rpc_runner --extension <checkout>/src/index.ts`, which the runner passes to Pi as `-e`.
 
-It uses `pipeline()` for execution-to-grading and `parallel()` only for a true all-results synthesis. Every schema result is checked for `null`. Every expected eval/arm/repetition is accounted as `completed`, `failed`, `skipped`, or `bounded`. Any failed/schema-null/gate-null item makes the campaign result `valid: false`; it is never dropped by `.filter(Boolean)` without an explicit count.
+The skill invokes the script through `SubagentWorkflow` with `scriptPath` when only that tool is present, or through `workflow` with the file content passed as `script` when pi-dynamic-workflows is loaded (its presence makes `SubagentWorkflow` stand down). The `workflow` tool's `name` input is never used.
+
+The script uses only the subset both runtimes implement: `meta { name, description, phases: [{ title }] }`, `phase()`, `agent()`, `parallel()`, `pipeline()`, `log()`, `args`, and `budget.spent()`. `agent()` options are only `label`, `phase`, `schema`, and `model`, plus `effort` emitted by the shim for pi-subagents. One shim function keyed on `args.runtime` is the only code that knows the runtimes differ: for `pi-subagents` it passes `model: "<provider/id>"` and `effort: "<thinking>"`; for `pi-dynamic-workflows` it passes `model: "<provider/id>:<thinking>"` and no `effort` key. `gate`, `agentType`, `resume`, `isolation`, `tier`, `thread`, `timeoutMs`, `retries`, `whenToUse`, and phase `detail` do not appear anywhere in the script. Role prompts tell the child to read `${skillCreatorPath}/agents/<role>.md` by absolute path and follow it; bundled-agent frontmatter does not apply to workflow children. The script contains no revision literal: the setup launcher records `workflow_runtime` from `args.runtime` and reads `workflow_runtime_revision`, `pi_revision`, `pi_subagents_revision`, and `repository_revision` with `git -C <checkout> rev-parse HEAD`.
+
+Every `agent()` call goes through `safeAgent()`, which turns a `null` result and a thrown error into an accounted `failed` item whose bounded `error` string begins with `null-result:` or `thrown:`. `status_counts` has exactly the buckets `completed`, `failed`, `skipped`, and `bounded`, and they sum to `expected_runs`; a separate `failure_kinds` object counts `null_result`, `thrown`, `explicit`, and `contract` failures and takes no part in that sum. It uses `pipeline()` for execution-to-grading and `parallel()` only for a true all-results synthesis. After grading and before aggregation a launcher agent runs `python -m scripts.aggregate_benchmark <iteration-dir> --validate-only`, which validates the whole iteration tree and writes nothing; Python validation is the authority, and the aggregation step validates again. Any failed item, a failed validation, or a failed aggregation makes the campaign result `valid: false`; nothing is dropped by `.filter(Boolean)` without an explicit count.
 
 ## C12. Test tiers and exact commands
 
@@ -297,10 +309,11 @@ No network, credentials, Pi checkout, or model calls.
 PI_EXECUTABLE=/absolute/path/to/pi-executable \
 PI_CHECKOUT=/absolute/path/to/pi \
 PI_SUBAGENTS_CHECKOUT=/absolute/path/to/pi-subagents \
+PI_DYNAMIC_WORKFLOWS_CHECKOUT=/absolute/path/to/pi-dynamic-workflows \
 uvx --from 'pytest==9.1.1' pytest -q tests/pi-skill-creator -m contract
 ```
 
-Tests assert exact revisions and skip only when either variable is absent. A present but wrong revision fails. Validator differential tests use Pi's real exported loader. Workflow meta/runtime tests execute through the pinned pi-subagents source.
+Tests assert exact revisions and skip only when either variable is absent. A present but wrong revision fails. Validator differential tests use Pi's real exported loader. Workflow meta/runtime tests execute the same script through the pinned pi-subagents source and, when `PI_DYNAMIC_WORKFLOWS_CHECKOUT` is set and its `node_modules/.bin/tsx` exists, through pinned pi-dynamic-workflows `runWorkflow` with an injected runner. A missing variable or a missing `tsx` skips with an explicit reason; a present checkout at the wrong revision fails.
 
 ### Static Python check
 

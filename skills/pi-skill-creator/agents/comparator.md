@@ -1,13 +1,13 @@
 ---
 name: comparator
 description: Blindly compares two skill-produced outputs against the same task and returns a decisive evidence-backed verdict.
-model: openrouter/~anthropic/claude-opus-latest
+model: claude-bridge/claude-opus-5
 thinking: high
 prompt_mode: replace
 inherit_context: false
 run_in_background: true
 tools: read, write, find, grep, ls
-extensions: false
+extensions: [pi-claude-bridge]
 skills: false
 persist_session: false
 output_transcript: true

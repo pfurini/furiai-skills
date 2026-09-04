@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from conftest import SKILL_ROOT
+from conftest import PI_DYNAMIC_WORKFLOWS_REVISION, PI_SUBAGENTS_REVISION, SKILL_ROOT
 
 
 README_PATH = SKILL_ROOT / "README.md"
@@ -39,6 +39,15 @@ def test_readme_invocations_resolve_and_runtime_requirements_are_truthful() -> N
     assert "absolute paths" in requirements
     assert "Pi 0.84.4" in requirements
     assert "pi-subagents 0.19.0" in requirements
+    # Both workflow runtimes and their exact pins are named for the benchmark branch.
+    assert "pi-dynamic-workflows 3.10.0" in requirements
+    assert PI_SUBAGENTS_REVISION in requirements
+    assert PI_DYNAMIC_WORKFLOWS_REVISION in requirements
+    assert "SubagentWorkflow" in requirements and "`workflow`" in requirements
+
+    caveats = _section(readme, "Honest caveats")
+    assert "SubagentWorkflow" in caveats and "pi-dynamic-workflows" in caveats
+    assert "names the runtime" in caveats or "name the runtime" in caveats
 
     distribution = _section(readme, "Distribution")
     assert "byte-for-byte copy" in distribution

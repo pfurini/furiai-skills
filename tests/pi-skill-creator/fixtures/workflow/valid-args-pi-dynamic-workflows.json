@@ -1,6 +1,6 @@
 {
   "approved": true,
-  "runtime": "pi-subagents",
+  "runtime": "pi-dynamic-workflows",
   "campaignId": "runtime-smoke-1",
   "createdAt": "2026-09-02T12:00:00Z",
   "projectRoot": "/tmp/skill-creator-project",
@@ -9,7 +9,7 @@
   "piExecutable": "/tmp/skill-creator-runtime/pi",
   "piCheckout": "/tmp/skill-creator-runtime/pi-checkout",
   "piSubagentsCheckout": "/tmp/skill-creator-runtime/pi-subagents",
-  "runtimeCheckout": "/tmp/skill-creator-runtime/pi-subagents",
+  "runtimeCheckout": "/tmp/skill-creator-runtime/pi-dynamic-workflows",
   "environmentProfile": "declared-dependencies",
   "iteration": 1,
   "repetitions": 1,

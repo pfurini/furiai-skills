@@ -655,7 +655,7 @@ A `comparator.md` pinned to `claude-bridge/claude-opus-5` runs on the parent mod
 
 Required direction:
 
-Pick the comparator model from providers that survive the environment profile in use, or record the profile as a constraint on the model policy. `openrouter/~anthropic/claude-opus-latest` is available without extensions and preserves the cross-family property. Whatever is chosen, an unresolvable pin must fail the campaign rather than degrade it.
+Pick the comparator model from providers that survive the environment profile in use, or record the profile as a constraint on the model policy. The pin is `claude-bridge/claude-opus-5` (OSC-17): it needs `pi-claude-bridge` loaded in the comparator child, so `agents/comparator.md` allowlists exactly that extension, and for Claude-produced outputs the comparison is not family-independent, which the campaign record states. Whatever is chosen, an unresolvable pin must fail the campaign rather than degrade it.
 
 ### F21. The configuration directory has three names across prose, schema, and viewer
 
@@ -992,7 +992,7 @@ These are implementation defaults to calibrate under Pi, not claims that the cur
 |---|---|---|---|
 | Creator and orchestrator | `openai-codex/gpt-5.6-sol` | `high` | High-judgment requirements extraction, drafting, and iteration |
 | Grader | `openai-codex/gpt-5.6-sol` | `high` | Evidence-heavy assertion evaluation and claim verification |
-| Blind comparator | `openrouter/~anthropic/claude-opus-latest` | `high` | Independent model family reduces same-family judging bias, and this provider survives `--no-extensions` and `isolated: true` (see F20) |
+| Blind comparator | `claude-bridge/claude-opus-5` | `high` | Chosen by policy (OSC-17). The pin requires `pi-claude-bridge` loaded in the comparator child (`extensions: [pi-claude-bridge]`), so it does not survive `extensions: false`; for Claude-produced outputs it is not family-independent, and the campaign record says so rather than adding an audit campaign (see F20) |
 | Comparison analyzer | `openai-codex/gpt-5.6-sol` | `high` | Causal synthesis across skills and transcripts |
 | Benchmark analyzer | `openai-codex/gpt-5.6-terra` | `medium` | Structured pattern analysis over already aggregated data |
 | Trigger consumer | Campaign-selected executor floor | Campaign-selected | Trigger behavior is model-specific |
@@ -1047,7 +1047,7 @@ color: blue
 ---
 name: comparator
 description: Blindly compares two skill-produced outputs against the same task and returns a decisive evidence-backed verdict.
-model: openrouter/~anthropic/claude-opus-latest
+model: claude-bridge/claude-opus-5
 thinking: high
 prompt_mode: replace
 inherit_context: false

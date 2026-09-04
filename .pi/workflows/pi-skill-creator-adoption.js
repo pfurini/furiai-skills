@@ -18,7 +18,7 @@ export const meta = {
 
 const SOURCE_BASELINE = '0b9e86bc77a60fb34039456a6624ea94e396f5d1'
 const REQUIRED_PI = 'a4043c1e332a61e4c8648b97b9b796c57f9db110'
-const REQUIRED_SUBAGENTS = 'bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4'
+const REQUIRED_SUBAGENTS = '7f569969445bf8bc6fbd7757f18db80b35de0ba9'
 const PYTEST = "uvx --from 'pytest==9.1.1' pytest"
 const TY = "uvx --from 'ty==0.0.77' ty"
 const REQUIRED_HANDOFF_FILES = [

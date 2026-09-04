@@ -29,7 +29,7 @@ def _write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def _materialize_case(tmp_path: Path, name: str) -> Path:
+def _materialize_case(tmp_path: Path, name: str, *, campaign_overrides: dict[str, Any] | None = None) -> Path:
     case = _read_case(name)
     campaign_id = "aggregation-fixture"
     skill_name = "example-skill"
@@ -49,6 +49,8 @@ def _materialize_case(tmp_path: Path, name: str) -> Path:
         "repository_revision": "1" * 40,
         "pi_revision": PI_REVISION,
         "pi_subagents_revision": PI_SUBAGENTS_REVISION,
+        "workflow_runtime": "pi-subagents",
+        "workflow_runtime_revision": PI_SUBAGENTS_REVISION,
         "skill_name": skill_name,
         "skill_path": os.fspath((tmp_path / "deployment" / skill_name).resolve()),
         "evaluation_cwd": os.fspath((tmp_path / "deployment").resolve()),
@@ -70,6 +72,11 @@ def _materialize_case(tmp_path: Path, name: str) -> Path:
             "final_test": "trigger/final-test.json",
         },
     }
+    for key, value in (campaign_overrides or {}).items():
+        if value is None:
+            campaign.pop(key, None)
+        else:
+            campaign[key] = value
     _write_json(campaign_root / "campaign.json", campaign)
 
     if not case.get("evals", True):
@@ -194,9 +201,11 @@ def _materialize_case(tmp_path: Path, name: str) -> Path:
     return iteration_root
 
 
-def _run_aggregator(iteration_root: Path) -> subprocess.CompletedProcess[str]:
+def _run_aggregator(
+    iteration_root: Path, *extra_arguments: str
+) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [sys.executable, "-m", "scripts.aggregate_benchmark", os.fspath(iteration_root)],
+        [sys.executable, "-m", "scripts.aggregate_benchmark", os.fspath(iteration_root), *extra_arguments],
         cwd=SKILL_ROOT,
         capture_output=True,
         text=True,
@@ -306,6 +315,39 @@ def test_malformed_or_ambiguous_run_data_is_fatal(
     assert message in result.stderr.lower()
     assert not (iteration_root / "benchmark.json").exists()
     assert not (iteration_root / "benchmark.md").exists()
+
+
+def test_campaign_requires_workflow_runtime_fields(tmp_path: Path) -> None:
+    """Campaign records name their workflow runtime, and `--validate-only` never writes."""
+    complete = _materialize_case(tmp_path, "complete")
+
+    validated = _run_aggregator(complete, "--validate-only")
+    assert validated.returncode == 0, validated.stderr
+    assert not (complete / "benchmark.json").exists()
+    assert not (complete / "benchmark.md").exists()
+
+    aggregated = _run_aggregator(complete)
+    assert aggregated.returncode == 0, aggregated.stderr
+    metadata = json.loads((complete / "benchmark.json").read_text(encoding="utf-8"))["metadata"]
+    assert metadata["workflow_runtime"] == "pi-subagents"
+    assert metadata["workflow_runtime_revision"] == PI_SUBAGENTS_REVISION
+
+    invalid_records = {
+        "missing-both": {"workflow_runtime": None, "workflow_runtime_revision": None},
+        "missing-runtime": {"workflow_runtime": None},
+        "missing-revision": {"workflow_runtime_revision": None},
+        "unknown-runtime": {"workflow_runtime": "claude-code"},
+        "uppercase-revision": {"workflow_runtime_revision": PI_SUBAGENTS_REVISION.upper()},
+        "short-revision": {"workflow_runtime_revision": PI_SUBAGENTS_REVISION[:12]},
+    }
+    for name, overrides in invalid_records.items():
+        iteration_root = _materialize_case(tmp_path / name, "complete", campaign_overrides=overrides)
+        for mode in (("--validate-only",), ()):
+            result = _run_aggregator(iteration_root, *mode)
+            assert result.returncode == 2, (name, mode, result.stdout, result.stderr)
+            assert "workflow_runtime" in result.stderr, (name, mode, result.stderr)
+            assert not (iteration_root / "benchmark.json").exists(), (name, mode)
+            assert not (iteration_root / "benchmark.md").exists(), (name, mode)
 
 
 def test_schema_reference_matches_frozen_artifact_contracts(skill_root: Path) -> None:

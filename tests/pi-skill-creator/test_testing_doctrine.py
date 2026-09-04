@@ -37,6 +37,8 @@ def test_testing_names_supported_mechanisms_and_profiles() -> None:
     assert "SubagentWorkflow" in loop and "dynamic or staged fan-out" in loop
     assert "explicit user approval" in loop
     assert "parallel writers" in loop and "worktree isolation" in loop
+    # The second workflow runtime is named beside the first, with its tool name.
+    assert "pi-dynamic-workflows" in loop and "`workflow`" in loop
 
 
 def test_testing_documents_supported_telemetry_boundaries() -> None:
@@ -61,6 +63,7 @@ def test_testing_documents_supported_telemetry_boundaries() -> None:
 
     assert "workflow children do not expose" in telemetry.lower()
     assert "not the only recoverable usage source" in telemetry.lower()
+    assert "pi-dynamic-workflows" in telemetry and "`workflow`" in telemetry
 
 
 def test_testing_uses_campaign_workspace_contract() -> None:
@@ -97,3 +100,4 @@ def test_testing_removes_unsupported_claims_and_exposes_spine_mechanisms() -> No
     assert "Agent" in forward_test and "explicit user approval" in forward_test
     assert "SubagentWorkflow" in benchmark
     assert "dynamic or staged fan-out" in benchmark
+    assert "pi-dynamic-workflows" in benchmark and "`workflow`" in benchmark

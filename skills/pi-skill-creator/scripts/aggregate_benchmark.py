@@ -17,6 +17,7 @@ TREATMENT = "with_skill"
 CONTROL = "without_skill"
 CONFIGURATIONS = (TREATMENT, CONTROL)
 _ENVIRONMENT_PROFILES = {"in-situ", "hermetic-core", "declared-dependencies"}
+_WORKFLOW_RUNTIMES = ("pi-subagents", "pi-dynamic-workflows")
 _TRANSCRIPT_FORMATS = {"pi-subagents-output-v1", "pi-json-events-v3"}
 _IDENTIFIER = re.compile(r"[a-z0-9][a-z0-9-]{0,63}\Z")
 _ITERATION = re.compile(r"iteration-[1-9][0-9]*\Z")
@@ -208,10 +209,23 @@ def _validate_campaign(iteration_dir: Path) -> dict[str, Any]:
         raise AggregationError(
             "campaign.json.created_at must be a valid RFC 3339 UTC timestamp"
         ) from error
-    for field in ("repository_revision", "pi_revision", "pi_subagents_revision"):
+    for field in (
+        "repository_revision",
+        "pi_revision",
+        "pi_subagents_revision",
+        "workflow_runtime_revision",
+    ):
         revision = _string(campaign.get(field), f"campaign.json.{field}")
         if _REVISION.fullmatch(revision) is None:
             raise AggregationError(f"campaign.json.{field} must be a lowercase 40-hex revision")
+    workflow_runtime = _string(campaign.get("workflow_runtime"), "campaign.json.workflow_runtime")
+    if workflow_runtime not in _WORKFLOW_RUNTIMES:
+        raise AggregationError(
+            "campaign.json.workflow_runtime must be one of " + ", ".join(_WORKFLOW_RUNTIMES)
+        )
+    notes = _array(campaign.get("notes", []), "campaign.json.notes")
+    for index, note in enumerate(notes):
+        _string(note, f"campaign.json.notes[{index}]", allow_placeholder=True)
     skill_name = _identifier(campaign.get("skill_name"), "campaign.json.skill_name")
     if campaign_dir.parent.name != skill_name:
         raise AggregationError("campaign skill directory does not match skill_name")
@@ -665,6 +679,8 @@ def generate_benchmark(iteration_dir: Path) -> dict[str, Any]:
         "repository_revision": campaign["repository_revision"],
         "pi_revision": campaign["pi_revision"],
         "pi_subagents_revision": campaign["pi_subagents_revision"],
+        "workflow_runtime": campaign["workflow_runtime"],
+        "workflow_runtime_revision": campaign["workflow_runtime_revision"],
         "skill_name": campaign["skill_name"],
         "skill_path": campaign["skill_path"],
         "evaluation_cwd": campaign["evaluation_cwd"],
@@ -684,7 +700,7 @@ def generate_benchmark(iteration_dir: Path) -> dict[str, Any]:
         "metadata": metadata,
         "runs": [record.to_json() for record in records],
         "run_summary": aggregate_results(records),
-        "notes": [],
+        "notes": list(cast(list[str], campaign.get("notes", []))),
     }
 
 
@@ -707,6 +723,7 @@ def generate_markdown(benchmark: dict[str, Any]) -> str:
         f"**Created**: {metadata['created_at']}",
         f"**Environment profile**: {metadata['environment_profile']}",
         f"**Effective executor**: {metadata['executor_model']} ({metadata['executor_thinking']})",
+        f"**Workflow runtime**: {metadata['workflow_runtime']} ({metadata['workflow_runtime_revision']})",
         f"**Evals**: {', '.join(map(str, metadata['evals_run']))} ({metadata['runs_per_configuration']} runs each per configuration)",
         "",
         "## Summary",
@@ -738,6 +755,11 @@ def main() -> int:
         description="Validate and aggregate an pi-skill-creator campaign iteration"
     )
     parser.add_argument("iteration_dir", type=Path, help="Path to campaign-*/iteration-N")
+    parser.add_argument(
+        "--validate-only",
+        action="store_true",
+        help="Validate the complete iteration tree and exit without writing any artifact",
+    )
     args = parser.parse_args()
 
     try:
@@ -749,6 +771,10 @@ def main() -> int:
     except OSError as error:
         _print_error(error)
         return 1
+
+    if args.validate_only:
+        print(f"Validated: {args.iteration_dir}")
+        return 0
 
     output_json = args.iteration_dir / "benchmark.json"
     output_markdown = args.iteration_dir / "benchmark.md"

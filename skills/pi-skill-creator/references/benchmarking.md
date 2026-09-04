@@ -18,22 +18,33 @@ Never aggregate different profiles. Record requested and observed effective mode
 
 The runtime workflow takes caller-supplied values only. Supply:
 
+- `runtime` as `pi-subagents` or `pi-dynamic-workflows` (chosen by the preflight below) and the absolute `runtimeCheckout` of that runtime's source checkout;
 - `campaignId` matching `[a-z0-9][a-z0-9-]{0,63}` and `createdAt` as a UTC timestamp;
-- absolute `projectRoot`, target `skillPath`, `${PI_SKILL_DIR}` as `skillCreatorPath`, `piExecutable`, `piCheckout`, and `piSubagentsCheckout`;
+- absolute `projectRoot`, target `skillPath`, `${PI_SKILL_DIR}` as `skillCreatorPath`, `piExecutable`, `piCheckout`, and `piSubagentsCheckout` (the RPC runner still loads pi-subagents for `declared-dependencies`, whichever runtime orchestrates; under `runtime: pi-subagents`, `runtimeCheckout` must equal `piSubagentsCheckout`);
 - one `environmentProfile`, a positive `iteration`, `repetitions`, and the complete `evals` array;
 - each eval's positive `eval_id`, descriptive `eval_name`, realistic `prompt`, and non-empty `expectations`;
-- explicit `model` and `thinking` entries for `executor`, `grader`, `comparator`, and `benchmarkAnalyzer`;
+- explicit `model` (`provider/id`, no thinking suffix) and `thinking` entries for `executor`, `grader`, `comparator`, and `benchmarkAnalyzer`; `thinking` is one of `minimal`, `low`, `medium`, `high`, `xhigh`, `max`, because `off` cannot be requested on both runtimes and a campaign must stay portable;
 - `approved: true`.
 
-The user supplies IDs and timestamps. The workflow never reads the clock or randomness. Use the absolute `SubagentWorkflow.scriptPath` formed from `${PI_SKILL_DIR}/workflows/benchmark.js` (expand `${PI_SKILL_DIR}` before the call; do not pass the placeholder literally). This runtime file is not a saved repository workflow and is not invoked by name.
+The user supplies IDs and timestamps. The workflow never reads the clock or randomness. The script `${PI_SKILL_DIR}/workflows/benchmark.js` is one plain-JavaScript file that runs unchanged on both runtimes; expand `${PI_SKILL_DIR}` before the call and never pass the placeholder literally. It is not a saved workflow: never invoke it by name, and never use the `workflow` tool's `name` input.
 
-A call has this shape:
+## Runtime preflight
+
+Before the call, check which workflow tool the session exposes:
+
+- `workflow` present: pi-dynamic-workflows (pinned `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`, version 3.10.0) is loaded and pi-subagents' `SubagentWorkflow` has stood down. Set `runtime: pi-dynamic-workflows`, set `runtimeCheckout` to the pi-dynamic-workflows checkout, read `${PI_SKILL_DIR}/workflows/benchmark.js`, and pass its content as `script`. The user's campaign approval is the explicit opt-in the `workflow` tool requires.
+- Only `SubagentWorkflow` present: pi-subagents (pinned `7f569969445bf8bc6fbd7757f18db80b35de0ba9`, version 0.19.0) orchestrates. Set `runtime: pi-subagents`, set `runtimeCheckout` equal to `piSubagentsCheckout`, and pass the absolute `scriptPath`.
+- Neither present: stop and tell the user that no workflow runtime is loaded; do not simulate the campaign with direct `Agent` calls.
+
+The two calls have these shapes:
 
 ```text
 SubagentWorkflow
   scriptPath: /absolute/pi-skill-root/pi-skill-creator/workflows/benchmark.js
   args:
     approved: true
+    runtime: pi-subagents
+    runtimeCheckout: /absolute/checkouts/pi-subagents
     campaignId: fork-smoke-1
     createdAt: 2026-09-02T12:00:00Z
     projectRoot: /absolute/evaluation-project
@@ -48,6 +59,18 @@ SubagentWorkflow
     evals: <approved eval array>
     roles: <explicit role model/thinking object>
 ```
+
+```text
+workflow
+  script: <the full content of /absolute/pi-skill-root/pi-skill-creator/workflows/benchmark.js>
+  args:
+    approved: true
+    runtime: pi-dynamic-workflows
+    runtimeCheckout: /absolute/checkouts/pi-dynamic-workflows
+    <the same remaining args as above>
+```
+
+To continue an interrupted campaign, call the same tool again with its `resumeFromRunId`; both runtimes replay the unchanged leading calls from their journal and run the rest live. Every campaign record carries `workflow_runtime` and `workflow_runtime_revision`, and every numeric claim names its runtime. Switching runtimes is a new campaign: the earlier numbers do not carry over until the campaign is re-run.
 
 ## Exact campaign tree
 
@@ -93,21 +116,23 @@ The only configurations are `with_skill` (treatment) and `without_skill` (contro
 
 ## Execution, grading, and telemetry
 
-The runtime workflow prepares metadata, then uses `pipeline()` so each completed executor goes directly to its grader without waiting for every executor. Fan-out is capped. Each item is explicitly accounted as `completed`, `failed`, `skipped`, `bounded`, or `null`; failed gates and null schema results invalidate the campaign. The deterministic aggregator runs only when every expected run completed and graded. `parallel()` is reserved for synthesis that genuinely needs all prior results together, not ordinary execution or grading.
+The runtime workflow prepares metadata, then uses `pipeline()` so each completed executor goes directly to its grader without waiting for every executor. Fan-out is capped. Every `agent()` call goes through one `safeAgent()` wrapper: a `null` child result and a thrown child both become accounted `failed` items, so a failing child never aborts the campaign on either runtime. Each item is explicitly accounted as `completed`, `failed`, `skipped`, or `bounded` (the buckets sum to `expected_runs`), and a separate `failure_kinds` object counts `null_result`, `thrown`, `explicit`, and `contract` failures. After grading, a `Validate` phase runs `python -m scripts.aggregate_benchmark <iteration-dir> --validate-only`, which checks the whole iteration tree and writes nothing; Python validation is the authority, not a shell gate. The deterministic aggregator runs only when every expected run completed, graded, and validated. `parallel()` is reserved for synthesis that genuinely needs all prior results together, not ordinary execution or grading.
 
 Fork and dependency executors are launcher agents that invoke `scripts.rpc_runner` with the explicit Pi executable, checkout, target skill, profile, model, thinking, identity, and run directory. The runner loads the target through `--skill` only for `with_skill`; `without_skill` omits it. Under `declared-dependencies`, it loads `<pi-subagents-checkout>/src/index.ts` explicitly. Do not add a separate `--skill` argument to the workflow call or claim that a prompt alone loads the target.
+
+Workflow children are plain launchers on both runtimes: the script never dispatches a bundled agent by type. The grader launcher is told to read `${PI_SKILL_DIR}/agents/grader.md` by absolute path and follow it, and its model and thinking come from `roles.grader`. Bundled-agent frontmatter (`tools`, `extensions`, `max_turns`) applies only to the top-level `Agent` path.
 
 Use the supported evidence seam:
 
 - A direct top-level `Agent` result exposes an `.output` JSONL path. Parse it as `pi-subagents-output-v1`.
-- A workflow child exposes only final text or validated structured output, not its own `.output` path or top-level lifecycle events.
+- A workflow child, under `SubagentWorkflow` or under `workflow`, exposes only final text or validated structured output, not its own `.output` path, usage, effective model, or top-level lifecycle events.
 - A measured RPC executor writes `transcript.jsonl`, `run.json`, and `transcript-metrics.json`; those RPC artifacts are executor evidence.
 
 Launcher usage is orchestration overhead. Never relabel it as executor usage or per-executor cost. The workflow returns `workflow_output_tokens` and marks per-launcher cost unavailable. Benchmark usage comes from authoritative executor transcript records, while character counts remain separate `_chars` fields.
 
-The `grader` agent grades one run against every expectation and writes `grading.json` with cited evidence. After complete aggregation, use `benchmark-analyzer` to identify expectation, variance, cost, and failure patterns without suggesting edits. For a blind output-quality comparison, give outputs A and B to `comparator`, then give the winner and both skills to `comparison-analyzer` for unblinded causes and improvements. Keep the comparator blind to `with_skill`, `without_skill`, treatment, and control identity.
+The `grader` agent grades one run against every expectation and writes `grading.json` with cited evidence. After complete aggregation, use `benchmark-analyzer` to identify expectation, variance, cost, and failure patterns without suggesting edits. For a blind output-quality comparison, give outputs A and B to `comparator`, then give the winner and both skills to `comparison-analyzer` for unblinded causes and improvements. Keep the comparator blind to `with_skill`, `without_skill`, treatment, and control identity. The comparator is `claude-bridge/claude-opus-5` at `high` thinking (`max` for critical skills) and loads only `pi-claude-bridge`; requested and effective model must both equal that pin, and an unresolved pin fails the campaign. For outputs produced by Claude-family executors it is not family-independent, and the campaign record says so in `notes`.
 
-The workflow returns campaign and iteration paths, status counts, validity, requested roles, observed effective executor/grader metadata, `workflow_output_tokens`, and per-item results. Treat `valid: false` as no benchmark claim, even if some durable run artifacts exist.
+The workflow returns `workflow_runtime`, campaign and iteration paths, status counts, failure kinds, stage statuses, validity, requested roles, observed effective executor/grader metadata, `workflow_output_tokens`, and per-item results. Treat `valid: false` as no benchmark claim, even if some durable run artifacts exist.
 
 ## Aggregate and inspect
 
@@ -115,11 +140,10 @@ The workflow runs the deterministic equivalent of:
 
 ```bash
 python -m scripts.aggregate_benchmark \
-  <campaign-root>/iteration-N \
-  --skill-name <skill-name>
+  <campaign-root>/iteration-N
 ```
 
-The command writes `benchmark.json` and `benchmark.md` only from a complete valid iteration. Read both before presenting a numeric claim.
+The command writes `benchmark.json` and `benchmark.md` only from a complete valid iteration; the skill name comes from `campaign.json` and the campaign directory, which it cross-checks. `python -m scripts.aggregate_benchmark <campaign-root>/iteration-N --validate-only` performs the same validation and writes nothing. Read both generated files before presenting a numeric claim, and name the recorded `workflow_runtime` with the claim.
 
 Launch the review viewer without discarding diagnostics:
 

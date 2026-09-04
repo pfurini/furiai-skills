@@ -54,16 +54,20 @@ Supporting references load only when a step points at them:
 
 The runtime skill uses Python 3.10+ standard library code plus one plain-JavaScript runtime workflow. It bundles no npm package, TypeScript code, or third-party Python dependency.
 
-Pi and pi-subagents are optional feature dependencies supplied through absolute paths rather than bundled into the skill:
+Pi, pi-subagents, and pi-dynamic-workflows are optional feature dependencies supplied through absolute paths rather than bundled into the skill:
 
 - Deterministic validation, report generation, aggregation, and transcript parsing need only Python 3.10+ and its standard library.
 - Trigger evaluation and measured RPC execution need an absolute Pi executable path and an absolute Pi 0.84.4 checkout path.
-- The quantitative benchmark workflow needs those Pi paths plus an absolute pi-subagents 0.19.0 checkout path; it loads pi-subagents explicitly as an extension for declared-dependency runs.
+- The quantitative benchmark workflow needs those Pi paths plus an absolute pi-subagents 0.19.0 checkout path (`7f569969445bf8bc6fbd7757f18db80b35de0ba9`); it loads pi-subagents explicitly as an extension for declared-dependency runs.
+- The same workflow file runs on either workflow runtime: pi-subagents 0.19.0 through its `SubagentWorkflow` tool, or pi-dynamic-workflows 3.10.0 (`e9c5a41d9c4234df908aa25a2b49ee9648e896d4`) through its `workflow` tool, which makes `SubagentWorkflow` stand down when both are loaded. The campaign passes the chosen runtime's absolute checkout path, and every campaign record names the runtime that ran it.
+- The blind comparator is pinned to `claude-bridge/claude-opus-5`, so a comparison needs the pi-claude-bridge extension (0.7.0, `c1d8b24a57e15bc8acc9d673f2804ab7227978ae`) loaded in the host session.
 
 ## Honest caveats
 
 - **On fully-specified tasks with a strong authoring model, the creator skill does not measurably improve the artifact.** The historical Claude Code clean-slate pilot shows all four creator skills and a no-skill control tying at 5/5 when the user's conventions are fully enumerated in the prompt. What the skill measurably adds at strong tiers is process evidence: baseline transcripts proving the skill is needed, forward-test results proving it works, snapshots making edits comparable, and a validator pass. The artifact-quality gap appears at weaker authoring tiers and (untested so far) on underspecified authoring tasks where knowledge must be mined rather than transcribed.
-- Qualitative baseline and forward tests require the Pi `Agent` tool. Quantitative campaigns additionally require the pi-subagents `SubagentWorkflow` tool and the explicit Pi RPC paths above. If those optional feature dependencies are unavailable, the affected branch cannot produce its claimed evidence.
+- Qualitative baseline and forward tests require the Pi `Agent` tool. Quantitative campaigns additionally require one workflow runtime (the pi-subagents `SubagentWorkflow` tool or the pi-dynamic-workflows `workflow` tool) and the explicit Pi RPC paths above. If those optional feature dependencies are unavailable, the affected branch cannot produce its claimed evidence.
+- A benchmark number is tied to the workflow runtime that produced it. Each campaign record names the runtime and its revision, and a claim made under one runtime does not carry over to the other until the campaign is re-run there. Execution under pi-dynamic-workflows is verified only with injected runners in the test suite, not yet with real models; live calibration runs under pi-subagents.
+- The comparator model is a Claude model. For outputs produced by Claude-family executors the blind comparison is not family-independent; the campaign record states this instead of adding an audit campaign.
 - A README inside a skill folder contradicts the skill's own "ship only what the executing agent needs" rule. This file is deliberately exempt as distribution documentation: it is never loaded into an agent's context at runtime.
 
 ## Method and raw results, concisely

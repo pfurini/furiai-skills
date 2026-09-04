@@ -20,13 +20,23 @@ These tests use local source checkouts without model credentials. Paths must be 
 PI_EXECUTABLE=/absolute/path/to/pi-executable \
 PI_CHECKOUT=/absolute/path/to/pi \
 PI_SUBAGENTS_CHECKOUT=/absolute/path/to/pi-subagents \
+PI_DYNAMIC_WORKFLOWS_CHECKOUT=/absolute/path/to/pi-dynamic-workflows \
 uvx --from 'pytest==9.1.1' pytest -q tests/pi-skill-creator -m contract
 ```
 
 Required revisions:
 
 - Pi `0.84.4`: `a4043c1e332a61e4c8648b97b9b796c57f9db110`
-- pi-subagents `0.19.0`: `bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4`
+- pi-subagents `0.19.0`: `7f569969445bf8bc6fbd7757f18db80b35de0ba9`
+- pi-dynamic-workflows `3.10.0`: `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`
+- pi-claude-bridge `0.7.0`: `c1d8b24a57e15bc8acc9d673f2804ab7227978ae` (loaded in the host session through `~/.pi/agent/settings.json`; never a test input)
+
+The runtime workflow tests in `test_runtime_workflow.py` execute `skills/pi-skill-creator/workflows/benchmark.js` through both pinned workflow runtimes:
+
+- pi-subagents: the checkout's `node_modules/.bin/tsc` compiles `src/workflow/`, and a stub host stands in for agent spawning.
+- pi-dynamic-workflows: `fixtures/workflow/pi-dynamic-workflows-probe.mjs` runs under the checkout's `node_modules/.bin/tsx`, imports `runWorkflow` from `src/workflow.ts`, and injects a fake agent runner. Run `npm ci` in that checkout once so `node_modules/.bin/tsx` exists (`npm ci` honours the committed lockfile; do not use `npm install`). The resulting untracked, git-ignored `node_modules/` is the only permitted change to that checkout. Those probes skip with a reason when `PI_DYNAMIC_WORKFLOWS_CHECKOUT` is unset or `tsx` is missing, and fail on a wrong revision.
+
+Neither path makes a model call, writes a workflow log, or reads an agent registry.
 
 ## Credentialed and live tests
 
@@ -58,3 +68,5 @@ uvx --from 'pytest==9.1.1' pytest -q tests/pi-skill-creator -m 'not live' && \
 uvx --from 'ty==0.0.77' ty check skills/pi-skill-creator/scripts skills/pi-skill-creator/eval-viewer && \
 git diff --check
 ```
+
+OSC-17 additionally requires the runtime workflow, bundled-agent, and aggregation tests to run with `PI_SUBAGENTS_CHECKOUT` and `PI_DYNAMIC_WORKFLOWS_CHECKOUT` set, with no pi-dynamic-workflows probe skipped.

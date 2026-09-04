@@ -19,6 +19,7 @@ AGENT_NAMES = (
     "comparison-analyzer",
     "benchmark-analyzer",
 )
+COMPARATOR_MODEL = "claude-bridge/claude-opus-5"
 EXPECTED_CONFIGS = {
     "grader": {
         "model": "openai-codex/gpt-5.6-sol",
@@ -26,13 +27,17 @@ EXPECTED_CONFIGS = {
         "maxTurns": 24,
         "runInBackground": True,
         "builtinToolNames": ["read", "write", "find", "grep", "ls"],
+        "extensions": False,
     },
     "comparator": {
-        "model": "openrouter/~anthropic/claude-opus-latest",
+        "model": COMPARATOR_MODEL,
         "thinking": "high",
         "maxTurns": 20,
         "runInBackground": True,
         "builtinToolNames": ["read", "write", "find", "grep", "ls"],
+        # The package-manifest name of pi-claude-bridge, the only extension a
+        # comparator child loads so its registry has the `claude-bridge` provider.
+        "extensions": ["pi-claude-bridge"],
     },
     "comparison-analyzer": {
         "model": "openai-codex/gpt-5.6-sol",
@@ -40,6 +45,7 @@ EXPECTED_CONFIGS = {
         "maxTurns": 24,
         "runInBackground": False,
         "builtinToolNames": ["read", "write", "find", "grep", "ls"],
+        "extensions": False,
     },
     "benchmark-analyzer": {
         "model": "openai-codex/gpt-5.6-terra",
@@ -47,6 +53,7 @@ EXPECTED_CONFIGS = {
         "maxTurns": 16,
         "runInBackground": False,
         "builtinToolNames": ["read", "write"],
+        "extensions": False,
     },
 }
 
@@ -109,6 +116,23 @@ try {
 } catch (error) {
   unavailableError = String(error.message ?? error);
 }
+// The comparator pin against a registry that never loaded pi-claude-bridge: the
+// `claude-bridge` provider is absent, exactly as in a child with `extensions: false`.
+const withoutBridge = availableModels.filter(model => model.provider !== "claude-bridge");
+const bridgelessRegistry = {
+  find(provider, id) {
+    return withoutBridge.find(model => model.provider === provider && model.id === id);
+  },
+  getAll() { return withoutBridge; },
+  getAvailable() { return withoutBridge; },
+};
+let bridgeAbsentError;
+try {
+  const resolved = resolveModel(input.comparatorModel, bridgelessRegistry);
+  bridgeAbsentError = typeof resolved === "string" ? resolved : `resolved:${resolved.provider}/${resolved.id}`;
+} catch (error) {
+  bridgeAbsentError = String(error.message ?? error);
+}
 
 const summarize = config => ({
   name: config.name,
@@ -161,6 +185,7 @@ process.stdout.write(JSON.stringify({
     typeof entry.config.model === "string" ? requireResolved(entry.config.model) : null,
   ])),
   unavailableError,
+  bridgeAbsentError,
 }));
 """
 
@@ -186,6 +211,7 @@ def _probe_agents(skill_root: Path) -> dict[str, Any]:
                 "checkout": os.fspath(checkout),
                 "skillRoot": os.fspath(skill_root),
                 "agentNames": AGENT_NAMES,
+                "comparatorModel": COMPARATOR_MODEL,
                 "selectedProfile": "declared-dependencies",
                 "availableModels": [
                     {
@@ -199,9 +225,9 @@ def _probe_agents(skill_root: Path) -> dict[str, Any]:
                         "name": "GPT 5.6 Terra",
                     },
                     {
-                        "provider": "openrouter",
-                        "id": "~anthropic/claude-opus-latest",
-                        "name": "Claude Opus Latest",
+                        "provider": "claude-bridge",
+                        "id": "claude-opus-5",
+                        "name": "Claude Opus 5",
                     },
                 ],
             }
@@ -227,7 +253,7 @@ def test_four_agents_register_with_locked_effective_frontmatter(skill_root: Path
             "name": name,
             "description": config["description"],
             "builtinToolNames": role_config["builtinToolNames"],
-            "extensions": False,
+            "extensions": role_config["extensions"],
             "skills": False,
             "model": role_config["model"],
             "thinking": role_config["thinking"],
@@ -281,6 +307,11 @@ def test_model_preflight_resolves_every_pin_and_rejects_unavailable_pin(
         "unavailableError"
     ]
     assert "parent/inherited-model" not in probe["resolvedModels"].values()
+    assert probe["resolvedModels"]["comparator"] == COMPARATOR_MODEL
+    # Without pi-claude-bridge loaded the pin fails instead of inheriting a model.
+    assert f'Model not found: "{COMPARATOR_MODEL}"' in probe["bridgeAbsentError"]
+    assert "resolved:" not in probe["bridgeAbsentError"]
+    assert "parent/inherited-model" not in probe["bridgeAbsentError"]
 
 
 def test_comparator_is_blind_and_analyzer_roles_do_not_bleed(skill_root: Path) -> None:
@@ -295,6 +326,12 @@ def test_comparator_is_blind_and_analyzer_roles_do_not_bleed(skill_root: Path) -
 
     for identity in ("with_skill", "without_skill", "treatment", "control"):
         assert identity not in comparator
+    comparator_frontmatter = comparator.split("---", 2)[1]
+    assert f"model: {COMPARATOR_MODEL}" in comparator_frontmatter
+    assert "extensions: [pi-claude-bridge]" in comparator_frontmatter
+    for other in ("grader.md", "comparison-analyzer.md", "benchmark-analyzer.md"):
+        frontmatter = (agents_root / other).read_text(encoding="utf-8").split("---", 2)[1]
+        assert "extensions: false" in frontmatter
     assert "winner_skill_path" in comparison
     assert "improvement" in comparison
     assert "benchmark_data_path" not in comparison

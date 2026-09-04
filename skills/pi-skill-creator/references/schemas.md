@@ -53,7 +53,9 @@ A campaign is stored below the evaluated project, not inside the distributed ski
   "created_at": "2026-09-02T12:00:00Z",
   "repository_revision": "1111111111111111111111111111111111111111",
   "pi_revision": "a4043c1e332a61e4c8648b97b9b796c57f9db110",
-  "pi_subagents_revision": "bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4",
+  "pi_subagents_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
+  "workflow_runtime": "pi-subagents",
+  "workflow_runtime_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
   "skill_name": "example-skill",
   "skill_path": "/absolute/path/to/example-skill",
   "evaluation_cwd": "/absolute/path/to/deployment-project",
@@ -75,11 +77,14 @@ A campaign is stored below the evaluated project, not inside the distributed ski
     "train": "trigger/train.json",
     "validation": "trigger/validation.json",
     "final_test": "trigger/final-test.json"
-  }
+  },
+  "notes": [
+    "Comparator claude-bridge/claude-opus-5 at high thinking judges blind; for outputs produced by executors of the same model family this comparison is not family-independent."
+  ]
 }
 ```
 
-`created_at` is caller supplied in UTC. Revisions are lowercase 40-hex values. `skill_path`, `evaluation_cwd`, and every declared extension are absolute. `environment_profile` is `in-situ`, `hermetic-core`, or `declared-dependencies`. Role entries not used by a campaign may be omitted, but benchmark aggregation requires the executor role. Requested model and thinking values must be concrete non-empty values.
+`created_at` is caller supplied in UTC. Revisions are lowercase 40-hex values read from `git rev-parse HEAD`, never typed from memory. `workflow_runtime` is `pi-subagents` or `pi-dynamic-workflows` and names the runtime that executed `workflows/benchmark.js`; `workflow_runtime_revision` is the `HEAD` of that runtime's checkout (under `pi-subagents` it equals `pi_subagents_revision`). Both fields are required: a campaign supports claims only for the runtime it records, and a run under the other runtime is a new campaign. `skill_path`, `evaluation_cwd`, and every declared extension are absolute. `environment_profile` is `in-situ`, `hermetic-core`, or `declared-dependencies`. Role entries not used by a campaign may be omitted, but benchmark aggregation requires the executor role. Requested model and thinking values must be concrete non-empty values. `notes` is an optional array of non-empty strings copied into `benchmark.json`; the setup launcher records the comparator family caveat there.
 
 ## `eval_metadata.json`
 
@@ -214,7 +219,9 @@ The grader writes one verdict for every expectation:
     "created_at": "2026-09-02T12:00:00Z",
     "repository_revision": "1111111111111111111111111111111111111111",
     "pi_revision": "a4043c1e332a61e4c8648b97b9b796c57f9db110",
-    "pi_subagents_revision": "bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4",
+    "pi_subagents_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
+    "workflow_runtime": "pi-subagents",
+    "workflow_runtime_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
     "skill_name": "example-skill",
     "skill_path": "/absolute/path/to/example-skill",
     "evaluation_cwd": "/absolute/path/to/deployment-project",
@@ -447,4 +454,6 @@ The grader writes one verdict for every expectation:
 }
 ```
 
-Each arm has the same complete statistic set. Each statistic has finite `mean`, sample `stddev`, `min`, and `max`. `evals_run` and `runs_per_configuration` are derived from validated records. All runs in one benchmark share the campaign profile and one observed effective executor model and thinking level. Mixed values require a separate pre-registered comparison campaign and are not accepted by this aggregator.
+Each arm has the same complete statistic set. Each statistic has finite `mean`, sample `stddev`, `min`, and `max`. `evals_run` and `runs_per_configuration` are derived from validated records. `workflow_runtime` and `workflow_runtime_revision` are copied from `campaign.json`, so every numeric claim names the runtime that produced it; `notes` carries the campaign notes. All runs in one benchmark share the campaign profile and one observed effective executor model and thinking level. Mixed values require a separate pre-registered comparison campaign and are not accepted by this aggregator.
+
+`python -m scripts.aggregate_benchmark <iteration-dir> --validate-only` runs the same validation over the whole iteration tree and writes nothing: exit 0 when everything validates, exit 2 with one bounded error on a contract failure, exit 1 on a filesystem error. The runtime workflow runs it after grading and before aggregation.

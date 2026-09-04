@@ -12,7 +12,7 @@ OSC-00 and OSC-01.
 
 - Exactly four runtime identities exist: `grader`, `comparator`, `comparison-analyzer`, and `benchmark-analyzer`; `agents/analyzer.md` is deleted, and no executor agent is added or pinned.
 - All four use `prompt_mode: replace`, `inherit_context: false`, `skills: false`, `persist_session: false`, and `output_transcript: true`. Grader/comparator run in background; both analyzers run in foreground.
-- The provisional comparator is `openrouter/~anthropic/claude-opus-latest` with `high` thinking. Every requested pin must resolve in its selected profile; unresolved models fail rather than inherit a parent model.
+- The provisional comparator is `openrouter/~anthropic/claude-opus-latest` with `high` thinking. Every requested pin must resolve in its selected profile; unresolved models fail rather than inherit a parent model. (Superseded by OSC-17 on 2026-09-04: the comparator pin is now `claude-bridge/claude-opus-5` with `extensions: [pi-claude-bridge]`, and the runtime workflow no longer dispatches bundled agents by `agentType`; this line records the historical OSC-06 decision.)
 
 ## Exclusive owned paths
 

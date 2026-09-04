@@ -12,7 +12,8 @@ from typing import Any
 import pytest
 
 PI_REVISION = "a4043c1e332a61e4c8648b97b9b796c57f9db110"
-PI_SUBAGENTS_REVISION = "bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4"
+PI_SUBAGENTS_REVISION = "7f569969445bf8bc6fbd7757f18db80b35de0ba9"
+PI_DYNAMIC_WORKFLOWS_REVISION = "e9c5a41d9c4234df908aa25a2b49ee9648e896d4"
 
 
 class CheckoutContractError(ValueError):
@@ -79,7 +80,8 @@ def verify_checkout_revision(path: Path, expected_revision: str, label: str) -> 
 
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
-        "markers", "contract: requires the pinned local Pi and pi-subagents checkouts"
+        "markers",
+        "contract: requires the pinned local Pi, pi-subagents, and pi-dynamic-workflows checkouts",
     )
     config.addinivalue_line(
         "markers", "live: requires explicit opt-in and may use credentials or model calls"
@@ -235,6 +237,8 @@ def campaign_factory(tmp_path: Path) -> Callable[..., Path]:
             "repository_revision": "0" * 40,
             "pi_revision": PI_REVISION,
             "pi_subagents_revision": PI_SUBAGENTS_REVISION,
+            "workflow_runtime": "pi-subagents",
+            "workflow_runtime_revision": PI_SUBAGENTS_REVISION,
             "skill_name": skill_name,
             "skill_path": os.fspath(skill_path),
             "evaluation_cwd": os.fspath(evaluation_cwd),
