@@ -535,6 +535,26 @@ def test_calibrate_refuses_call_count_above_max_paid_calls(development_workflow_
         assert "ty check skills/pi-skill-creator/scripts skills/pi-skill-creator/eval-viewer" in command
 
 
+def test_calibrate_preflight_defines_repository_revision(
+    development_workflow_runtime: Path,
+) -> None:
+    """OSC-14: the calibrate child failed three smokes by reading this as stageStartCommit.
+
+    `repository_revision` is the evaluation project's HEAD, a temporary directory with its
+    own git history, so it never equals `stageStartCommit` and names no object in the
+    repository. The prompt has to say so, or the stage fails closed on a correct record.
+    """
+    args = _args("calibrate")
+    probe = _calibration_run(development_workflow_runtime, "calibrate", args)
+    preflight = probe["calls"][0]
+    assert preflight["label"] == "preflight:calibrate", probe["calls"]
+    prompt = preflight["prompt"]
+    assert "repository_revision" in prompt
+    assert "evaluation project" in prompt
+    assert "never args.stageStartCommit" in prompt
+    assert "correct rather than a finding" in prompt
+
+
 def test_calibration_workflow_makes_no_paid_call_prompt(development_workflow_runtime: Path) -> None:
     probe = _calibration_run(development_workflow_runtime, "calibrate", _args("calibrate"))
     assert probe["run"]["status"] == "completed", probe["run"]

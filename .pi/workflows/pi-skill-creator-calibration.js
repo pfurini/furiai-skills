@@ -187,7 +187,7 @@ const stageStartMeaning = {
 }[stage]
 const stageDetail = {
   preflight: `Campaign directory ${campaignDir} must not contain campaign.json yet. Manifest models to resolve through ${piExecutable} --list-models (exact provider and model row): ${JSON.stringify(manifest?.models)}.`,
-  calibrate: `Campaign directory ${campaignDir} holds the smoke records the top-level session produced; read them, never modify them. Manifest models to resolve through ${piExecutable} --list-models (exact provider and model row): ${JSON.stringify(manifest?.models)}.`,
+  calibrate: `Campaign directory ${campaignDir} holds the smoke records the top-level session produced; read them, never modify them. \`repository_revision\` in campaign.json and benchmark.json is the HEAD of the evaluation project the campaign ran in, which is a temporary directory outside this repository with its own git history (OSC-14 precondition 4: the setup launcher reads it with git -C <projectRoot> rev-parse HEAD). It is never args.stageStartCommit, it is not expected to name any object in ${repoPath}, and a value that differs from stageStartCommit is correct rather than a finding. Manifest models to resolve through ${piExecutable} --list-models (exact provider and model row): ${JSON.stringify(manifest?.models)}.`,
   finalize: `The immutable human review record ${humanReviewRecord} must exist. No manifest model is checked in this stage: return models_resolved and models_unresolved as empty arrays.`,
 }[stage]
 
