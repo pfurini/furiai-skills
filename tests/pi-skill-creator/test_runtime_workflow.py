@@ -56,7 +56,11 @@ const iterationRoot = `${campaignRoot}/iteration-${input.args.iteration}`;
 function responseFor(label) {
   if (label === "setup") return {
     status: "completed",
-    campaign_path: `${campaignRoot}/campaign.json`,
+    // `setup-campaign-root` reproduces the OSC-14 smoke failure: the child returned
+    // the campaign directory where the contract requires the campaign.json file.
+    campaign_path: input.scenario === "setup-campaign-root"
+      ? campaignRoot
+      : `${campaignRoot}/campaign.json`,
     evals_path: `${campaignRoot}/evals.json`,
   };
   if (label.startsWith("execute:")) {
@@ -500,6 +504,48 @@ def test_runtime_workflow_refuses_missing_approval_and_setup_failure(
     assert [call["label"] for call in setup_failure["calls"]] == ["setup"]
 
 
+@pytest.mark.parametrize("runtime", RUNTIMES)
+def test_runtime_workflow_refuses_a_setup_that_returns_the_campaign_directory(
+    request: pytest.FixtureRequest, runtime: str
+) -> None:
+    """The OSC-14 smoke failure: `campaign_path` was the campaign root, not campaign.json."""
+    probe = _probe(request, runtime)
+    result = probe.run(scenario="setup-campaign-root")
+    assert result["run"]["status"] == "completed", result["run"]
+    value = result["run"]["value"]
+    assert value["valid"] is False
+    assert value["scheduled_runs"] == 0
+    assert value["failure_kinds"] == {"null_result": 0, "thrown": 0, "explicit": 0, "contract": 1}
+    assert value["stage_statuses"] == {
+        "setup": "failed",
+        "validation": "bounded",
+        "aggregation": "bounded",
+    }
+    # No executor process may start once the campaign tree is unconfirmed.
+    assert [call["label"] for call in result["calls"]] == ["setup"]
+
+
+@pytest.mark.parametrize("runtime", RUNTIMES)
+def test_runtime_workflow_setup_prompt_pins_paths_and_forbids_transcribed_revisions(
+    request: pytest.FixtureRequest, runtime: str
+) -> None:
+    """Both OSC-14 setup defects are prevented in the prompt, not just detected after."""
+    probe = _probe(request, runtime)
+    result = probe.run()
+    setup = next(call for call in result["calls"] if call["label"] == "setup")
+    args = probe.args()
+    campaign_root = (
+        f"{args['projectRoot']}/.skill-creator/example-skill/campaign-{args['campaignId']}"
+    )
+    # The exact return values, so `campaign_path` cannot be read as the directory.
+    assert f"campaign_path exactly {campaign_root}/campaign.json" in setup["prompt"]
+    assert f"evals_path exactly {campaign_root}/evals.json" in setup["prompt"]
+    assert "not the directory holding them" in setup["prompt"]
+    # Revisions are substituted by the shell, never transcribed into the reply.
+    assert "$(git -C" in setup["prompt"]
+    assert "never by copying a value into your reply" in setup["prompt"]
+
+
 def test_runtime_workflow_rejects_unknown_runtime(
     skill_root: Path, workflow_runtime_modules: Path
 ) -> None:
@@ -629,7 +675,15 @@ def test_runtime_workflow_reports_call_accounting(
 
 
 _RUNTIME_GUARD_SCENARIOS = {
-    "pi-subagents": ["success", "explicit-failure", "schema-null", "spawn-failure", "setup-null", "validation-failure"],
+    "pi-subagents": [
+        "success",
+        "explicit-failure",
+        "schema-null",
+        "spawn-failure",
+        "setup-null",
+        "setup-campaign-root",
+        "validation-failure",
+    ],
     "pi-dynamic-workflows": [
         "success",
         "explicit-failure",
@@ -637,6 +691,7 @@ _RUNTIME_GUARD_SCENARIOS = {
         "recoverable-throw",
         "thrown-child",
         "setup-null",
+        "setup-campaign-root",
         "validation-failure",
     ],
 }
@@ -661,8 +716,10 @@ def test_runtime_workflow_host_never_sees_more_than_max_agent_calls_spawns(
     assert value["agent_calls_made"] == len(probe["calls"])
     assert len(probe["calls"]) <= value["max_agent_calls"]
     assert value["agent_calls_planned"] <= value["max_agent_calls"]
-    # Nothing is bounded by the runtime guard here; a failed setup bounds every run by design.
-    assert value["status_counts"]["bounded"] == (value["expected_runs"] if scenario == "setup-null" else 0)
+    # Nothing is bounded by the runtime guard here; a failed setup bounds every run by
+    # design, whether it failed by returning nothing or by breaking the path contract.
+    setup_failed = scenario.startswith("setup-")
+    assert value["status_counts"]["bounded"] == (value["expected_runs"] if setup_failed else 0)
 
 
 def test_runtime_workflow_never_exceeds_max_agent_calls_at_runtime(skill_root: Path) -> None:

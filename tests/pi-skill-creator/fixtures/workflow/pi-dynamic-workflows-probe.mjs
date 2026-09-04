@@ -22,7 +22,11 @@ function responseFor(label) {
   if (label === "setup") {
     return {
       status: "completed",
-      campaign_path: `${campaignRoot}/campaign.json`,
+      // `setup-campaign-root` reproduces the OSC-14 smoke failure: the child returned
+      // the campaign directory where the contract requires the campaign.json file.
+      campaign_path: input.scenario === "setup-campaign-root"
+        ? campaignRoot
+        : `${campaignRoot}/campaign.json`,
       evals_path: `${campaignRoot}/evals.json`,
     };
   }

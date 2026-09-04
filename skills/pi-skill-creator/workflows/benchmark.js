@@ -39,8 +39,8 @@ const SETUP_SCHEMA = {
   properties: {
     status: { type: 'string', enum: RESULT_STATUSES },
     error: { type: 'string' },
-    campaign_path: { type: 'string' },
-    evals_path: { type: 'string' },
+    campaign_path: { type: 'string', description: 'Absolute path of the campaign.json file that was written, not the directory holding it.' },
+    evals_path: { type: 'string', description: 'Absolute path of the evals.json file that was written, not the directory holding it.' },
   },
   required: ['status'],
   additionalProperties: false,
@@ -334,21 +334,32 @@ log(`benchmark campaign ${campaignId} on ${runtime}: ${expectedRuns} expected ru
 const setupPrompt = `Prepare one deterministic benchmark campaign without making model calls.
 Read ${skillCreatorPath}/references/schemas.md first, then create ${campaignRoot} with the exact campaign tree required by pi-skill-creator.campaign/v1.
 Write ${campaignPath} with: campaign_id=${campaignId}, created_at=${createdAt}, skill_name=${skillName}, skill_path=${skillPath}, evaluation_cwd=${projectRoot}, environment_profile=${environmentProfile}, repetitions=${input.repetitions}, treatment=with_skill, control=without_skill, workflow_runtime=${runtime}, and notes=${JSON.stringify(campaignNotes)}.
-Read every revision field from git, never from memory, and record each as the lowercase 40-hex string the command prints: repository_revision from git -C ${shellQuote(projectRoot)} rev-parse HEAD; pi_revision from git -C ${shellQuote(piCheckout)} rev-parse HEAD; pi_subagents_revision from git -C ${shellQuote(piSubagentsCheckout)} rev-parse HEAD; workflow_runtime_revision from git -C ${shellQuote(runtimeCheckout)} rev-parse HEAD.
+Set every revision field by shell substitution, never by copying a value into your reply: write repository_revision as $(git -C ${shellQuote(projectRoot)} rev-parse HEAD), pi_revision as $(git -C ${shellQuote(piCheckout)} rev-parse HEAD), pi_subagents_revision as $(git -C ${shellQuote(piSubagentsCheckout)} rev-parse HEAD), and workflow_runtime_revision as $(git -C ${shellQuote(runtimeCheckout)} rev-parse HEAD). Each must land in the file as the lowercase 40-hex string the command printed; transcribing a revision by hand is the one way this step fails silently.
 Record declared_extensions as ${JSON.stringify(environmentProfile === 'declared-dependencies' ? [extensionPath] : [])}. Record requested role model/thinking values from this JSON: ${JSON.stringify({ executor: executorRole, grader: graderRole, comparator: comparatorRole, benchmark_analyzer: analyzerRole })}.
 Write ${evalsPath}, trigger/train.json, trigger/validation.json, trigger/final-test.json, and trigger/results.json as strict JSON plus LF. Write each ${iterationRoot}/<eval-name>/eval_metadata.json with eval_id, eval_name, prompt, and expectations from: ${JSON.stringify(evaluations)}.
-Return status completed with campaign_path and evals_path only after every file is durable. On any error, return failed with a bounded error string.`
+Return status completed only after every file is durable, with campaign_path exactly ${campaignPath} and evals_path exactly ${evalsPath}. Both are the files themselves, not the directory holding them. On any error, return failed with a bounded error string.`
 const setup = await safeAgent(setupPrompt, runtimeAgentOptions(executorRole, {
   label: 'setup',
   phase: 'Prepare',
   schema: SETUP_SCHEMA,
 }), 'setup')
 
+// Names the offending field and both values: a bare "did not match the campaign tree"
+// cannot distinguish a child that returned the campaign directory from one that wrote
+// the tree somewhere else, and those need opposite fixes.
+function setupPathProblems(result) {
+  const problems = []
+  if (!samePath(result.campaign_path, campaignPath)) problems.push(`campaign_path was ${JSON.stringify(result.campaign_path)}, expected ${campaignPath}`)
+  if (!samePath(result.evals_path, evalsPath)) problems.push(`evals_path was ${JSON.stringify(result.evals_path)}, expected ${evalsPath}`)
+  return problems
+}
+
+const setupProblems = setup.status === 'completed' ? setupPathProblems(setup) : []
 const setupResult = setup.status !== 'completed'
   ? setup
-  : (samePath(setup.campaign_path, campaignPath) && samePath(setup.evals_path, evalsPath)
+  : (setupProblems.length === 0
     ? setup
-    : contractFailure('setup', 'campaign_path or evals_path did not match the campaign tree'))
+    : contractFailure('setup', setupProblems.join('; ')))
 
 if (setupResult.status !== 'completed') {
   countFailure(setupResult)
