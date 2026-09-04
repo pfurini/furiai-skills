@@ -1,5 +1,7 @@
 # OSC-18: Calibration hardening and Pi re-pin
 
+> Superseded pin, 2026-09-04: this order re-pinned Pi to `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0`, and every revision below records that moment accurately. The checkout later moved two commits further, and OSC-14 moved the pin to `db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee` rather than rewinding it. The current pin lives in `contracts.md` C1 and the `index.md` table; the revisions in this order are historical.
+
 ## Findings
 
 No new primary finding number. This order applies handoff decisions 6 and 7 from `HANDOFF-pi-skill-creator.md` and carries the Pi re-pin that the checkout drift forces. It is deterministic (no model call) and must land before the smoke run in OSC-14, because the smoke cannot make a single measured call until the Pi pin moves and because nothing today bounds the number of paid calls mechanically. It is a secondary consumer of F3 (campaign metadata), F7 and F37 (the RPC runner), F12 (workflow dispatch), F15 (the regression suite), and F35 (the workflow-child boundary).

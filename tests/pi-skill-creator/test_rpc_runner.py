@@ -34,7 +34,7 @@ from scripts.rpc_runner import (  # noqa: E402
 )
 
 SUPERSEDED_PI_REVISION = "a4043c1e332a61e4c8648b97b9b796c57f9db110"
-REPINNED_PI_REVISION = "7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0"
+REPINNED_PI_REVISION = "db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee"
 
 RPC_FIXTURES = TEST_ROOT / "fixtures/rpc"
 

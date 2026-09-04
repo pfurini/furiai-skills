@@ -6,7 +6,7 @@ Executors implement these contracts exactly. A conflict discovered against the p
 
 - Immutable source baseline: `0b9e86bc77a60fb34039456a6624ea94e396f5d1`. It only freezes the F19 removal and pre-implementation skill state; adoption never starts from that SHA.
 - Adoption implementation start: the caller supplies a full `implementationStartCommit` naming the later clean current `HEAD` that contains this contract, the index, all 17 OSC orders, and both project workflows. It must descend from or equal the source baseline. All isolated implementation worktrees branch from this handoff-containing commit, and all adoption branch/integration diff gates use `implementationStartCommit..HEAD`.
-- Pi checkout: `/absolute/path` supplied by workflow input, revision `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0`, version `0.84.4`. This revision is one commit past `a4043c1e332a61e4c8648b97b9b796c57f9db110` and changes only `packages/ai/scripts/generate-models.ts`; `packages/ai/src/models.generated.ts` is identical at both revisions, and the executable is a pre-commit build with identical behavior that reports `0.84.4`.
+- Pi checkout: `/absolute/path` supplied by workflow input, revision `db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee`, version `0.84.4`. This revision is two commits past OSC-18's pin `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0` (itself one commit past `a4043c1e332a61e4c8648b97b9b796c57f9db110`). Those two commits ("feat(ai): verify zai synthetic skill-pair replay and flag its models" and "fix(ai): replace retired gpt-5.2-codex id in tool-call id test") add one entry to `SKILL_SYNTHETIC_REPLAY_CLASSES` in `packages/ai/src/types.ts` and touch two `packages/ai` test files; `packages/ai/src/models.generated.ts` and every `packages/coding-agent` source this skill depends on are identical at both revisions. `packages/coding-agent/dist/cli.js`, which the executable symlinks, was built on 2026-09-03 before all three revisions, so the executable behaves identically and still reports `0.84.4`.
 - Pi executable: a separate absolute `piExecutable` workflow input; preflight requires it to be executable and report Pi `0.84.4`.
 - pi-subagents checkout: `/absolute/path` supplied by workflow input, revision `7f569969445bf8bc6fbd7757f18db80b35de0ba9`, version `0.19.0`. This revision differs from `bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4` only by the case-insensitive workflow-tool collision check in `src/workflow/collisions.ts`, which lets `SubagentWorkflow` stand down beside pi-dynamic-workflows' `workflow` tool.
 - pi-dynamic-workflows checkout: `/absolute/path` supplied by the `PI_DYNAMIC_WORKFLOWS_CHECKOUT` test input and by the runtime workflow's `runtimeCheckout` argument, revision `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`, version `3.10.0`. Tests that execute through it require `node_modules/.bin/tsx` produced by `npm ci` in that checkout; that directory is covered by the checkout's `.gitignore` and is the only permitted change there.
@@ -94,7 +94,7 @@ The experiment roles are:
   "campaign_id": "fork-smoke-1",
   "created_at": "2026-09-02T12:00:00Z",
   "repository_revision": "<40-hex>",
-  "pi_revision": "7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0",
+  "pi_revision": "db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee",
   "pi_subagents_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
   "workflow_runtime": "pi-subagents",
   "workflow_runtime_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",

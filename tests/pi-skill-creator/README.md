@@ -26,7 +26,7 @@ uvx --from 'pytest==9.1.1' pytest -q tests/pi-skill-creator -m contract
 
 Required revisions:
 
-- Pi `0.84.4`: `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0`
+- Pi `0.84.4`: `db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee`
 - pi-subagents `0.19.0`: `7f569969445bf8bc6fbd7757f18db80b35de0ba9`
 - pi-dynamic-workflows `3.10.0`: `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`
 - pi-claude-bridge `0.7.0`: `c1d8b24a57e15bc8acc9d673f2804ab7227978ae` (loaded in the host session through `~/.pi/agent/settings.json`; never a test input)

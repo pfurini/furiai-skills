@@ -22,7 +22,7 @@ from scripts.transcript_metrics import TranscriptMetricsError, parse_transcript
 EnvironmentProfile = Literal["in-situ", "hermetic-core", "declared-dependencies"]
 Configuration = Literal["with_skill", "without_skill"]
 
-PI_REVISION = "7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0"
+PI_REVISION = "db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee"
 PI_VERSION = "0.84.4"
 RPC_PROTOCOL_VERSION = 3
 TRANSCRIPT_FORMAT = "pi-json-events-v3"

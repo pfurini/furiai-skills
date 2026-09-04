@@ -10,7 +10,7 @@ This handoff was prepared on 2026-09-02 from source baseline `0b9e86bc77a60fb340
 |---|---|
 | Source baseline | `0b9e86bc77a60fb34039456a6624ea94e396f5d1` |
 | Implementation start | Caller-supplied full `implementationStartCommit` for the later clean handoff-containing commit |
-| Pi fork | `0.84.4`, `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0` (re-pinned by OSC-18 from `a4043c1e332a61e4c8648b97b9b796c57f9db110`; OSC-00 through OSC-17 integrated against the earlier revision; the only change is `packages/ai/scripts/generate-models.ts`, and the executable is a pre-commit build with identical behavior) |
+| Pi fork | `0.84.4`, `db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee` (re-pinned during OSC-14 from OSC-18's `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0`, itself re-pinned from `a4043c1e332a61e4c8648b97b9b796c57f9db110`; OSC-00 through OSC-17 integrated against the earliest revision. The two commits past OSC-18's pin touch only `packages/ai/src/types.ts` and two `packages/ai` tests, and the executable is a pre-commit build with identical behavior) |
 | pi-subagents | `0.19.0`, `7f569969445bf8bc6fbd7757f18db80b35de0ba9` (re-pinned by OSC-17 from `bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4`; OSC-00 through OSC-13 integrated against the earlier revision) |
 | pi-dynamic-workflows | `3.10.0`, `e9c5a41d9c4234df908aa25a2b49ee9648e896d4` (added by OSC-17) |
 | pi-claude-bridge | `0.7.0`, `c1d8b24a57e15bc8acc9d673f2804ab7227978ae` (added by OSC-17; loaded in the host session, never a workflow input) |

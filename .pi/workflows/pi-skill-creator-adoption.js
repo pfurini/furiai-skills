@@ -16,7 +16,7 @@ export const meta = {
 }
 
 const SOURCE_BASELINE = '0b9e86bc77a60fb34039456a6624ea94e396f5d1'
-const REQUIRED_PI = '7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0'
+const REQUIRED_PI = 'db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee'
 const REQUIRED_SUBAGENTS = '7f569969445bf8bc6fbd7757f18db80b35de0ba9'
 const PYTEST = "uvx --from 'pytest==9.1.1' pytest"
 const TY = "uvx --from 'ty==0.0.77' ty"

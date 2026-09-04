@@ -10,7 +10,7 @@ export const meta = {
   ],
 }
 
-const REQUIRED_PI = '7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0'
+const REQUIRED_PI = 'db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee'
 const REQUIRED_PI_VERSION = '0.84.4'
 const REQUIRED_SUBAGENTS = '7f569969445bf8bc6fbd7757f18db80b35de0ba9'
 const REQUIRED_DYNAMIC_WORKFLOWS = 'e9c5a41d9c4234df908aa25a2b49ee9648e896d4'
