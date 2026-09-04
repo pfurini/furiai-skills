@@ -64,9 +64,11 @@ Pi, pi-subagents, and pi-dynamic-workflows are optional feature dependencies sup
 
 ## Honest caveats
 
+The quantitative caveats in this section concern historical Claude Code evidence.
+
 - **On fully-specified tasks with a strong authoring model, the creator skill does not measurably improve the artifact.** The historical Claude Code clean-slate pilot shows all four creator skills and a no-skill control tying at 5/5 when the user's conventions are fully enumerated in the prompt. What the skill measurably adds at strong tiers is process evidence: baseline transcripts proving the skill is needed, forward-test results proving it works, snapshots making edits comparable, and a validator pass. The artifact-quality gap appears at weaker authoring tiers and (untested so far) on underspecified authoring tasks where knowledge must be mined rather than transcribed.
 - Qualitative baseline and forward tests require the Pi `Agent` tool. Quantitative campaigns additionally require one workflow runtime (the pi-subagents `SubagentWorkflow` tool or the pi-dynamic-workflows `workflow` tool) and the explicit Pi RPC paths above. If those optional feature dependencies are unavailable, the affected branch cannot produce its claimed evidence.
-- A benchmark number is tied to the workflow runtime that produced it. Each campaign record names the runtime and its revision, and a claim made under one runtime does not carry over to the other until the campaign is re-run there. Execution under pi-dynamic-workflows is verified only with injected runners in the test suite, not yet with real models; live calibration runs under pi-subagents.
+- A smoke campaign under pi-subagents at the recorded revisions proved that the benchmark machinery runs end to end with real models and supports no numeric claim; each campaign record names the runtime and its revision, and execution under pi-dynamic-workflows remains verified only with injected runners in the test suite.
 - The comparator model is a Claude model. For outputs produced by Claude-family executors the blind comparison is not family-independent; the campaign record states this instead of adding an audit campaign.
 - A README inside a skill folder contradicts the skill's own "ship only what the executing agent needs" rule. This file is deliberately exempt as distribution documentation: it is never loaded into an agent's context at runtime.
 
