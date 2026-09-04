@@ -1,0 +1,28 @@
+{
+  "approved": true,
+  "campaignId": "runtime-smoke-1",
+  "createdAt": "2026-09-02T12:00:00Z",
+  "projectRoot": "/tmp/skill-creator-project",
+  "skillPath": "/tmp/skill-creator-project/example-skill",
+  "skillCreatorPath": "/tmp/skill-creator-runtime/pi-skill-creator",
+  "piExecutable": "/tmp/skill-creator-runtime/pi",
+  "piCheckout": "/tmp/skill-creator-runtime/pi-checkout",
+  "piSubagentsCheckout": "/tmp/skill-creator-runtime/pi-subagents",
+  "environmentProfile": "declared-dependencies",
+  "iteration": 1,
+  "repetitions": 1,
+  "evals": [
+    {
+      "eval_id": 1,
+      "eval_name": "runtime-behavior",
+      "prompt": "Exercise the skill and save the requested output.",
+      "expectations": ["The requested output is complete."]
+    }
+  ],
+  "roles": {
+    "executor": {"model": "fixture/executor", "thinking": "low"},
+    "grader": {"model": "fixture/grader", "thinking": "high"},
+    "comparator": {"model": "fixture/comparator", "thinking": "high"},
+    "benchmarkAnalyzer": {"model": "fixture/analyzer", "thinking": "medium"}
+  }
+}
