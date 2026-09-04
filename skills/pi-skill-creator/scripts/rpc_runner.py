@@ -532,6 +532,7 @@ def run_rpc(prompt: str, config: RpcRunConfig) -> dict[str, Any]:
     transcript_path = validated.run_dir / "transcript.jsonl"
     metrics_path = validated.run_dir / "transcript-metrics.json"
     run_path = validated.run_dir / "run.json"
+    timing_path = validated.run_dir / "timing.json"
     # One run directory is at most one measured executor call (contract C9). A directory
     # that already holds a completed record or the transcript of a failed run is refused
     # before any directory is created or any process launches, and nothing is deleted:
@@ -547,6 +548,9 @@ def run_rpc(prompt: str, config: RpcRunConfig) -> dict[str, Any]:
     (validated.run_dir / "outputs").mkdir(exist_ok=True)
     validate_runtime(validated)
 
+    # Wall clock for the measured executor process only, which is what timing.json means:
+    # the launcher's own overhead is not the executor's cost and is never attributable.
+    started = time.monotonic()
     try:
         stdout, _, stderr = _read_rpc_process(
             build_pi_command(validated),
@@ -558,6 +562,7 @@ def run_rpc(prompt: str, config: RpcRunConfig) -> dict[str, Any]:
         if error.transcript is not None:
             transcript_path.write_bytes(error.transcript)
         raise
+    total_duration_seconds = time.monotonic() - started
     transcript_path.write_bytes(stdout)
     protocol = _validate_protocol(stdout, stderr=stderr)
     effective_thinking = _effective_thinking(protocol.state)
@@ -575,6 +580,9 @@ def run_rpc(prompt: str, config: RpcRunConfig) -> dict[str, Any]:
         raise RpcRunnerError("invalid_output", "effective model is invalid")
 
     _write_json(metrics_path, metrics)
+    # The benchmark aggregates this per run (`aggregate_benchmark._validate_timing`), and
+    # the workflow's execute contract requires it durable before grading is dispatched.
+    _write_json(timing_path, {"total_duration_seconds": total_duration_seconds})
     identity = validated.identity
     run = {
         "schema_version": "pi-skill-creator.run/v1",

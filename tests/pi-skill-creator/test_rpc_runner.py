@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import shutil
@@ -213,6 +214,14 @@ def test_success_writes_transcript_metrics_then_completed_run(
     assert run["requested_model"] == "openrouter/auto"
     assert run["transcript_format"] == "pi-json-events-v3"
     assert (config.run_dir / "outputs").is_dir()
+
+    # The benchmark's execute stage will not dispatch grading until timing.json is durable,
+    # and aggregate_benchmark reads total_duration_seconds from it for every run.
+    timing = json.loads((config.run_dir / "timing.json").read_text(encoding="utf-8"))
+    assert set(timing) == {"total_duration_seconds"}
+    duration = timing["total_duration_seconds"]
+    assert isinstance(duration, float) and not isinstance(duration, bool)
+    assert math.isfinite(duration) and duration >= 0
 
 
 @pytest.mark.parametrize(

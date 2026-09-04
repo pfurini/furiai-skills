@@ -546,6 +546,33 @@ def test_runtime_workflow_setup_prompt_pins_paths_and_forbids_transcribed_revisi
     assert "never by copying a value into your reply" in setup["prompt"]
 
 
+@pytest.mark.parametrize("runtime", RUNTIMES)
+def test_runtime_workflow_execute_requires_only_executor_owned_artifacts(
+    request: pytest.FixtureRequest, runtime: str
+) -> None:
+    """The executor cannot be asked to prove grading.json, which the next stage writes."""
+    probe = _probe(request, runtime)
+    result = probe.run()
+    execute = next(call for call in result["calls"] if call["label"] == EXECUTE_WITH)
+    prompt = execute["prompt"]
+    # timing.json is the RPC runner's own output and stays required.
+    assert "timing.json" in prompt
+    assert "run.json" in prompt and "transcript-metrics.json" in prompt
+    # grading.json belongs to the grade stage that runs after this one.
+    assert "grading.json" not in prompt
+
+
+@pytest.mark.parametrize("runtime", RUNTIMES)
+def test_runtime_workflow_grade_follows_execute_for_each_item(
+    request: pytest.FixtureRequest, runtime: str
+) -> None:
+    """Ordering is what makes grading.json unavailable at execute time; pin it."""
+    probe = _probe(request, runtime)
+    labels = [call["label"] for call in probe.run()["calls"]]
+    assert labels.index(EXECUTE_WITH) < labels.index(GRADE_WITH)
+    assert labels.index(EXECUTE_WITHOUT) < labels.index(GRADE_WITHOUT)
+
+
 def test_runtime_workflow_rejects_unknown_runtime(
     skill_root: Path, workflow_runtime_modules: Path
 ) -> None:

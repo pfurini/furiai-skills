@@ -417,12 +417,23 @@ const extensionArgument = environmentProfile === 'declared-dependencies'
   : ''
 
 async function executeItem(item) {
+  // Everything the RPC runner itself writes, and nothing else. `item.paths.grading` is the
+  // grader's output from the next stage, so requiring it here made the contract
+  // unsatisfiable: the executor could only pass by proving an artifact that cannot exist
+  // until after it has passed.
+  const executorPaths = {
+    run: item.paths.run,
+    transcript: item.paths.transcript,
+    metrics: item.paths.metrics,
+    outputs: item.paths.outputs,
+    timing: item.paths.timing,
+  }
   const command = `cd ${shellQuote(skillCreatorPath)} && printf '%s' ${shellQuote(item.evaluation.prompt)} | python -m scripts.rpc_runner --pi-executable ${shellQuote(piExecutable)} --pi-checkout ${shellQuote(piCheckout)} --evaluation-cwd ${shellQuote(projectRoot)} --skill-path ${shellQuote(skillPath)} --run-dir ${shellQuote(item.runRoot)} --model ${shellQuote(executorRole.model)} --thinking ${shellQuote(executorRole.thinking)} --profile ${shellQuote(environmentProfile)}${extensionArgument} --campaign-id ${shellQuote(campaignId)} --eval-id ${item.evaluation.eval_id} --eval-name ${shellQuote(item.evaluation.eval_name)} --configuration ${shellQuote(item.configuration)} --run-number ${item.runNumber}`
   const execution = await safeAgent(`Run one measured executor through the pi-skill-creator RPC runner.
 Execute this exact shell command with bash:
 ${command}
 Do not substitute workflow-child usage for executor telemetry. The executor evidence is only run.json and transcript-metrics.json written by the RPC runner.
-Return completed only when the command succeeds and these paths are durable: ${JSON.stringify(item.paths)}. Report effective_model and effective_thinking exactly as run.json records them. On any error, return failed with a bounded error string.`, runtimeAgentOptions(executorRole, {
+Return completed only when the command succeeds and these paths are durable: ${JSON.stringify(executorPaths)}. The RPC runner writes every one of them; do not create, repair, or synthesize any of them yourself. Report effective_model and effective_thinking exactly as run.json records them. On any error, return failed with a bounded error string.`, runtimeAgentOptions(executorRole, {
     label: `execute:${item.identity}`,
     phase: 'Execute',
     schema: EXECUTION_SCHEMA,
