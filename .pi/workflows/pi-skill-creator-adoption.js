@@ -12,15 +12,19 @@ export const meta = {
     { title: 'Doctrine' },
     { title: 'Runtime workflow' },
     { title: 'README' },
-    { title: 'Integrate' },
   ],
 }
 
 const SOURCE_BASELINE = '0b9e86bc77a60fb34039456a6624ea94e396f5d1'
-const REQUIRED_PI = 'a4043c1e332a61e4c8648b97b9b796c57f9db110'
+const REQUIRED_PI = '7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0'
 const REQUIRED_SUBAGENTS = '7f569969445bf8bc6fbd7757f18db80b35de0ba9'
 const PYTEST = "uvx --from 'pytest==9.1.1' pytest"
 const TY = "uvx --from 'ty==0.0.77' ty"
+// Handoff decision 7: the three list fields have fixed meanings, and every writer and
+// integrator prompt states them so a mandated exclusion is never reported as skipped work.
+const THREE_FIELD_SEMANTICS = '`tests_skipped` lists intentionally skipped tests only; `bounded_work` lists mandated exclusions only; `skipped_work` lists required work left incomplete and must be `[]` on completion.'
+// Historical: the 17 order files the adoption run enumerated. OSC-17 and OSC-18 were added
+// later and run standalone, so this list is not extended.
 const REQUIRED_HANDOFF_FILES = [
   'docs/pi-skill-creator-work-orders/index.md',
   'docs/pi-skill-creator-work-orders/contracts.md',
@@ -184,7 +188,7 @@ const bounded = []
 const skipped = []
 
 async function runOrder(orderId, file, phaseName, gate) {
-  const prompt = `Implement work order ${orderId} from docs/pi-skill-creator-work-orders/${file} in your current isolated worktree. Read contracts.md and the complete order first. The main repository path ${repoPath} and runtime checkout paths are references only; write only in the current worktree. Follow passing-main TDD: observe the named red test, implement only this order, run every deterministic gate, and commit all owned changes. Do not run live or credentialed tests. Do not modify vendor/, skills/pi-skill-creator/, ${piPath}, or ${piSubagentsPath}. Before answering, verify exclusive ownership and return the required structured handoff, including your current branch and commit.`
+  const prompt = `Implement work order ${orderId} from docs/pi-skill-creator-work-orders/${file} in your current isolated worktree. Read contracts.md and the complete order first. The main repository path ${repoPath} and runtime checkout paths are references only; write only in the current worktree. Follow passing-main TDD: observe the named red test, implement only this order, run every deterministic gate, and commit all owned changes. Do not run live or credentialed tests. Do not modify vendor/, skills/pi-skill-creator/, ${piPath}, or ${piSubagentsPath}. Before answering, verify exclusive ownership and return the required structured handoff, including your current branch and commit. ${THREE_FIELD_SEMANTICS}`
   const result = await agent(prompt, {
     label: orderId,
     phase: phaseName,
@@ -201,13 +205,16 @@ async function runOrder(orderId, file, phaseName, gate) {
   return checked
 }
 
-async function integrateWave(label, results, gate) {
+// The integration agent runs under the phase of the implementation it integrates
+// (handoff decision 7): a separate `Integrate` phase made the UI show a late phase
+// running between the implementation phases.
+async function integrateWave(label, results, gate, phaseName) {
   const branches = results.map(result => result.branch)
   if (new Set(branches).size !== branches.length) throw new Error(`${label} returned duplicate branch names`)
-  const prompt = `Integrate ${label} into the current main checkout at ${repoPath}. Merge these already-gated worktree branches in order: ${JSON.stringify(branches)}. Read each structured handoff. Reject unexpected paths, ownership overlap, conflict, missing commit, bounded required work, or skipped work. Resolve no semantic contract by improvisation. Run the supplied non-live deterministic gate, commit the integration, and return the structured integration result.`
+  const prompt = `Integrate ${label} into the current main checkout at ${repoPath}. Merge these already-gated worktree branches in order: ${JSON.stringify(branches)}. Read each structured handoff. Reject unexpected paths, ownership overlap, conflict, missing commit, bounded required work, or skipped work. Resolve no semantic contract by improvisation. Run the supplied non-live deterministic gate, commit the integration, and return the structured integration result. ${THREE_FIELD_SEMANTICS}`
   const result = await agent(prompt, {
     label: `integrate:${label}`,
-    phase: 'Integrate',
+    phase: phaseName,
     agentType: 'general-purpose',
     model: integratorModel,
     effort: 'high',
@@ -222,7 +229,7 @@ async function integrateWave(label, results, gate) {
 
 phase('Foundation')
 const foundation = await runOrder('OSC-00', 'osc-00-test-foundation.md', 'Foundation', testGate)
-await integrateWave('foundation', [foundation], testGate)
+await integrateWave('foundation', [foundation], testGate, 'Foundation')
 
 phase('Contracts')
 const contractWave = await parallel([
@@ -232,7 +239,7 @@ const contractWave = await parallel([
   () => runOrder('OSC-04', 'osc-04-viewer-hardening.md', 'Contracts', viewerGate),
 ])
 if (contractWave.some(result => result === null)) throw new Error('Contracts wave failed or was skipped')
-await integrateWave('contracts', contractWave, contractsGate)
+await integrateWave('contracts', contractWave, contractsGate, 'Contracts')
 
 phase('Core')
 const coreWave = await parallel([
@@ -240,11 +247,11 @@ const coreWave = await parallel([
   () => runOrder('OSC-06', 'osc-06-bundled-agents.md', 'Core', contractsGate),
 ])
 if (coreWave.some(result => result === null)) throw new Error('Core wave failed or was skipped')
-await integrateWave('core', coreWave, coreGate)
+await integrateWave('core', coreWave, coreGate, 'Core')
 
 phase('Models')
 const models = await runOrder('OSC-07', 'osc-07-role-model-config.md', 'Models', fullGate)
-await integrateWave('models', [models], fullGate)
+await integrateWave('models', [models], fullGate, 'Models')
 
 phase('Execution')
 const executionWave = await parallel([
@@ -252,7 +259,7 @@ const executionWave = await parallel([
   () => runOrder('OSC-10', 'osc-10-rpc-profiles.md', 'Execution', fullGate),
 ])
 if (executionWave.some(result => result === null)) throw new Error('Execution wave failed or was skipped')
-await integrateWave('execution', executionWave, fullGate)
+await integrateWave('execution', executionWave, fullGate, 'Execution')
 
 phase('Doctrine')
 const doctrineWave = await parallel([
@@ -260,15 +267,15 @@ const doctrineWave = await parallel([
   () => runOrder('OSC-11', 'osc-11-testing-doctrine.md', 'Doctrine', fullGate),
 ])
 if (doctrineWave.some(result => result === null)) throw new Error('Doctrine wave failed or was skipped')
-await integrateWave('doctrine', doctrineWave, fullGate)
+await integrateWave('doctrine', doctrineWave, fullGate, 'Doctrine')
 
 phase('Runtime workflow')
 const runtimeWorkflow = await runOrder('OSC-12', 'osc-12-runtime-workflow-docs.md', 'Runtime workflow', fullGate)
-await integrateWave('runtime-workflow', [runtimeWorkflow], fullGate)
+await integrateWave('runtime-workflow', [runtimeWorkflow], fullGate, 'Runtime workflow')
 
 phase('README')
 const readme = await runOrder('OSC-13', 'osc-13-readme-deterministic.md', 'README', fullGate)
-await integrateWave('readme', [readme], fullGate)
+await integrateWave('readme', [readme], fullGate, 'README')
 
 if (skipped.length) throw new Error(`Required implementation work was skipped: ${skipped.join('; ')}`)
 log('Deterministic implementation complete. Paid/live calibration was not started.')

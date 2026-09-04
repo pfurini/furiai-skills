@@ -189,6 +189,9 @@ if (!Number.isInteger(input.iteration) || input.iteration < 1) fail('iteration m
 if (!Number.isInteger(input.repetitions) || input.repetitions < 1 || input.repetitions > 100) {
   fail('repetitions must be an integer from 1 to 100')
 }
+if (!Number.isInteger(input.maxAgentCalls) || input.maxAgentCalls < 1) {
+  fail('maxAgentCalls must be a positive integer bounding the workflow children of this campaign')
+}
 if (!Array.isArray(input.evals) || input.evals.length === 0 || input.evals.length > 256) {
   fail('evals must contain from 1 to 256 evaluations')
 }
@@ -233,6 +236,20 @@ const extensionPath = `${piSubagentsCheckout}/src/index.ts`
 const expectedRuns = evaluations.length * CONFIGURATIONS.length * input.repetitions
 const scheduledRuns = Math.min(expectedRuns, MAX_SCHEDULED_RUNS)
 
+// The mechanical call bound. The exact plan is known before the first call: one setup
+// launcher, one execute launcher and one grader per scheduled run, one validate launcher,
+// and one aggregate launcher. A plan above the bound is refused here; the runtime guard
+// in safeAgent() then makes sure the count never exceeds the bound even if the plan and
+// the run diverge. The bound covers workflow children only: the comparator, analyzers,
+// and viewer calls made from the top-level session are counted by the caller's manifest,
+// and measured RPC executor processes are counted by their run.json records.
+const maxAgentCalls = input.maxAgentCalls
+const agentCallsPlanned = 1 + 2 * scheduledRuns + 2
+if (agentCallsPlanned > maxAgentCalls) {
+  fail(`maxAgentCalls ${maxAgentCalls} is below the planned ${agentCallsPlanned} agent calls (1 setup + 2 per scheduled run + 1 validate + 1 aggregate for ${scheduledRuns} scheduled runs)`)
+}
+let agentCallsMade = 0
+
 // The runtime shim. Every agent() options object is built here from the shared
 // keys (label, phase, schema) plus the role's model and thinking. pi-subagents
 // takes the thinking level as `effort`; pi-dynamic-workflows takes it only as a
@@ -248,8 +265,14 @@ function runtimeAgentOptions(role, options) {
 // The only call site of agent(). A null result and a thrown error both become
 // accounted failed items, so a child failure never escapes a pipeline stage on
 // either runtime. `failure_kind` is private to this script: every child schema
-// forbids additional properties, so a child cannot forge it.
+// forbids additional properties, so a child cannot forge it. The counter moves
+// before the call: a call that would exceed maxAgentCalls is never launched and
+// comes back as a bounded item, which is not a failure.
 async function safeAgent(prompt, options, identity) {
+  if (agentCallsMade + 1 > maxAgentCalls) {
+    return { status: 'bounded', error: `bounded: ${identity}: max_agent_calls ${maxAgentCalls} reached` }
+  }
+  agentCallsMade += 1
   let result
   try {
     result = await agent(prompt, options)
@@ -338,6 +361,9 @@ if (setupResult.status !== 'completed') {
     status_counts: { completed: 0, failed: 0, skipped: 0, bounded: expectedRuns },
     failure_kinds: failureKinds,
     stage_statuses: { setup: 'failed', validation: 'bounded', aggregation: 'bounded' },
+    agent_calls_planned: agentCallsPlanned,
+    agent_calls_made: agentCallsMade,
+    max_agent_calls: maxAgentCalls,
     durable_paths: basePaths,
     requested_roles: requestedRoles,
     effective_roles: { executor: null, grader: null },
@@ -390,6 +416,9 @@ Return completed only when the command succeeds and these paths are durable: ${J
     phase: 'Execute',
     schema: EXECUTION_SCHEMA,
   }), `execute:${item.identity}`)
+  if (execution.status === 'bounded') {
+    return { status: 'bounded', item, execution, grading: null, error: execution.error ?? `execute:${item.identity} was bounded` }
+  }
   if (execution.status !== 'completed') {
     return { status: 'failed', failure_kind: failureKind(execution), item, execution, grading: null, error: execution.error ?? `execute:${item.identity} returned ${execution.status}` }
   }
@@ -419,6 +448,9 @@ Write one pi-skill-creator.grading/v1 JSON object plus LF to grading_path. Retur
     phase: 'Grade',
     schema: GRADING_SCHEMA,
   }), `grade:${item.identity}`)
+  if (grading.status === 'bounded') {
+    return { ...executionResult, status: 'bounded', grading, error: grading.error ?? `grade:${item.identity} was bounded` }
+  }
   if (grading.status !== 'completed') {
     return { ...executionResult, status: 'failed', failure_kind: failureKind(grading), grading, error: grading.error ?? `grade:${item.identity} returned ${grading.status}` }
   }
@@ -453,7 +485,8 @@ for (let index = 0; index < workItems.length; index += 1) {
     result = { ...result, status: 'failed', failure_kind: failure.failure_kind, error: failure.error }
   }
   statusCounts[result.status] += 1
-  if (result.status !== 'completed') countFailure(result)
+  // A bounded item was never launched, so it is not a failure and takes no failure kind.
+  if (result.status !== 'completed' && result.status !== 'bounded') countFailure(result)
   accountedResults.push({
     status: result.status,
     eval_id: item.evaluation.eval_id,
@@ -489,7 +522,7 @@ It validates campaign.json, evals, every run.json, transcript-metrics.json, grad
     phase: 'Validate',
     schema: VALIDATION_SCHEMA,
   }), 'validate')
-  if (validation.status !== 'completed') countFailure(validation)
+  if (validation.status !== 'completed' && validation.status !== 'bounded') countFailure(validation)
 }
 const validationCompleted = validation !== null && validation.status === 'completed'
 
@@ -509,7 +542,7 @@ Do not repair, omit, or synthesize missing records. Return completed with benchm
     && !(samePath(aggregation.benchmark_json_path, benchmarkJson) && samePath(aggregation.benchmark_markdown_path, benchmarkMarkdown))) {
     aggregation = contractFailure('aggregate', 'benchmark paths did not match the iteration directory')
   }
-  if (aggregation.status !== 'completed') countFailure(aggregation)
+  if (aggregation.status !== 'completed' && aggregation.status !== 'bounded') countFailure(aggregation)
 }
 const aggregationCompleted = aggregation !== null && aggregation.status === 'completed'
 
@@ -534,7 +567,7 @@ for (const result of accountedResults) {
 }
 
 function stageStatus(result, ran) {
-  if (!ran || result === null) return 'bounded'
+  if (!ran || result === null || result.status === 'bounded') return 'bounded'
   return result.status === 'completed' ? 'completed' : 'failed'
 }
 
@@ -550,6 +583,9 @@ return {
     validation: stageStatus(validation, allRunsCompleted),
     aggregation: stageStatus(aggregation, validationCompleted),
   },
+  agent_calls_planned: agentCallsPlanned,
+  agent_calls_made: agentCallsMade,
+  max_agent_calls: maxAgentCalls,
   durable_paths: durablePaths,
   requested_roles: requestedRoles,
   effective_roles: {

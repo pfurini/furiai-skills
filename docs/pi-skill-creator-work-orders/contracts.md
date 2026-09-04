@@ -6,7 +6,7 @@ Executors implement these contracts exactly. A conflict discovered against the p
 
 - Immutable source baseline: `0b9e86bc77a60fb34039456a6624ea94e396f5d1`. It only freezes the F19 removal and pre-implementation skill state; adoption never starts from that SHA.
 - Adoption implementation start: the caller supplies a full `implementationStartCommit` naming the later clean current `HEAD` that contains this contract, the index, all 17 OSC orders, and both project workflows. It must descend from or equal the source baseline. All isolated implementation worktrees branch from this handoff-containing commit, and all adoption branch/integration diff gates use `implementationStartCommit..HEAD`.
-- Pi checkout: `/absolute/path` supplied by workflow input, revision `a4043c1e332a61e4c8648b97b9b796c57f9db110`, version `0.84.4`.
+- Pi checkout: `/absolute/path` supplied by workflow input, revision `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0`, version `0.84.4`. This revision is one commit past `a4043c1e332a61e4c8648b97b9b796c57f9db110` and changes only `packages/ai/scripts/generate-models.ts`; `packages/ai/src/models.generated.ts` is identical at both revisions, and the executable is a pre-commit build with identical behavior that reports `0.84.4`.
 - Pi executable: a separate absolute `piExecutable` workflow input; preflight requires it to be executable and report Pi `0.84.4`.
 - pi-subagents checkout: `/absolute/path` supplied by workflow input, revision `7f569969445bf8bc6fbd7757f18db80b35de0ba9`, version `0.19.0`. This revision differs from `bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4` only by the case-insensitive workflow-tool collision check in `src/workflow/collisions.ts`, which lets `SubagentWorkflow` stand down beside pi-dynamic-workflows' `workflow` tool.
 - pi-dynamic-workflows checkout: `/absolute/path` supplied by the `PI_DYNAMIC_WORKFLOWS_CHECKOUT` test input and by the runtime workflow's `runtimeCheckout` argument, revision `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`, version `3.10.0`. Tests that execute through it require `node_modules/.bin/tsx` produced by `npm ci` in that checkout; that directory is covered by the checkout's `.gitignore` and is the only permitted change there.
@@ -72,6 +72,8 @@ campaign-<campaign-id>/
 
 Eval directory names are descriptive and match `[a-z0-9][a-z0-9-]{0,63}`. The only configuration directory names are `with_skill` and `without_skill`. The `run-N` layer is mandatory. Discovery of zero runs, a missing expected arm, a missing repetition, or an unexpected configuration is fatal and writes no benchmark artifact.
 
+The campaign root may additionally hold `workflow-result.json` (the workflow tool's returned object, saved verbatim by the caller) and a `comparisons/` directory for blind-comparison records made from the top-level session. The aggregator reads neither. `iteration-N/` accepts no file other than `benchmark.json`, `benchmark.md`, `feedback.json`, and `viewer.pid`, and no directory other than eval directories.
+
 ## C4. Terminology
 
 A graded claim is an **expectation** everywhere. The JSON key is `expectations`. `assertion` is not a schema synonym.
@@ -92,7 +94,7 @@ The experiment roles are:
   "campaign_id": "fork-smoke-1",
   "created_at": "2026-09-02T12:00:00Z",
   "repository_revision": "<40-hex>",
-  "pi_revision": "a4043c1e332a61e4c8648b97b9b796c57f9db110",
+  "pi_revision": "7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0",
   "pi_subagents_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
   "workflow_runtime": "pi-subagents",
   "workflow_runtime_revision": "7f569969445bf8bc6fbd7757f18db80b35de0ba9",
@@ -262,6 +264,8 @@ It launches the explicit absolute Pi executable input using `<pi-executable> --m
 
 The CLI requires absolute `--pi-executable`, `--pi-checkout`, `--evaluation-cwd`, `--skill-path`, and `--run-dir`, plus `--model`, an explicit `--thinking`, and `--profile`. `declared-dependencies` additionally requires absolute repeatable `--extension` values. Queries are sent in JSON on stdin, never as the argument following `-p`, so leading `@` and `-` survive.
 
+A run directory is at most one measured executor call. When `--run-dir` already contains `run.json` or `transcript.jsonl`, the runner fails with kind `invalid_input` and exit status 2 before launching any process, and it never deletes stale records. A retry needs a new run directory that the campaign plan accounts for.
+
 RPC extension UI dialog requests are a run failure in automated campaigns. Fire-and-forget UI notifications may be recorded and ignored. Timeouts terminate the process group and classify the run as `timeout`. Nonzero process exits and malformed protocol records never produce `completed` run metadata.
 
 ## C10. Bundled agent identities
@@ -292,6 +296,8 @@ The skill invokes the script through `SubagentWorkflow` with `scriptPath` when o
 The script uses only the subset both runtimes implement: `meta { name, description, phases: [{ title }] }`, `phase()`, `agent()`, `parallel()`, `pipeline()`, `log()`, `args`, and `budget.spent()`. `agent()` options are only `label`, `phase`, `schema`, and `model`, plus `effort` emitted by the shim for pi-subagents. One shim function keyed on `args.runtime` is the only code that knows the runtimes differ: for `pi-subagents` it passes `model: "<provider/id>"` and `effort: "<thinking>"`; for `pi-dynamic-workflows` it passes `model: "<provider/id>:<thinking>"` and no `effort` key. `gate`, `agentType`, `resume`, `isolation`, `tier`, `thread`, `timeoutMs`, `retries`, `whenToUse`, and phase `detail` do not appear anywhere in the script. Role prompts tell the child to read `${skillCreatorPath}/agents/<role>.md` by absolute path and follow it; bundled-agent frontmatter does not apply to workflow children. The script contains no revision literal: the setup launcher records `workflow_runtime` from `args.runtime` and reads `workflow_runtime_revision`, `pi_revision`, `pi_subagents_revision`, and `repository_revision` with `git -C <checkout> rev-parse HEAD`.
 
 Every `agent()` call goes through `safeAgent()`, which turns a `null` result and a thrown error into an accounted `failed` item whose bounded `error` string begins with `null-result:` or `thrown:`. `status_counts` has exactly the buckets `completed`, `failed`, `skipped`, and `bounded`, and they sum to `expected_runs`; a separate `failure_kinds` object counts `null_result`, `thrown`, `explicit`, and `contract` failures and takes no part in that sum. It uses `pipeline()` for execution-to-grading and `parallel()` only for a true all-results synthesis. After grading and before aggregation a launcher agent runs `python -m scripts.aggregate_benchmark <iteration-dir> --validate-only`, which validates the whole iteration tree and writes nothing; Python validation is the authority, and the aggregation step validates again. Any failed item, a failed validation, or a failed aggregation makes the campaign result `valid: false`; nothing is dropped by `.filter(Boolean)` without an explicit count.
+
+`maxAgentCalls` is a required positive integer. Before the first `agent()` call the script computes `agent_calls_planned` as `1` (setup) `+ 2 × scheduled_runs` (one execute launcher and one grader per scheduled run) `+ 1` (validate) `+ 1` (aggregate) and fails argument validation, naming `maxAgentCalls`, when the plan exceeds the bound. At runtime `safeAgent()` counts every call before making it; a call that would exceed the bound is never launched and is accounted as a `bounded` item (`failure_kinds` unchanged). The returned object reports `agent_calls_planned`, `agent_calls_made`, and `max_agent_calls`, and `agent_calls_made` never exceeds `max_agent_calls`. The bound covers workflow children only: the comparator, any analyzer, and any viewer call made from the top-level session are counted separately by the caller's manifest, and measured RPC executor processes are counted by their `run.json` records.
 
 ## C12. Test tiers and exact commands
 
@@ -333,7 +339,7 @@ PI_SKILL_CREATOR_CAMPAIGN_DIR=/absolute/path/outside/skill \
 uvx --from 'pytest==9.1.1' pytest -q tests/pi-skill-creator -m live
 ```
 
-The calibration workflow performs paid calls under its explicit bound, then runs this command only to replay and validate durable records. `PI_SKILL_CREATOR_REPLAY_ONLY=1` is a hard no-model-call mode. `PI_SKILL_CREATOR_LIVE_TESTS=1` alone is not approval.
+The calibration workflow makes no paid call in any stage. The smoke campaign is run from the top-level Pi session under the human-approved manifest, and the workflow's `calibrate` stage then runs this command only to replay and validate the durable records against `PI_SKILL_CREATOR_MAX_PAID_CALLS`. `PI_SKILL_CREATOR_REPLAY_ONLY=1` is a hard no-model-call mode. `PI_SKILL_CREATOR_LIVE_TESTS=1` alone is not approval.
 
 ### Deterministic branch-tip gates
 
@@ -377,9 +383,10 @@ Credentialed tests are never required to make an implementation branch green. Th
 
 ## C15. Calibration workflow stage-start commit
 
-The required `stageStartCommit` argument always names the exact clean repository commit at which that workflow invocation starts:
+The calibration workflow has three stages, each a separate invocation, and makes no paid call in any of them. The required `stageStartCommit` argument is validated as a lowercase 40-hex string before any use, is shell-quoted in every gate, and always names the exact clean repository commit at which that invocation starts:
 
-- for `stage: "calibrate"`, it equals the deterministic `implementationIntegrationCommit` returned by `.pi/workflows/pi-skill-creator-adoption.js`;
-- for `stage: "finalize"`, it equals the `calibrationIntegrationCommit` returned by the earlier calibration invocation, after the human has reviewed that commit's campaign records.
+- for `stage: "preflight"`, it equals the OSC-18 integration commit (the commit at which the smoke will run). Preflight requires no approval token, spends nothing, and writes nothing: it verifies the pins, the clean tree at `stageStartCommit`, the executable version, that every manifest model prints an exact `provider` and `model` row from `pi --list-models <provider/id>`, that the installed skill copy is byte-for-byte equal to `skills/pi-skill-creator/` and is the only copy in Pi's skill roots, and the manifest schema, then returns structured output;
+- for `stage: "preflight"`, it equals the OSC-18 integration commit (the commit at which the smoke will run). Preflight requires no approval token, spends nothing, and writes nothing: it verifies the four checkout pins, the clean tree at `stageStartCommit`, the executable version, that every manifest model prints an exact `provider` and `model` row from `pi --list-models <provider/id>`, that the installed skill copy is byte-for-byte equal to `skills/pi-skill-creator/` and is the only copy in the two user skill roots (`~/.pi/agent/skills` and `~/.agents/skills`; project roots under the evaluation project are the human's responsibility and the smoke uses a fresh directory), and the manifest schema, then returns structured output;
+- for `stage: "finalize"`, it equals the `calibrationIntegrationCommit` returned by the calibrate invocation, after the human has reviewed that commit's campaign records. Finalize requires `approval: "APPROVE_CALIBRATION_RESULTS"`, `humanReviewComplete: true`, and the absolute immutable human review record.
 
-Preflight requires repository `HEAD` to equal `stageStartCommit` exactly and the tree to be clean. The two stages remain separate invocations: calibration requires `approval: "APPROVE_PAID_CALIBRATION"`; finalization requires `approval: "APPROVE_CALIBRATION_RESULTS"`, `humanReviewComplete: true`, and the absolute immutable human review record. A commit argument, prior approval, or review-file existence never authorizes the other stage.
+Preflight for every stage requires repository `HEAD` to equal `stageStartCommit` exactly and the tree to be clean. A commit argument, a prior approval, a preflight result, or review-file existence never authorizes another stage.

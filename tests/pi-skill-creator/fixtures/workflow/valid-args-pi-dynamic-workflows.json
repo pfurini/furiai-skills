@@ -13,6 +13,7 @@
   "environmentProfile": "declared-dependencies",
   "iteration": 1,
   "repetitions": 1,
+  "maxAgentCalls": 7,
   "evals": [
     {
       "eval_id": 1,

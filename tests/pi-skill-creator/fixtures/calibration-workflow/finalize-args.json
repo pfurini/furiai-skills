@@ -1,0 +1,18 @@
+{
+  "stage": "finalize",
+  "approval": "APPROVE_CALIBRATION_RESULTS",
+  "humanReviewComplete": true,
+  "humanReviewRecord": "/tmp/skill-creator-calibration/review/calibration-review.json",
+  "stageStartCommit": "9e0f3f2a9c1e5b7d4e6f8a0b1c2d3e4f5a6b7c8d",
+  "repoPath": "/tmp/skill-creator-calibration/furiai-skills",
+  "piPath": "/tmp/skill-creator-calibration/pi",
+  "piSubagentsPath": "/tmp/skill-creator-calibration/pi-subagents",
+  "piDynamicWorkflowsPath": "/tmp/skill-creator-calibration/pi-dynamic-workflows",
+  "piClaudeBridgePath": "/tmp/skill-creator-calibration/pi-claude-bridge",
+  "piExecutable": "/tmp/skill-creator-calibration/bin/pi",
+  "installedSkillPath": "/tmp/skill-creator-calibration/home/.pi/agent/skills/pi-skill-creator",
+  "campaignDir": "/tmp/skill-creator-calibration/evaluation/.skill-creator/release-note-smoke/campaign-smoke-1",
+  "orchestratorModel": "fixture/orchestrator",
+  "writerModel": "fixture/writer",
+  "integratorModel": "fixture/integrator"
+}

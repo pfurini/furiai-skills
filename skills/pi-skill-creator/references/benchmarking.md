@@ -22,6 +22,7 @@ The runtime workflow takes caller-supplied values only. Supply:
 - `campaignId` matching `[a-z0-9][a-z0-9-]{0,63}` and `createdAt` as a UTC timestamp;
 - absolute `projectRoot`, target `skillPath`, `${PI_SKILL_DIR}` as `skillCreatorPath`, `piExecutable`, `piCheckout`, and `piSubagentsCheckout` (the RPC runner still loads pi-subagents for `declared-dependencies`, whichever runtime orchestrates; under `runtime: pi-subagents`, `runtimeCheckout` must equal `piSubagentsCheckout`);
 - one `environmentProfile`, a positive `iteration`, `repetitions`, and the complete `evals` array;
+- `maxAgentCalls`, a positive integer bounding the workflow children: the exact plan is `1 + 2 × scheduled runs + 2` (one setup launcher, one execute launcher and one grader per scheduled run, one validate launcher, one aggregate launcher), so one eval, two arms, and one repetition plan 7 calls. The workflow computes the plan before its first call and refuses a plan above the bound; at runtime a call that would exceed the bound is never launched and is accounted as `bounded`. The bound covers workflow children only: the comparator, any analyzer, and any viewer call made from the top-level session are counted separately by the approved campaign manifest, and measured RPC executor processes are counted by their `run.json` records;
 - each eval's positive `eval_id`, descriptive `eval_name`, realistic `prompt`, and non-empty `expectations`;
 - explicit `model` (`provider/id`, no thinking suffix) and `thinking` entries for `executor`, `grader`, `comparator`, and `benchmarkAnalyzer`; `thinking` is one of `minimal`, `low`, `medium`, `high`, `xhigh`, `max`, because `off` cannot be requested on both runtimes and a campaign must stay portable;
 - `approved: true`.
@@ -55,8 +56,9 @@ SubagentWorkflow
     piSubagentsCheckout: /absolute/checkouts/pi-subagents
     environmentProfile: declared-dependencies
     iteration: 1
-    repetitions: 3
-    evals: <approved eval array>
+    repetitions: 1
+    maxAgentCalls: 7
+    evals: <approved eval array with one eval; 1 + 2 × scheduled runs + 2>
     roles: <explicit role model/thinking object>
 ```
 
@@ -67,6 +69,7 @@ workflow
     approved: true
     runtime: pi-dynamic-workflows
     runtimeCheckout: /absolute/checkouts/pi-dynamic-workflows
+    maxAgentCalls: 7
     <the same remaining args as above>
 ```
 
@@ -120,6 +123,8 @@ The runtime workflow prepares metadata, then uses `pipeline()` so each completed
 
 Fork and dependency executors are launcher agents that invoke `scripts.rpc_runner` with the explicit Pi executable, checkout, target skill, profile, model, thinking, identity, and run directory. The runner loads the target through `--skill` only for `with_skill`; `without_skill` omits it. Under `declared-dependencies`, it loads `<pi-subagents-checkout>/src/index.ts` explicitly. Do not add a separate `--skill` argument to the workflow call or claim that a prompt alone loads the target.
 
+A run directory holds at most one measured executor call. The runner refuses a `--run-dir` that already contains `run.json` or `transcript.jsonl` (exit status 2, kind `invalid_input`) before launching any process, and it never deletes stale records; a retry needs a new run directory that the campaign plan accounts for. A failed run leaves its `transcript.jsonl` behind, so a failed directory is refused on retry as well.
+
 Workflow children are plain launchers on both runtimes: the script never dispatches a bundled agent by type. The grader launcher is told to read `${PI_SKILL_DIR}/agents/grader.md` by absolute path and follow it, and its model and thinking come from `roles.grader`. Bundled-agent frontmatter (`tools`, `extensions`, `max_turns`) applies only to the top-level `Agent` path.
 
 Use the supported evidence seam:
@@ -132,7 +137,7 @@ Launcher usage is orchestration overhead. Never relabel it as executor usage or 
 
 The `grader` agent grades one run against every expectation and writes `grading.json` with cited evidence. After complete aggregation, use `benchmark-analyzer` to identify expectation, variance, cost, and failure patterns without suggesting edits. For a blind output-quality comparison, give outputs A and B to `comparator`, then give the winner and both skills to `comparison-analyzer` for unblinded causes and improvements. Keep the comparator blind to `with_skill`, `without_skill`, treatment, and control identity. The comparator is `claude-bridge/claude-opus-5` at `high` thinking (`max` for critical skills) and loads only `pi-claude-bridge`; requested and effective model must both equal that pin, and an unresolved pin fails the campaign. For outputs produced by Claude-family executors it is not family-independent, and the campaign record says so in `notes`.
 
-The workflow returns `workflow_runtime`, campaign and iteration paths, status counts, failure kinds, stage statuses, validity, requested roles, observed effective executor/grader metadata, `workflow_output_tokens`, and per-item results. Treat `valid: false` as no benchmark claim, even if some durable run artifacts exist.
+The workflow returns `workflow_runtime`, campaign and iteration paths, status counts, failure kinds, stage statuses, validity, requested roles, observed effective executor/grader metadata, `workflow_output_tokens`, per-item results, and the call accounting `agent_calls_planned`, `agent_calls_made`, and `max_agent_calls` (`agent_calls_made` never exceeds `max_agent_calls`). Treat `valid: false` as no benchmark claim, even if some durable run artifacts exist; anything bounded also makes the result `valid: false`.
 
 ## Aggregate and inspect
 

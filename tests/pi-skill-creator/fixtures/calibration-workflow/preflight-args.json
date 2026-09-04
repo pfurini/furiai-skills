@@ -1,0 +1,26 @@
+{
+  "stage": "preflight",
+  "stageStartCommit": "3f2a9c1e5b7d4e6f8a0b1c2d3e4f5a6b7c8d9e0f",
+  "repoPath": "/tmp/skill-creator-calibration/furiai-skills",
+  "piPath": "/tmp/skill-creator-calibration/pi",
+  "piSubagentsPath": "/tmp/skill-creator-calibration/pi-subagents",
+  "piDynamicWorkflowsPath": "/tmp/skill-creator-calibration/pi-dynamic-workflows",
+  "piClaudeBridgePath": "/tmp/skill-creator-calibration/pi-claude-bridge",
+  "piExecutable": "/tmp/skill-creator-calibration/bin/pi",
+  "installedSkillPath": "/tmp/skill-creator-calibration/home/.pi/agent/skills/pi-skill-creator",
+  "campaignDir": "/tmp/skill-creator-calibration/evaluation/.skill-creator/release-note-smoke/campaign-smoke-1",
+  "orchestratorModel": "fixture/orchestrator",
+  "writerModel": "fixture/writer",
+  "integratorModel": "fixture/integrator",
+  "campaignId": "smoke-1",
+  "createdAt": "2026-09-04T12:00:00Z",
+  "repetitions": 1,
+  "maxPaidCalls": 10,
+  "models": {
+    "executor": {"model": "openai-codex/gpt-5.6-terra", "thinking": "medium"},
+    "grader": {"model": "openai-codex/gpt-5.6-sol", "thinking": "high"},
+    "comparator": {"model": "claude-bridge/claude-opus-5", "thinking": "high"},
+    "benchmarkAnalyzer": {"model": "openai-codex/gpt-5.6-terra", "thinking": "medium"}
+  },
+  "scenarios": ["runtime-workflow-smoke"]
+}

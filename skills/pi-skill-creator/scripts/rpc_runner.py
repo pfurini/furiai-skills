@@ -22,7 +22,7 @@ from scripts.transcript_metrics import TranscriptMetricsError, parse_transcript
 EnvironmentProfile = Literal["in-situ", "hermetic-core", "declared-dependencies"]
 Configuration = Literal["with_skill", "without_skill"]
 
-PI_REVISION = "a4043c1e332a61e4c8648b97b9b796c57f9db110"
+PI_REVISION = "7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0"
 PI_VERSION = "0.84.4"
 RPC_PROTOCOL_VERSION = 3
 TRANSCRIPT_FORMAT = "pi-json-events-v3"
@@ -529,13 +529,22 @@ def run_rpc(prompt: str, config: RpcRunConfig) -> dict[str, Any]:
     if not isinstance(prompt, str) or not prompt:
         raise RpcRunnerError("invalid_input", "prompt must be a non-empty string")
     validated = _validate_config(config)
-    validated.run_dir.mkdir(parents=True, exist_ok=True)
-    (validated.run_dir / "outputs").mkdir(exist_ok=True)
     transcript_path = validated.run_dir / "transcript.jsonl"
     metrics_path = validated.run_dir / "transcript-metrics.json"
     run_path = validated.run_dir / "run.json"
-    for stale_path in (run_path, metrics_path, transcript_path):
-        stale_path.unlink(missing_ok=True)
+    # One run directory is at most one measured executor call (contract C9). A directory
+    # that already holds a completed record or the transcript of a failed run is refused
+    # before any directory is created or any process launches, and nothing is deleted:
+    # a retry needs a new run directory that the campaign plan accounts for.
+    for existing in (run_path, transcript_path):
+        if existing.exists():
+            raise RpcRunnerError(
+                "invalid_input",
+                f"run directory {validated.run_dir} already holds {existing.name}; "
+                "a run directory is at most one measured call, so retry into a new directory",
+            )
+    validated.run_dir.mkdir(parents=True, exist_ok=True)
+    (validated.run_dir / "outputs").mkdir(exist_ok=True)
     validate_runtime(validated)
 
     try:

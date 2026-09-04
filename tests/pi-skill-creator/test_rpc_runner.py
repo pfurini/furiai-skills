@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -18,6 +19,8 @@ from conftest import PI_REVISION, SKILL_ROOT, TEST_ROOT
 sys.path.insert(0, os.fspath(SKILL_ROOT))
 
 from scripts.rpc_runner import (  # noqa: E402
+    PI_REVISION as RUNNER_PI_REVISION,
+    PI_VERSION,
     RPC_PROTOCOL_VERSION,
     TRANSCRIPT_FORMAT,
     RpcRunConfig,
@@ -27,7 +30,11 @@ from scripts.rpc_runner import (  # noqa: E402
     build_pi_command,
     profile_arguments,
     run_rpc,
+    validate_runtime,
 )
+
+SUPERSEDED_PI_REVISION = "a4043c1e332a61e4c8648b97b9b796c57f9db110"
+REPINNED_PI_REVISION = "7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0"
 
 RPC_FIXTURES = TEST_ROOT / "fixtures/rpc"
 
@@ -250,6 +257,132 @@ def test_timeout_terminates_process_group_without_run_metadata(
     assert raised.value.kind == "timeout"
     assert (config.run_dir / "transcript.jsonl").is_file()
     assert not (config.run_dir / "run.json").exists()
+
+
+def test_run_directory_refuses_a_second_measured_call(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """One run directory is at most one measured executor call (OSC-18)."""
+    _patch_runtime_validation(monkeypatch)
+    args_path = tmp_path / "args.json"
+    monkeypatch.setenv("FAKE_PI_ARGS", os.fspath(args_path))
+    config = _config(tmp_path)
+
+    first = run_rpc("first measured call", config)
+    run_path = config.run_dir / "run.json"
+    transcript_path = config.run_dir / "transcript.jsonl"
+    recorded_run = run_path.read_bytes()
+    recorded_transcript = transcript_path.read_bytes()
+    args_path.unlink()
+
+    with pytest.raises(RpcRunnerError, match=re.escape(os.fspath(config.run_dir.resolve()))) as raised:
+        run_rpc("second measured call", config)
+
+    assert raised.value.kind == "invalid_input"
+    assert not args_path.exists(), "no Pi process may launch into a used run directory"
+    assert run_path.read_bytes() == recorded_run
+    assert transcript_path.read_bytes() == recorded_transcript
+    assert first == json.loads(run_path.read_text(encoding="utf-8"))
+
+    # A failed run leaves transcript.jsonl behind, so its directory is refused on retry too.
+    failed_dir = tmp_path / "failed-run"
+    failed_dir.mkdir()
+    (failed_dir / "transcript.jsonl").write_bytes(b'{"type":"fixture"}\n')
+    with pytest.raises(RpcRunnerError, match="transcript.jsonl") as refused:
+        run_rpc("retry into a failed directory", replace(config, run_dir=failed_dir))
+    assert refused.value.kind == "invalid_input"
+    assert not args_path.exists()
+    assert not (failed_dir / "run.json").exists()
+
+
+def test_cli_refuses_run_directory_with_existing_run_json(
+    skill_root: Path, tmp_path: Path
+) -> None:
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (run_dir / "run.json").write_text("{}\n", encoding="utf-8")
+    args_path = tmp_path / "args.json"
+    evaluation_cwd = tmp_path / "evaluation"
+    evaluation_cwd.mkdir()
+    skill_path = tmp_path / "skills/example-skill"
+    skill_path.mkdir(parents=True)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "scripts.rpc_runner",
+            "--pi-executable",
+            os.fspath(_fake_pi(tmp_path)),
+            "--pi-checkout",
+            os.fspath(tmp_path),
+            "--evaluation-cwd",
+            os.fspath(evaluation_cwd),
+            "--skill-path",
+            os.fspath(skill_path),
+            "--run-dir",
+            os.fspath(run_dir),
+            "--model",
+            "provider/model",
+            "--thinking",
+            "low",
+            "--profile",
+            "hermetic-core",
+            "--campaign-id",
+            "cli-1",
+            "--eval-id",
+            "1",
+            "--eval-name",
+            "cli-eval",
+            "--configuration",
+            "without_skill",
+            "--run-number",
+            "1",
+        ],
+        cwd=skill_root,
+        env={**os.environ, "FAKE_PI_ARGS": os.fspath(args_path)},
+        input="fixture prompt",
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert result.stdout == ""
+    assert result.stderr.count("\n") == 1
+    assert "run.json" in result.stderr and os.fspath(run_dir.resolve()) in result.stderr
+    assert len(result.stderr.encode()) <= 2048
+    assert not args_path.exists(), "the CLI must refuse before launching Pi"
+    assert (run_dir / "run.json").read_text(encoding="utf-8") == "{}\n"
+
+
+def test_rpc_runner_refuses_the_superseded_pi_revision(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """OSC-18 re-pins Pi; the superseded revision is refused as `invalid_runtime`."""
+    assert RUNNER_PI_REVISION == REPINNED_PI_REVISION
+    assert RUNNER_PI_REVISION == PI_REVISION, "conftest and the runner must agree on the pin"
+    assert PI_VERSION == "0.84.4"
+    config = _config(tmp_path)
+
+    def fake_output(revision: str):
+        def _command_output(command: list[str], *, label: str) -> str:
+            if command[1:] == ["--version"]:
+                return PI_VERSION
+            assert command[:2] == ["git", "-C"] and command[-2:] == ["rev-parse", "HEAD"]
+            return revision
+
+        return _command_output
+
+    monkeypatch.setattr("scripts.rpc_runner._command_output", fake_output(SUPERSEDED_PI_REVISION))
+    with pytest.raises(RpcRunnerError, match="Pi revision mismatch") as raised:
+        validate_runtime(config)
+    assert raised.value.kind == "invalid_runtime"
+    assert REPINNED_PI_REVISION in str(raised.value)
+    assert SUPERSEDED_PI_REVISION in str(raised.value)
+
+    monkeypatch.setattr("scripts.rpc_runner._command_output", fake_output(REPINNED_PI_REVISION))
+    validate_runtime(config)
 
 
 def test_cli_requires_all_absolute_inputs_and_reads_prompt_from_stdin(

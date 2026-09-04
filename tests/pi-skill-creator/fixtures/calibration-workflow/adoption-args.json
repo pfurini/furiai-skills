@@ -1,0 +1,10 @@
+{
+  "approval": "APPROVE_IMPLEMENTATION",
+  "implementationStartCommit": "5a6b7c8d9e0f3f2a9c1e5b7d4e6f8a0b1c2d3e4f",
+  "repoPath": "/tmp/skill-creator-calibration/furiai-skills",
+  "piPath": "/tmp/skill-creator-calibration/pi",
+  "piSubagentsPath": "/tmp/skill-creator-calibration/pi-subagents",
+  "piExecutable": "/tmp/skill-creator-calibration/bin/pi",
+  "writerModel": "fixture/writer",
+  "integratorModel": "fixture/integrator"
+}

@@ -353,6 +353,10 @@ def _assert_complete_success(value: dict[str, Any], runtime: str) -> None:
     assert value["telemetry"]["per_launcher_cost"] == "unavailable"
     assert value["effective_roles"]["executor"]["models"] == ["fixture/executor-effective"]
     assert value["effective_roles"]["grader"]["models"] == ["fixture/grader-effective"]
+    # One eval, two arms, one repetition: 1 setup + 2 executes + 2 grades + validate + aggregate.
+    assert value["agent_calls_planned"] == 7
+    assert value["agent_calls_made"] == 7
+    assert value["max_agent_calls"] == 7
 
 
 def _assert_pipeline_order(labels: list[str]) -> None:
@@ -558,6 +562,140 @@ def test_runtime_workflow_refuses_unportable_arguments(
     assert result["calls"] == []
 
 
+def _max_agent_calls_cases() -> list[Any]:
+    cases: list[tuple[str, Callable[[dict[str, Any]], None]]] = [
+        ("plan-above-bound", lambda args: args.update(maxAgentCalls=6)),
+        ("zero", lambda args: args.update(maxAgentCalls=0)),
+        ("negative", lambda args: args.update(maxAgentCalls=-1)),
+        ("fractional", lambda args: args.update(maxAgentCalls=1.5)),
+        ("string", lambda args: args.update(maxAgentCalls="7")),
+        ("missing", lambda args: args.pop("maxAgentCalls")),
+    ]
+    return [
+        pytest.param(runtime, mutate, id=f"{runtime}-{name}")
+        for runtime in RUNTIMES
+        for name, mutate in cases
+    ]
+
+
+@pytest.mark.parametrize(("runtime", "mutate"), _max_agent_calls_cases())
+def test_runtime_workflow_refuses_plan_above_max_agent_calls(
+    request: pytest.FixtureRequest,
+    runtime: str,
+    mutate: Callable[[dict[str, Any]], None],
+) -> None:
+    """`maxAgentCalls` is a required positive integer that the exact plan must not exceed."""
+    probe = _probe(request, runtime)
+    args = probe.args()
+    mutate(args)
+    result = probe.run(args=args)
+    message = _refusal(result["run"])
+    assert "maxAgentCalls" in message, result["run"]
+    if args.get("maxAgentCalls") == 6:
+        # The refusal names both numbers: the plan and the bound.
+        assert "7" in message and "6" in message, message
+    assert result["calls"] == []
+
+
+@pytest.mark.parametrize("runtime", RUNTIMES)
+def test_runtime_workflow_reports_call_accounting(
+    request: pytest.FixtureRequest, runtime: str
+) -> None:
+    probe = _probe(request, runtime)
+
+    success = probe.run()["run"]
+    assert success["status"] == "completed", success
+    assert success["value"]["agent_calls_planned"] == 7
+    assert success["value"]["agent_calls_made"] == 7
+    assert success["value"]["max_agent_calls"] == 7
+
+    # setup, two executes, one grade (the failed arm is not graded), no validate, no aggregate:
+    # four calls. OSC-18 enumerates exactly these calls; its stated total of 5 is arithmetic.
+    failure = probe.run(scenario="explicit-failure")
+    assert failure["run"]["status"] == "completed", failure["run"]
+    assert failure["run"]["value"]["agent_calls_planned"] == 7
+    assert failure["run"]["value"]["agent_calls_made"] == 4
+    assert failure["run"]["value"]["max_agent_calls"] == 7
+    # The two executes run concurrently, so compare as a set of labels.
+    assert sorted(call["label"] for call in failure["calls"]) == sorted(
+        ["setup", EXECUTE_WITH, EXECUTE_WITHOUT, GRADE_WITH]
+    )
+
+    setup_failure = probe.run(scenario="setup-null")
+    assert setup_failure["run"]["status"] == "completed", setup_failure["run"]
+    assert setup_failure["run"]["value"]["agent_calls_planned"] == 7
+    assert setup_failure["run"]["value"]["agent_calls_made"] == 1
+    assert setup_failure["run"]["value"]["max_agent_calls"] == 7
+
+
+_RUNTIME_GUARD_SCENARIOS = {
+    "pi-subagents": ["success", "explicit-failure", "schema-null", "spawn-failure", "setup-null", "validation-failure"],
+    "pi-dynamic-workflows": [
+        "success",
+        "explicit-failure",
+        "null-child",
+        "recoverable-throw",
+        "thrown-child",
+        "setup-null",
+        "validation-failure",
+    ],
+}
+
+
+@pytest.mark.parametrize(
+    ("runtime", "scenario"),
+    [
+        pytest.param(runtime, scenario, id=f"{runtime}-{scenario}")
+        for runtime, scenarios in _RUNTIME_GUARD_SCENARIOS.items()
+        for scenario in scenarios
+    ],
+)
+def test_runtime_workflow_host_never_sees_more_than_max_agent_calls_spawns(
+    request: pytest.FixtureRequest, runtime: str, scenario: str
+) -> None:
+    """Behavioral variant of the runtime guard: spawns observed by the host stay within the bound."""
+    probe = _probe(request, runtime).run(scenario=scenario)
+    assert probe["run"]["status"] == "completed", probe["run"]
+    value = probe["run"]["value"]
+    assert value["max_agent_calls"] == 7
+    assert value["agent_calls_made"] == len(probe["calls"])
+    assert len(probe["calls"]) <= value["max_agent_calls"]
+    assert value["agent_calls_planned"] <= value["max_agent_calls"]
+    # Nothing is bounded by the runtime guard here; a failed setup bounds every run by design.
+    assert value["status_counts"]["bounded"] == (value["expected_runs"] if scenario == "setup-null" else 0)
+
+
+def test_runtime_workflow_never_exceeds_max_agent_calls_at_runtime(skill_root: Path) -> None:
+    """The runtime guard lives in `safeAgent()` and nowhere else.
+
+    No argument set makes the planning count and the runtime count diverge, so the guard
+    is proven at the source level: `safeAgent()` increments the counter before `agent()`
+    and returns a `bounded` status on overflow, and no other function touches the counter.
+    """
+    source = _source(skill_root)
+    body = _function_body(source, "safeAgent")
+
+    increment = body.index("agentCallsMade += 1")
+    call = body.index("agent(")
+    assert increment < call, "the counter must move before agent() is called"
+    bounded = body.index("status: 'bounded'")
+    assert bounded < call, "the bounded return must precede the agent() call"
+    assert "agentCallsMade + 1 > maxAgentCalls" in body or "agentCallsMade >= maxAgentCalls" in body
+    assert "max_agent_calls" in body and "reached" in body
+
+    # The counter is declared once at the top level, mutated only inside safeAgent(), and
+    # otherwise only read into the returned object.
+    assert source.count("let agentCallsMade = 0") == 1
+    mutations = re.findall(r"(?<!let )agentCallsMade\s*(?:\+=|-=|=)(?!=)", source)
+    assert len(mutations) == 1, mutations
+    outside = source.replace(body, "")
+    assert "agentCallsMade +=" not in outside
+    assert "agentCallsMade =" not in outside.replace("let agentCallsMade = 0", "")
+    for other in ("executeItem", "gradeItem", "runtimeAgentOptions", "countFailure"):
+        assert "agentCallsMade" not in _function_body(source, other), other
+    assert source.count("agent_calls_made: agentCallsMade") == 2
+
+
 @pytest.mark.parametrize("runtime", RUNTIMES)
 def test_runtime_workflow_validation_failure_skips_aggregation(
     request: pytest.FixtureRequest, runtime: str
@@ -661,6 +799,12 @@ def test_runtime_workflow_source_uses_only_the_shared_subset(skill_root: Path) -
     ):
         assert forbidden not in source, forbidden
     assert re.search(r"[0-9a-f]{40}", source) is None, "no revision literal in the script"
+
+    # The call bound is a required argument, planned before the first call, and reported.
+    assert "maxAgentCalls" in source
+    assert source.index("agentCallsPlanned") < source.index("phase('Prepare')")
+    for reported in ("agent_calls_planned", "agent_calls_made", "max_agent_calls"):
+        assert source.count(f"{reported}:") == 2, reported
 
     # `effort:` and the `:thinking` model suffix exist only inside the shim.
     assert source.count("effort:") == shim.count("effort:") >= 1

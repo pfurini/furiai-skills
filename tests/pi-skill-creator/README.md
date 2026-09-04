@@ -26,7 +26,7 @@ uvx --from 'pytest==9.1.1' pytest -q tests/pi-skill-creator -m contract
 
 Required revisions:
 
-- Pi `0.84.4`: `a4043c1e332a61e4c8648b97b9b796c57f9db110`
+- Pi `0.84.4`: `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0`
 - pi-subagents `0.19.0`: `7f569969445bf8bc6fbd7757f18db80b35de0ba9`
 - pi-dynamic-workflows `3.10.0`: `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`
 - pi-claude-bridge `0.7.0`: `c1d8b24a57e15bc8acc9d673f2804ab7227978ae` (loaded in the host session through `~/.pi/agent/settings.json`; never a test input)
@@ -37,6 +37,8 @@ The runtime workflow tests in `test_runtime_workflow.py` execute `skills/pi-skil
 - pi-dynamic-workflows: `fixtures/workflow/pi-dynamic-workflows-probe.mjs` runs under the checkout's `node_modules/.bin/tsx`, imports `runWorkflow` from `src/workflow.ts`, and injects a fake agent runner. Run `npm ci` in that checkout once so `node_modules/.bin/tsx` exists (`npm ci` honours the committed lockfile; do not use `npm install`). The resulting untracked, git-ignored `node_modules/` is the only permitted change to that checkout. Those probes skip with a reason when `PI_DYNAMIC_WORKFLOWS_CHECKOUT` is unset or `tsx` is missing, and fail on a wrong revision.
 
 Neither path makes a model call, writes a workflow log, or reads an agent registry.
+
+`test_calibration_workflow.py` (contract tier) executes the two repository-development workflows, `.pi/workflows/pi-skill-creator-calibration.js` and `.pi/workflows/pi-skill-creator-adoption.js`, through the same compiled pi-subagents runtime with the stub host in `fixtures/calibration-workflow/stub-host-probe.mjs`. The stub answers every child from a fixture table and records the gate commands it is handed, so the stage schemas, approval tokens, `stageStartCommit` quoting, the exact-row `pi --list-models` checks, the paid-call bound comparison, and the phase grouping of integration agents are all asserted without a model call, a git command, or a gate command running. Fixture arguments live in `fixtures/calibration-workflow/*-args.json`. The same module validates the smoke target skill `fixtures/smoke/release-note-smoke/` with `quick_validate.py`; that fixture is the target of the OSC-14 smoke campaign and is never distributed.
 
 ## Credentialed and live tests
 
@@ -69,4 +71,4 @@ uvx --from 'ty==0.0.77' ty check skills/pi-skill-creator/scripts skills/pi-skill
 git diff --check
 ```
 
-OSC-17 additionally requires the runtime workflow, bundled-agent, and aggregation tests to run with `PI_SUBAGENTS_CHECKOUT` and `PI_DYNAMIC_WORKFLOWS_CHECKOUT` set, with no pi-dynamic-workflows probe skipped.
+OSC-17 additionally requires the runtime workflow, bundled-agent, and aggregation tests to run with `PI_SUBAGENTS_CHECKOUT` and `PI_DYNAMIC_WORKFLOWS_CHECKOUT` set, with no pi-dynamic-workflows probe skipped. OSC-18 extends that gate with `test_calibration_workflow.py` and `test_rpc_runner.py` and requires all four checkout variables (`PI_EXECUTABLE`, `PI_CHECKOUT`, `PI_SUBAGENTS_CHECKOUT`, `PI_DYNAMIC_WORKFLOWS_CHECKOUT`) in the full `not live` run, so no contract test skips; a skip there is a gate failure.
