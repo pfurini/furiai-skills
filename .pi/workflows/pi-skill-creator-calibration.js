@@ -131,7 +131,18 @@ const humanReviewRecord = stage === 'finalize' ? requireAbsolute(args?.humanRevi
 
 // Every gate carries the four checkout variables, so the deterministic gate runs the full
 // `not live` suite with no contract test or pi-dynamic-workflows probe skipped.
-const envPrefix = `PI_EXECUTABLE=${shellQuote(piExecutable)} PI_CHECKOUT=${shellQuote(piPath)} PI_SUBAGENTS_CHECKOUT=${shellQuote(piSubagentsPath)} PI_DYNAMIC_WORKFLOWS_CHECKOUT=${shellQuote(piDynamicWorkflowsPath)}`
+//
+// The finalize stage adds the two claim variables to the same prefix rather than to one
+// command. OSC-15 creates `test_calibrated_claims.py`, which is not marked `live` and is
+// required to fail rather than skip when either variable is unset, so from the moment that
+// file exists every `-m 'not live'` run needs them. A shell assignment written before one
+// command applies only to that command, so setting them on the claim pytest alone left the
+// deterministic gate that follows it, and OSC-16's gate after that, running the new tests
+// blind: the stage could never pass its own gate.
+const claimEnv = stage === 'finalize'
+  ? ` PI_SKILL_CREATOR_CAMPAIGN_DIR=${shellQuote(campaignDir)} PI_SKILL_CREATOR_HUMAN_REVIEW=${shellQuote(humanReviewRecord)}`
+  : ''
+const envPrefix = `PI_EXECUTABLE=${shellQuote(piExecutable)} PI_CHECKOUT=${shellQuote(piPath)} PI_SUBAGENTS_CHECKOUT=${shellQuote(piSubagentsPath)} PI_DYNAMIC_WORKFLOWS_CHECKOUT=${shellQuote(piDynamicWorkflowsPath)}${claimEnv}`
 const stageDiff = `${shellQuote(stageStartCommit)}..HEAD`
 const deterministicGate = `${envPrefix} ${PYTEST} -q tests/pi-skill-creator -m 'not live' && ${TY} check skills/pi-skill-creator/scripts skills/pi-skill-creator/eval-viewer && git diff --check ${stageDiff}`
 

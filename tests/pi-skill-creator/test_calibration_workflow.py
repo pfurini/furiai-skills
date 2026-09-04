@@ -357,6 +357,43 @@ def test_calibration_workflow_quotes_stage_start_commit_in_every_gate(
         assert all(f"git diff --check '{commit}'..HEAD" in command for command in diff_gates)
 
 
+def test_finalize_gates_carry_the_claim_variables_on_every_not_live_run(
+    development_workflow_runtime: Path,
+) -> None:
+    """OSC-15 writes test_calibrated_claims.py, which fails rather than skips when either
+
+    variable is unset and is not marked `live`. Every `-m 'not live'` run from that point on
+    therefore needs both. A shell assignment binds only the command it prefixes, so setting
+    them on the claim pytest alone left the deterministic gate behind it, and OSC-16's gate
+    after that, running the new tests blind: the stage could never pass its own gate.
+    """
+    args = _args("finalize")
+    probe = _calibration_run(development_workflow_runtime, "finalize", args)
+    assert probe["run"]["status"] == "completed", probe["run"]
+    commands = [call["gate"] for call in probe["calls"] if call["gate"]]
+    commands += [gate["command"] for gate in probe["gateCalls"]]
+    not_live = [command for command in commands if "-m 'not live'" in command]
+    assert not_live, commands
+    campaign = args["campaignDir"]
+    review = args["humanReviewRecord"]
+    for command in not_live:
+        assert f"PI_SKILL_CREATOR_CAMPAIGN_DIR='{campaign}'" in command, command
+        assert f"PI_SKILL_CREATOR_HUMAN_REVIEW='{review}'" in command, command
+
+
+@pytest.mark.parametrize("stage", ["preflight", "calibrate"])
+def test_only_finalize_carries_the_claim_variables(
+    development_workflow_runtime: Path, stage: str
+) -> None:
+    """The claim variables belong to the stage that creates the tests needing them."""
+    probe = _calibration_run(development_workflow_runtime, stage, _args(stage))
+    assert probe["run"]["status"] == "completed", probe["run"]
+    commands = [call["gate"] for call in probe["calls"] if call["gate"]]
+    commands += [gate["command"] for gate in probe["gateCalls"]]
+    for command in commands:
+        assert "PI_SKILL_CREATOR_HUMAN_REVIEW" not in command, command
+
+
 def _bad_manifest_cases() -> list[Any]:
     cases: list[tuple[str, Any, str]] = [
         ("missing-role", lambda args: args["models"].pop("grader"), "models"),
