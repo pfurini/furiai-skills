@@ -38,29 +38,23 @@ Scoped models (`~/.pi/agent/settings.json` `enabledModels`) include `openai-code
    Verify before writing: that pi-subagents rejects a `:thinking` suffix in `model` (it lists `effort` separately and rejects unknown option keys); that `claude-bridge/claude-opus-5` resolves for a pi-dynamic-workflows child through the shared registry.
 4. **Sequencing**: port `benchmark.js` and its docs and tests first. Live calibration runs under pi-subagents, because the user is not activating pi-dynamic-workflows yet; every claim must record that runtime, and a later switch invalidates numeric claims until re-run. The development workflows (`.pi/workflows/pi-skill-creator-adoption.js` and `-calibration.js`) stay on pi-subagents; they are repository tooling.
 5. **The creator stays unpinned** (no `model`/`effort` in `SKILL.md`); the user chooses Opus 5 or Fable 5.1 per task.
-6. **Calibration hardening before any paid call** (`.pi/workflows/pi-skill-creator-calibration.js`): strict schemas for `models` and `scenarios`; `maxPaidCalls` enforced mechanically before each measured call, counting orchestration calls separately; `stageStartCommit` validated as a 40-hex SHA and shell-quoted; explicit `pi-claude-bridge` loading; the `bounded_work` versus `skipped_work` handoff clarification (see below); multi-turn reasoning scenarios, because the RPC benchmark is one-shot and does not represent interactive reasoning skills.
+6. **Calibration is right-sized to a smoke test.** The two-track, multi-family campaign program discussed earlier is dropped; it optimized for publishable benchmark claims nobody asked for. OSC-14 becomes one bounded end-to-end run under pi-subagents whose only purpose is to prove the machinery (RPC runner, transcript parser, grader, comparator, aggregator, viewer) works with real models: one eval, two arms, one or two repetitions, one consumer model, one grading per run, one comparison, about 10 to 15 measured calls and 1M to 2M tokens, `maxPaidCalls` around 40. OSC-15 becomes claim hygiene: keep historical numbers labeled historical or delete them, add no new numbers, and verify that the grader, comparator, and analyzer pins resolve. OSC-16 is unchanged. Evidence for any future claim accumulates from real Step 7 campaigns on skills the user actually builds; the multi-turn reasoning harness is deferred with the program. Before the smoke run, still harden `.pi/workflows/pi-skill-creator-calibration.js`: strict schemas for `models` and `scenarios`, `maxPaidCalls` enforced mechanically before each measured call (orchestration calls counted separately), `stageStartCommit` validated as a 40-hex SHA and shell-quoted, explicit `pi-claude-bridge` loading, and the `bounded_work` versus `skipped_work` clarification below. Update the OSC-14 and OSC-15 work orders and the index's completion definition to this scope before running anything.
 7. **Adoption workflow fixes to persist** (the successful run used a temporary recovery copy that may no longer exist at `/tmp/opin-skill-creator-adoption-resume-e6667a066d0f.js`): integration agents were assigned `phase: 'Integrate'`, which made the UI show phase 10 running between phases; group each integration under its implementation phase. Writer prompts must state that `tests_skipped` is for intentionally skipped tests, `bounded_work` for mandated exclusions, and `skipped_work` only for required work left incomplete (must be `[]` on completion); the first run failed because OSC-00 listed mandated exclusions under `skipped_work`.
 8. **Overnight runs**: the machine slept for nine hours mid-workflow. Launch Pi with `caffeinate -dimsu pi` for long workflows.
 
-## Model policy agreed with the user
+## Model policy (reference, not a campaign plan)
 
-The user creates and optimizes skills with `claude-bridge/claude-opus-5` at `max`, or `claude-bridge/claude-fable-5-1` at `high` (sometimes higher) for the toughest skills. Produced skills run on two populations, never on the lowest tier (no Luna, no Haiku):
+The user creates and optimizes skills with `claude-bridge/claude-opus-5` at `max`, or `claude-bridge/claude-fable-5-1` at `high` for the toughest skills. Produced skills run on medium and large models, never on the lowest tier: reasoning skills on Opus 5, Fable, GPT-5.6 Sol, sometimes GLM-5.3; executor skills on Sonnet 5, GPT-5.6 Terra, GLM-5.3-flash. Forward tests and Step 7 campaigns for a produced skill should use the model and thinking it will actually run on.
 
-- reasoning skills (brainstorming, architecture, hard research) on Opus 5 or Fable at `high`, GPT-5.6 Sol at `high`, sometimes GLM-5.3 at `high` or `max`;
-- executor skills (tests, implementation plans, bug verification) on Sonnet 5 at `medium` or `high`, GPT-5.6 Terra at `medium`, GLM-5.3-flash at `high` or `max`.
-
-Calibration roles and tracks:
+Bundled-agent pins, chosen by policy and verified by resolution preflight only:
 
 | Role | Model | Thinking |
 |---|---|---|
-| Campaign orchestration, grader, comparison analyzer | `openai-codex/gpt-5.6-sol` | high |
-| Blind comparator | `claude-bridge/claude-opus-5` | high (max for critical) |
-| Benchmark analyzer, integration | `openai-codex/gpt-5.6-terra` | medium |
-| Creator and optimizer under test | `claude-bridge/claude-opus-5` max; `claude-bridge/claude-fable-5-1` high for the critical suite | |
-| Reasoning-track consumers (separate campaigns) | Opus 5 high, Fable 5.1 high, Sol high, GLM-5.3 high | |
-| Executor-track consumers (separate campaigns) | Sonnet 5 medium and high, Terra medium, GLM-5.3-flash high | |
+| Grader, comparison analyzer | `openai-codex/gpt-5.6-sol` | high |
+| Blind comparator | `claude-bridge/claude-opus-5` | high |
+| Benchmark analyzer | `openai-codex/gpt-5.6-terra` | medium |
 
-Never aggregate different effective models or profiles in one campaign. Trigger tests use the same model and thinking as the corresponding execution campaign. For Claude-produced outputs the Opus comparator is not family-independent; add a blind `zai/glm-5.3` high disagreement audit on a stratified subset. Calibrate the executor track first (the one-shot harness already represents it), then extend the harness for multi-turn reasoning sessions.
+Never aggregate different effective models or profiles in one campaign. For Claude-produced outputs the Opus comparator is not family-independent; note it in the record rather than adding an audit campaign.
 
 ## Working method that worked
 
@@ -73,4 +67,4 @@ Never aggregate different effective models or profiles in one campaign. Trigger 
 1. Commit `docs/parity/` in pi-dynamic-workflows.
 2. Write a work order (OSC-17, "orchestrator-independent benchmark workflow") from decision 3, covering `benchmark.js`, `references/benchmarking.md`, `references/testing.md`, `SKILL.md` Step 7, `README.md`, `test_runtime_workflow.py` plus a pi-dynamic-workflows execution test, and the pi-subagents re-pin to `7f569969`.
 3. Apply decision 1 (comparator) in the same or an adjacent order, since `test_bundled_agents.py` pins the comparator model.
-4. Harden the calibration workflow per decision 6, then present an exact campaign manifest and paid-call cap for approval before any measured call.
+4. Rewrite OSC-14 and OSC-15 to the smoke-test scope in decision 6, harden the calibration workflow, then present the exact smoke manifest and `maxPaidCalls` for approval before any measured call.
