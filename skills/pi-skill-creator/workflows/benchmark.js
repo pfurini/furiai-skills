@@ -295,7 +295,7 @@ const requestedRoles = {
   benchmark_analyzer: analyzerRole,
 }
 const campaignNotes = [
-  `Comparator ${comparatorRole.model} at ${comparatorRole.thinking} thinking judges blind; for outputs produced by executors of the same model family this comparison is not family-independent.`,
+  `Comparator ${comparatorRole.model} at ${comparatorRole.thinking} thinking judges blind; for outputs produced by Claude-family executors this comparison is not family-independent.`,
 ]
 
 function telemetry() {

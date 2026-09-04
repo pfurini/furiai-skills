@@ -79,7 +79,7 @@ A campaign is stored below the evaluated project, not inside the distributed ski
     "final_test": "trigger/final-test.json"
   },
   "notes": [
-    "Comparator claude-bridge/claude-opus-5 at high thinking judges blind; for outputs produced by executors of the same model family this comparison is not family-independent."
+    "Comparator claude-bridge/claude-opus-5 at high thinking judges blind; for outputs produced by Claude-family executors this comparison is not family-independent."
   ]
 }
 ```
