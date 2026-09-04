@@ -117,6 +117,14 @@ function absolutePath(value, label) {
   return path.replace(/[\\/]+$/, '')
 }
 
+// Directories the operating system reclaims, on macOS at reboot and on Linux by tmpfiles.
+// `/var/folders` is the macOS per-user temporary root that also holds subagent `.output`.
+const EPHEMERAL_ROOTS = ['/tmp', '/private/tmp', '/var/tmp', '/private/var/tmp', '/var/folders', '/dev/shm']
+
+function isEphemeral(path) {
+  return EPHEMERAL_ROOTS.some(root => path === root || path.startsWith(`${root}/`))
+}
+
 function roleConfig(roles, name) {
   const role = requiredObject(roles[name], `roles.${name}`)
   const model = requiredText(role.model, `roles.${name}.model`)
@@ -174,6 +182,19 @@ if (!IDENTIFIER.test(campaignId)) fail('campaignId is invalid')
 const createdAt = requiredText(input.createdAt, 'createdAt')
 if (!UTC_TIMESTAMP.test(createdAt)) fail('createdAt must be a caller-supplied UTC timestamp')
 const projectRoot = absolutePath(input.projectRoot, 'projectRoot')
+// The campaign tree under projectRoot is the only evidence a claim can ever rest on: the
+// review record fingerprints those files and the replay tests read them back. A temporary
+// directory silently converts a validated campaign into an unverifiable one at the next
+// reboot, so refuse before anything is spent. A deliberately disposable calibration run
+// opts in, and the campaign then records that its own location is volatile.
+const ephemeralProjectRoot = isEphemeral(projectRoot)
+if (ephemeralProjectRoot && input.allowEphemeralProjectRoot !== true) {
+  fail(
+    `projectRoot ${projectRoot} is inside an operating-system temporary directory, whose contents are reclaimed at reboot. ` +
+    'The campaign records under it are the only evidence for any claim, so pass a projectRoot that persists, ' +
+    'or set allowEphemeralProjectRoot: true to declare that this campaign is disposable.',
+  )
+}
 const skillPath = absolutePath(input.skillPath, 'skillPath')
 const skillCreatorPath = absolutePath(input.skillCreatorPath, 'skillCreatorPath')
 const piExecutable = absolutePath(input.piExecutable, 'piExecutable')
@@ -320,6 +341,11 @@ const requestedRoles = {
 const campaignNotes = [
   `Comparator ${comparatorRole.model} at ${comparatorRole.thinking} thinking judges blind; for outputs produced by Claude-family executors this comparison is not family-independent.`,
 ]
+if (ephemeralProjectRoot) {
+  campaignNotes.push(
+    `This campaign was written under the temporary directory ${projectRoot} with allowEphemeralProjectRoot, so its records are reclaimed at reboot and support no claim once that happens. Copy the campaign root somewhere durable before citing it.`,
+  )
+}
 
 function telemetry() {
   return {

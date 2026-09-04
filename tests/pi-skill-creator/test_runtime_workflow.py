@@ -573,6 +573,57 @@ def test_runtime_workflow_grade_follows_execute_for_each_item(
     assert labels.index(EXECUTE_WITHOUT) < labels.index(GRADE_WITHOUT)
 
 
+@pytest.mark.parametrize("runtime", RUNTIMES)
+@pytest.mark.parametrize(
+    "project_root",
+    ["/tmp/x", "/private/tmp/x", "/var/tmp/x", "/var/folders/ab/x", "/dev/shm/x"],
+)
+def test_runtime_workflow_refuses_an_ephemeral_project_root(
+    request: pytest.FixtureRequest, runtime: str, project_root: str
+) -> None:
+    """Campaign records are the only evidence a claim rests on; /tmp loses them at reboot."""
+    probe = _probe(request, runtime)
+    args = probe.args()
+    args["projectRoot"] = project_root
+    args.pop("allowEphemeralProjectRoot", None)
+    refusal = _refusal(probe.run(args=args)["run"])
+    assert "temporary directory" in refusal, refusal
+    assert "allowEphemeralProjectRoot" in refusal, refusal
+    # Refused during argument validation, so nothing is spent.
+    assert probe.run(args=args)["calls"] == []
+
+
+@pytest.mark.parametrize("runtime", RUNTIMES)
+def test_runtime_workflow_records_that_a_disposable_campaign_is_volatile(
+    request: pytest.FixtureRequest, runtime: str
+) -> None:
+    """Opting in is allowed, but the campaign has to say so in its own notes."""
+    probe = _probe(request, runtime)
+    args = probe.args()
+    args["projectRoot"] = "/tmp/skill-creator-project"
+    args["allowEphemeralProjectRoot"] = True
+    result = probe.run(args=args)
+    assert result["run"]["status"] == "completed", result["run"]
+    setup = next(call for call in result["calls"] if call["label"] == "setup")
+    assert "reclaimed at reboot" in setup["prompt"]
+    assert "Copy the campaign root somewhere durable" in setup["prompt"]
+
+
+@pytest.mark.parametrize("runtime", RUNTIMES)
+def test_runtime_workflow_accepts_a_durable_project_root_without_the_flag(
+    request: pytest.FixtureRequest, runtime: str
+) -> None:
+    """The ordinary case stays flagless, and records no volatility note."""
+    probe = _probe(request, runtime)
+    args = probe.args()
+    args["projectRoot"] = "/Users/example/projects/evaluation"
+    args.pop("allowEphemeralProjectRoot", None)
+    result = probe.run(args=args)
+    assert result["run"]["status"] == "completed", result["run"]
+    setup = next(call for call in result["calls"] if call["label"] == "setup")
+    assert "reclaimed at reboot" not in setup["prompt"]
+
+
 def test_runtime_workflow_rejects_unknown_runtime(
     skill_root: Path, workflow_runtime_modules: Path
 ) -> None:

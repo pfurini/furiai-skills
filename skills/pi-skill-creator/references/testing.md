@@ -109,7 +109,7 @@ Keep tests, fixtures, reports, and campaign records outside the distributable sk
 
 Use only the telemetry seam supported by the execution mechanism:
 
-- **Direct measured runs**: top-level `Agent` `.output` paths are returned by results and completion notifications. Each file contains JSONL message snapshots, not tool lifecycle events. Parse it as `pi-subagents-output-v1`; derive tool calls from assistant `toolCall` content and usage or effective model from authoritative assistant messages.
+- **Direct measured runs**: top-level `Agent` `.output` paths are returned by results and completion notifications. Each file contains JSONL message snapshots, not tool lifecycle events. Parse it as `pi-subagents-output-v1`; derive tool calls from assistant `toolCall` content and usage or effective model from authoritative assistant messages. The path lives in the session scratch directory and is reclaimed at reboot, so any transcript a durable record cites must be copied next to that record first and parsed from the copy.
 - **Workflow orchestration**: `SubagentWorkflow` (pi-subagents) and `workflow` (pi-dynamic-workflows) children return final text or validated structured output. Workflow children do not expose an `.output` path, usage, effective model, or top-level lifecycle events on either runtime. Do not claim per-child transcripts or cost, and do not substitute launcher-agent telemetry for executor evidence.
 - **Fork or dependency measured runs**: use Pi RPC with the declared dependencies loaded explicitly. Preserve the Pi JSON event stream in `transcript.jsonl`, parse it as `pi-json-events-v3`, and use its `run.json` and `transcript-metrics.json` records as executor evidence.
 
