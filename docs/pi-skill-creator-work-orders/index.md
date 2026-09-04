@@ -4,13 +4,13 @@
 
 These work orders are the executable handoff for adopting Pi 0.84.4 and pi-subagents 0.19.0 in `skills/pi-skill-creator/`. The findings and settled decisions in `docs/pi-skill-creator-adoption-report.md` remain authoritative. `contracts.md` freezes interfaces where several orders meet. If an executor finds a conflict, it stops and records it instead of choosing a new contract locally.
 
-This handoff was prepared on 2026-09-02 from source baseline `0b9e86bc77a60fb34039456a6624ea94e396f5d1`. That immutable source baseline only freezes the F19 removal and pre-implementation skill state; adoption never starts from that SHA. The adoption implementation start is a later clean commit containing this finalized index, `contracts.md`, every OSC-00 through OSC-16 order, and both project workflows (OSC-17 was added on 2026-09-04 after the adoption run and is executed standalone; see wave 8b). The caller supplies that full commit SHA as `implementationStartCommit`, and preflight requires it to equal current `HEAD` and descend from or equal the source baseline.
+This handoff was prepared on 2026-09-02 from source baseline `0b9e86bc77a60fb34039456a6624ea94e396f5d1`. That immutable source baseline only freezes the F19 removal and pre-implementation skill state; adoption never starts from that SHA. The adoption implementation start is a later clean commit containing this finalized index, `contracts.md`, every OSC-00 through OSC-16 order, and both project workflows (OSC-17 and OSC-18 were added on 2026-09-04 after the adoption run and are executed standalone; see waves 8b and 8c). The caller supplies that full commit SHA as `implementationStartCommit`, and preflight requires it to equal current `HEAD` and descend from or equal the source baseline.
 
 | Component | Exact revision |
 |---|---|
 | Source baseline | `0b9e86bc77a60fb34039456a6624ea94e396f5d1` |
 | Implementation start | Caller-supplied full `implementationStartCommit` for the later clean handoff-containing commit |
-| Pi fork | `0.84.4`, `a4043c1e332a61e4c8648b97b9b796c57f9db110` |
+| Pi fork | `0.84.4`, `7815e97a0dd5e7eee3cd01858bd5aa0fabeebae0` (re-pinned by OSC-18 from `a4043c1e332a61e4c8648b97b9b796c57f9db110`; OSC-00 through OSC-17 integrated against the earlier revision; the only change is `packages/ai/scripts/generate-models.ts`, and the executable is a pre-commit build with identical behavior) |
 | pi-subagents | `0.19.0`, `7f569969445bf8bc6fbd7757f18db80b35de0ba9` (re-pinned by OSC-17 from `bfa262fdd75d807b1c6b1f852f1f1bea2bbb3fa4`; OSC-00 through OSC-13 integrated against the earlier revision) |
 | pi-dynamic-workflows | `3.10.0`, `e9c5a41d9c4234df908aa25a2b49ee9648e896d4` (added by OSC-17) |
 | pi-claude-bridge | `0.7.0`, `c1d8b24a57e15bc8acc9d673f2804ab7227978ae` (added by OSC-17; loaded in the host session, never a workflow input) |
@@ -95,11 +95,12 @@ OSC-05 + OSC-06 + OSC-07 + OSC-09 + OSC-10 + OSC-11
 └── OSC-12 runtime benchmark workflow and benchmark prose
     └── OSC-13 deterministic README corrections
         └── OSC-17 orchestrator-independent benchmark workflow
-            └── HUMAN APPROVAL FOR PAID/LIVE WORK
-                └── OSC-14 Pi-native calibration records
-                    └── HUMAN REVIEW OF CALIBRATION RESULTS
-                        └── OSC-15 apply approved conclusions
-                            └── OSC-16 directory distribution validation
+            └── OSC-18 calibration hardening and Pi re-pin
+                └── HUMAN APPROVAL FOR THE SMOKE RUN
+                    └── OSC-14 smoke-test calibration run under pi-subagents
+                        └── HUMAN REVIEW OF THE SMOKE RECORD
+                            └── OSC-15 claim hygiene
+                                └── OSC-16 directory distribution validation
 ```
 
 This enforces the report corrections: old WP5 precedes WP6; old WP11 precedes WP12; authoring doctrine precedes RPC fork tests while sterilization prose follows the RPC evidence; telemetry is frozen before aggregation, agents, RPC integration, and the runtime workflow.
@@ -120,10 +121,11 @@ The project workflow may parallelize only the orders listed on the same row. Par
 | 7 | OSC-12 | Sole integration owner of `benchmarking.md`, runtime workflow, and final SKILL workflow wiring |
 | 8 | OSC-13 | README deterministic corrections after runtime behavior settles |
 | 8b | OSC-17 | Runtime portability, comparator re-pin, and pi-subagents re-pin after the README settles; serial later owner of every path it touches, so calibration records carry the runtime fields |
+| 8c | OSC-18 | Pi re-pin, mechanical call bounds, and calibration-workflow hardening before any measured call; serial later owner of every path it touches |
 | Stop | Report ready-for-calibration state | Implementation workflow does not run live or paid calibration |
-| 9 | Human separately approves calibration; OSC-14 | Separate workflow and explicit budget/model arguments |
-| Stop | Human reviews `review-required.json` and records decisions | No claims or pins change before this checkpoint |
-| 10 | OSC-15 | Apply only the human-approved calibration conclusions; no paid calls |
+| 9 | Human runs the `preflight` stage, approves the exact smoke manifest, runs the smoke from the top-level Pi session, then runs the `calibrate` stage; OSC-14 | One bounded smoke campaign under pi-subagents; the calibration workflow makes no paid call and only validates and integrates the record |
+| Stop | Human reviews `review-required.json` and records decisions | No claims or pins change before this checkpoint; a smoke supports no numeric claim |
+| 10 | OSC-15 | Claim hygiene only: historical numbers labelled or removed, no new numbers, pins verified resolvable; no paid calls |
 | 11 | OSC-16 | Old WP11 precedes old WP12; final copied-directory proof |
 
 ## Exclusive file ownership matrix
@@ -132,29 +134,29 @@ An order owns a path only during its wave. A later serial owner starts from the 
 
 | Path | Owners in order |
 |---|---|
-| `references/benchmarking.md` | OSC-12 → OSC-17 |
+| `references/benchmarking.md` | OSC-12 → OSC-17 → OSC-18 |
 | `SKILL.md` | OSC-03 → OSC-11 → OSC-12 → OSC-17 (Step 7 only) → OSC-15 (only for a human-approved creator pin) |
-| `references/schemas.md` | OSC-05 → OSC-17 |
+| `references/schemas.md` | OSC-05 → OSC-17 → OSC-18 (example revision values only) |
 | `references/testing.md` | OSC-11 → OSC-17 |
 | `references/writing-principles.md` | OSC-03 only |
-| `scripts/run_eval.py` | OSC-07 → OSC-08 |
+| `scripts/run_eval.py` | OSC-07 → OSC-08 → OSC-18 (`PI_REVISION` only) |
 | `scripts/run_loop.py` | OSC-07 → OSC-09 |
 | `scripts/improve_description.py` | OSC-07 → OSC-09 |
 | `scripts/generate_report.py` | OSC-09 only |
 | `scripts/quick_validate.py`, `scripts/utils.py` | OSC-02 only |
 | `scripts/transcript_metrics.py` | OSC-01 only |
-| `scripts/rpc_runner.py` | OSC-10 only |
+| `scripts/rpc_runner.py` | OSC-10 → OSC-18 |
 | `scripts/aggregate_benchmark.py` | OSC-05 → OSC-17 |
 | `agents/*.md` | OSC-06 → OSC-17 (`comparator.md` only) → OSC-15 (only for human-approved calibrated pin changes) |
 | `eval-viewer/**`, `assets/eval_review.html` | OSC-04 only |
-| `workflows/benchmark.js` | OSC-12 → OSC-17 |
+| `workflows/benchmark.js` | OSC-12 → OSC-17 → OSC-18 |
 | `README.md` | OSC-13 → OSC-17 (runtime requirements and caveats only) → OSC-15 → OSC-16 |
-| `tests/pi-skill-creator/test_foundation.py`, shared fixture helpers | OSC-00 → OSC-17 (`conftest.py` pin constants and `campaign_factory` fields only) |
-| `tests/pi-skill-creator/README.md` | OSC-00 → OSC-17 |
-| Order-specific test modules/fixture subdirectories | The corresponding order only; OSC-17 is the later owner of `test_runtime_workflow.py`, `fixtures/workflow/**`, `test_bundled_agents.py`, `test_aggregation.py` (campaign fixture fields), and may add assertions to `test_readme.py` and `test_testing_doctrine.py` |
-| `.pi/workflows/pi-skill-creator-adoption.js`, `.pi/workflows/pi-skill-creator-calibration.js` | OSC-17 (`REQUIRED_SUBAGENTS` constant only) |
-| `docs/pi-skill-creator-work-orders/contracts.md`, `osc-06-bundled-agents.md`, `docs/pi-skill-creator-adoption-report.md` model-policy lines | OSC-17 (contract amendments and comparator pin lines only) |
-| `.skill-creator/**` campaign records | OSC-14 only; never distributed |
+| `tests/pi-skill-creator/test_foundation.py`, shared fixture helpers | OSC-00 → OSC-17 (`conftest.py` pin constants and `campaign_factory` fields only) → OSC-18 (`conftest.py` `PI_REVISION` only) |
+| `tests/pi-skill-creator/README.md` | OSC-00 → OSC-17 → OSC-18 |
+| Order-specific test modules/fixture subdirectories | The corresponding order only; OSC-17 is the later owner of `test_runtime_workflow.py`, `fixtures/workflow/**`, `test_bundled_agents.py`, `test_aggregation.py` (campaign fixture fields), and may add assertions to `test_readme.py` and `test_testing_doctrine.py`; OSC-18 is the later owner of `test_runtime_workflow.py`, `fixtures/workflow/**`, and `test_rpc_runner.py`, and owns `test_calibration_workflow.py`, `fixtures/calibration-workflow/**`, and `fixtures/smoke/**` (the smoke target skill); OSC-14 owns `test_live_calibration.py`; OSC-15 owns `test_calibrated_claims.py` |
+| `.pi/workflows/pi-skill-creator-adoption.js`, `.pi/workflows/pi-skill-creator-calibration.js` | OSC-17 (`REQUIRED_SUBAGENTS` constant only) → OSC-18 |
+| `docs/pi-skill-creator-work-orders/contracts.md`, `osc-06-bundled-agents.md`, `docs/pi-skill-creator-adoption-report.md` model-policy lines | OSC-17 (contract amendments and comparator pin lines only) → OSC-18 (`contracts.md` amendments only) |
+| `.skill-creator/**` campaign records under the evaluation project | OSC-14 only; never committed or distributed |
 
 Tests use order-scoped modules (`test_validator.py`, `test_aggregation.py`, and so on), so parallel orders do not share a test file.
 
@@ -162,18 +164,18 @@ Tests use order-scoped modules (`test_validator.py`, `test_aggregation.py`, and 
 
 1. **Before implementation fan-out:** after committing the finalized handoff, the user must invoke `.pi/workflows/pi-skill-creator-adoption.js` from that clean repository `HEAD` with `approval: "APPROVE_IMPLEMENTATION"`, `implementationStartCommit` equal to that full commit SHA, an absolute Pi executable path, and absolute repository, Pi, and pi-subagents checkout paths. Preflight proves the commit contains the tracked index, contracts, all 17 OSC orders that existed at that time (OSC-00 through OSC-16), and both project workflows, and that it descends from or equals source baseline `0b9e86bc77a60fb34039456a6624ea94e396f5d1`. This makes every isolated implementation worktree branch from a commit containing every order and contract it must read. File existence or the source-baseline SHA is not approval. The workflow returns both `implementationStartCommit` and the final deterministic `implementationIntegrationCommit`.
 2. **Before runtime multi-agent campaigns:** the implemented skill must ask the user before invoking `Agent` fan-out, `SubagentWorkflow`, or `workflow`; documentation cannot pre-authorize a run.
-3. **Before paid/live calibration:** the user separately invokes `.pi/workflows/pi-skill-creator-calibration.js` with `stage: "calibrate"`, `stageStartCommit` equal to that `implementationIntegrationCommit`, `approval: "APPROVE_PAID_CALIBRATION"`, explicit models, repetitions, maximum paid calls, campaign directory, and absolute checkout paths. Preflight requires exact `HEAD` and a clean tree at `stageStartCommit`; success returns `calibrationIntegrationCommit`.
-4. **Before permanent model pins or public numeric claims:** a human reads the pre-registered key and every deterministic failure flagged by calibration.
-5. **Before final distribution sign-off:** the user invokes the calibration workflow again with `stage: "finalize"`, `stageStartCommit` equal to the human-reviewed `calibrationIntegrationCommit`, `approval: "APPROVE_CALIBRATION_RESULTS"`, `humanReviewComplete: true`, and the absolute immutable review record. Preflight again requires exact `HEAD` and a clean tree. OSC-16 runs only after OSC-15 applies that record; a skipped claim may be removed, never presented as calibrated.
+3. **Before the smoke run:** the user invokes `.pi/workflows/pi-skill-creator-calibration.js` with `stage: "preflight"` and `stageStartCommit` equal to the OSC-18 integration commit (no approval token, no spend, nothing written); it verifies pins, clean tree, executable version, that every manifest model resolves through `pi --list-models`, the fresh installed skill copy, and the manifest schema. The user then approves the exact smoke manifest in OSC-14, runs the smoke from the top-level Pi session (`SubagentWorkflow` on the installed copy, one comparator `Agent` call, the static viewer export), and only then invokes `stage: "calibrate"` with the same `stageStartCommit`, `approval: "APPROVE_PAID_CALIBRATION"`, the manifest's models, repetitions, `maxPaidCalls`, and scenarios, the campaign directory, the installed skill path, and absolute checkout paths. That stage makes no paid call: it validates the records against the bound, writes `review-required.json`, integrates the replay-only live test, and returns `calibrationIntegrationCommit`.
+4. **Before claim hygiene:** a human reads `review-required.json` (machinery pass or fail per component, effective models, call counts, token usage, anomalies) and writes the immutable review record. For a smoke, `accepted_claims` is limited to the statement that the machinery works on runtime pi-subagents at the recorded revisions, and `accepted_pins` is typically empty; no numeric observation becomes a claim.
+5. **Before final distribution sign-off:** the user invokes the calibration workflow again with `stage: "finalize"`, `stageStartCommit` equal to the human-reviewed `calibrationIntegrationCommit`, `approval: "APPROVE_CALIBRATION_RESULTS"`, `humanReviewComplete: true`, and the absolute immutable review record. Preflight again requires exact `HEAD` and a clean tree. OSC-16 runs only after OSC-15 applies that record; every number is labelled historical or removed, never presented as calibrated.
 
 ## Completion definition
 
 Adoption is complete only when:
 
-- all OSC-00 through OSC-17 deterministic gates pass at one integrated commit;
-- the optional/live tier either passes with approved campaign records or all unsupported model claims and pins are removed;
+- all OSC-00 through OSC-18 deterministic gates pass at one integrated commit;
+- the smoke campaign record exists under the evaluation project, replays through the replay-only live tier without a model call, and every numeric or model claim in the runtime documents is either labelled historical or removed;
 - `uvx --from 'pytest==9.1.1' pytest -q tests/pi-skill-creator` passes offline;
-- local contract tests pass against the exact Pi, pi-subagents, and pi-dynamic-workflows revisions above (the pi-subagents revision is the OSC-17 re-pin);
+- local contract tests pass against the exact Pi, pi-subagents, and pi-dynamic-workflows revisions above (the pi-subagents revision is the OSC-17 re-pin and the Pi revision is the OSC-18 re-pin);
 - `uvx --from 'ty==0.0.77' ty check skills/pi-skill-creator/scripts skills/pi-skill-creator/eval-viewer` passes;
 - the runtime workflow passes meta extraction and execution tests on both pinned workflow runtimes (pi-subagents stub host and pi-dynamic-workflows injected runner), including the thrown-child and resume-replay cases;
 - every campaign rejects missing runs, mixed profiles, null/schema failures, unresolved models, and infrastructure failures, and records `workflow_runtime` and `workflow_runtime_revision`;
