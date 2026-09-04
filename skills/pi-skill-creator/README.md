@@ -59,7 +59,7 @@ Pi, pi-subagents, and pi-dynamic-workflows are optional feature dependencies sup
 - Deterministic validation, report generation, aggregation, and transcript parsing need only Python 3.10+ and its standard library.
 - Trigger evaluation and measured RPC execution need an absolute Pi executable path and an absolute Pi 0.84.4 checkout path.
 - The quantitative benchmark workflow needs those Pi paths plus an absolute pi-subagents 0.19.0 checkout path (`7f569969445bf8bc6fbd7757f18db80b35de0ba9`); it loads pi-subagents explicitly as an extension for declared-dependency runs.
-- The same workflow file runs on either workflow runtime: pi-subagents 0.19.0 through its `SubagentWorkflow` tool, or pi-dynamic-workflows 3.10.0 (`e9c5a41d9c4234df908aa25a2b49ee9648e896d4`) through its `workflow` tool, which makes `SubagentWorkflow` stand down when both are loaded. The campaign passes the chosen runtime's absolute checkout path, and every campaign record names the runtime that ran it.
+- The same workflow file runs on either workflow runtime: pi-subagents 0.19.0 through its `SubagentWorkflow` tool, or pi-dynamic-workflows 3.10.1 (`c82d31af1e36b6f0e89cfcc4bdd728d982e22dc9`) through its `workflow` tool, which makes `SubagentWorkflow` stand down when both are loaded. The campaign passes the chosen runtime's absolute checkout path, and every campaign record names the runtime that ran it.
 - The blind comparator is pinned to `claude-bridge/claude-opus-5`, so a comparison needs the pi-claude-bridge extension (0.7.0, `c1d8b24a57e15bc8acc9d673f2804ab7227978ae`) loaded in the host session.
 
 ## Honest caveats

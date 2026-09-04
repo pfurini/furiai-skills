@@ -13,7 +13,7 @@ export const meta = {
 const REQUIRED_PI = 'db6bee3d6ccb79f5bc7884962ea4d98ca21e60ee'
 const REQUIRED_PI_VERSION = '0.84.4'
 const REQUIRED_SUBAGENTS = '7f569969445bf8bc6fbd7757f18db80b35de0ba9'
-const REQUIRED_DYNAMIC_WORKFLOWS = 'e9c5a41d9c4234df908aa25a2b49ee9648e896d4'
+const REQUIRED_DYNAMIC_WORKFLOWS = 'c82d31af1e36b6f0e89cfcc4bdd728d982e22dc9'
 const REQUIRED_CLAUDE_BRIDGE = 'c1d8b24a57e15bc8acc9d673f2804ab7227978ae'
 const PYTEST = "uvx --from 'pytest==9.1.1' pytest"
 const TY = "uvx --from 'ty==0.0.77' ty"

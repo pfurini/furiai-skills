@@ -33,7 +33,7 @@ The user supplies IDs and timestamps. The workflow never reads the clock or rand
 
 Before the call, check which workflow tool the session exposes:
 
-- `workflow` present: pi-dynamic-workflows (pinned `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`, version 3.10.0) is loaded and pi-subagents' `SubagentWorkflow` has stood down. Set `runtime: pi-dynamic-workflows`, set `runtimeCheckout` to the pi-dynamic-workflows checkout, read `${PI_SKILL_DIR}/workflows/benchmark.js`, and pass its content as `script`. The user's campaign approval is the explicit opt-in the `workflow` tool requires.
+- `workflow` present: pi-dynamic-workflows (pinned `c82d31af1e36b6f0e89cfcc4bdd728d982e22dc9`, version 3.10.1) is loaded and pi-subagents' `SubagentWorkflow` has stood down. Set `runtime: pi-dynamic-workflows`, set `runtimeCheckout` to the pi-dynamic-workflows checkout, read `${PI_SKILL_DIR}/workflows/benchmark.js`, and pass its content as `script`. The user's campaign approval is the explicit opt-in the `workflow` tool requires.
 - Only `SubagentWorkflow` present: pi-subagents (pinned `7f569969445bf8bc6fbd7757f18db80b35de0ba9`, version 0.19.0) orchestrates. Set `runtime: pi-subagents`, set `runtimeCheckout` equal to `piSubagentsCheckout`, and pass the absolute `scriptPath`.
 - Neither present: stop and tell the user that no workflow runtime is loaded; do not simulate the campaign with direct `Agent` calls.
 

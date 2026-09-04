@@ -1,5 +1,7 @@
 # OSC-17: Orchestrator-independent benchmark workflow
 
+> Superseded pin, 2026-09-04: this order pinned pi-dynamic-workflows at `e9c5a41d9c4234df908aa25a2b49ee9648e896d4`, version `3.10.0`, and the revisions below record that moment accurately. That commit was later rebased onto `main` and now exists on no branch, so OSC-14 re-pinned to `c82d31af1e36b6f0e89cfcc4bdd728d982e22dc9`, version `3.10.1`, against which the parity probes pass unchanged. The current pins live in `contracts.md` C1 and the `index.md` table; the revisions in this order are historical.
+
 ## Findings
 
 No new primary finding number. This order applies handoff decisions 1, 3, and 4 from `HANDOFF-pi-skill-creator.md`: the runtime workflow `skills/pi-skill-creator/workflows/benchmark.js` must run unchanged on two workflow runtimes (pi-subagents through its `SubagentWorkflow` tool and pi-dynamic-workflows through its `workflow` tool), the blind comparator moves to `claude-bridge/claude-opus-5`, and every campaign record names the runtime it ran under. It takes over two resolutions from OSC-06 for the workflow path only: F12 (bundled agents are no longer dispatched by `agentType` inside the workflow) and F20 (the comparator pin and its extension loading). It is a secondary consumer of F3 (campaign metadata gains runtime fields), F4, F7, F8, F17, and F35 (the workflow-child telemetry boundary now covers both runtimes). It also carries the pi-subagents re-pin from `bfa262fd` to `7f569969`.
