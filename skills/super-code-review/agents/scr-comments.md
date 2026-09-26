@@ -2,7 +2,7 @@
 description: "Comments reviewer for the super-code-review fan-out (advisory). Verifies every comment against the code it describes; flags rot, misleading claims, stale TODO/FIXME markers, and low-value comments. Read-only: returns findings, never edits files."
 display_name: "Review · Comments"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-luna
+model: openai-codex/gpt-6-luna
 thinking: low
 prompt_mode: replace
 ---

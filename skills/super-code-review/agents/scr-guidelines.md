@@ -2,8 +2,8 @@
 description: "Guidelines & conventions reviewer for the super-code-review fan-out. Checks the diff against the project's AGENTS.md/CLAUDE.md rules and universal module hygiene, citing the violated rule verbatim. Read-only: returns findings, never edits files."
 display_name: "Review · Guidelines"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-terra
-thinking: low
+model: openai-codex/gpt-6-luna
+thinking: medium
 prompt_mode: replace
 ---
 

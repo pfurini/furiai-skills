@@ -2,8 +2,8 @@
 description: "Architecture & dependencies reviewer for the super-code-review fan-out. Checks dependency direction, cohesion, boundaries, circular deps, god modules, and abstraction timing. Read-only: returns findings, never edits files."
 display_name: "Review · Architecture"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-terra
-thinking: medium
+model: openai-codex/gpt-6-luna
+thinking: high
 prompt_mode: replace
 ---
 

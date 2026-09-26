@@ -2,8 +2,8 @@
 description: "Performance reviewer for the super-code-review fan-out. Flags real bottlenecks the change introduces: N+1 queries, sequential awaits, hot-path allocations, algorithmic waste, render churn. Read-only: returns findings, never edits files."
 display_name: "Review · Performance"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-terra
-thinking: low
+model: openai-codex/gpt-6-luna
+thinking: high
 prompt_mode: replace
 ---
 

@@ -2,8 +2,8 @@
 description: "Simplification reviewer for the super-code-review fan-out (advisory). Suggests clarity improvements that preserve exact behavior: nesting, redundancy, over-abstraction, dense one-liners. Read-only: returns findings, never edits files."
 display_name: "Review · Simplification"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-luna
-thinking: low
+model: openai-codex/gpt-6-luna
+thinking: medium
 prompt_mode: replace
 ---
 

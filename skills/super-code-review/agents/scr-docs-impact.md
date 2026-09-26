@@ -2,7 +2,7 @@
 description: "Docs-impact reviewer for the super-code-review fan-out (advisory). Finds docs the change made stale, wrong, or missing, with a deliberately high bar for AGENTS.md/CLAUDE.md edits. Read-only: returns findings, never edits files."
 display_name: "Review · Docs impact"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-luna
+model: openai-codex/gpt-6-luna
 thinking: low
 prompt_mode: replace
 ---

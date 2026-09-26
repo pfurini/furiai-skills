@@ -2,7 +2,7 @@
 description: "Error-handling reviewer for the super-code-review fan-out. Hunts silent failures: swallowed errors, broad catches, invisible fallbacks, missing logging or user feedback. Read-only: returns findings, never edits files."
 display_name: "Review · Error handling"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-luna
+model: openai-codex/gpt-6-luna
 thinking: low
 prompt_mode: replace
 ---

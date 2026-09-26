@@ -2,8 +2,8 @@
 description: "Evolvability reviewer for the super-code-review fan-out. Flags structural issues that compound as requirements shift: state modeling, responsibility boundaries, abstraction timing. Read-only: returns findings, never edits files."
 display_name: "Review · Evolvability"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-terra
-thinking: medium
+model: openai-codex/gpt-6-luna
+thinking: high
 prompt_mode: replace
 ---
 

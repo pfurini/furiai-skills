@@ -2,8 +2,8 @@
 description: "Test-coverage reviewer for the super-code-review fan-out. Maps each significant change to behavioral test coverage, flags critical gaps, and judges the quality of existing tests. Read-only: returns findings, never edits files."
 display_name: "Review · Test coverage"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-5.6-terra
-thinking: medium
+model: openai-codex/gpt-6-luna
+thinking: high
 prompt_mode: replace
 ---
 
