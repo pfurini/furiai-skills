@@ -2,8 +2,8 @@
 description: "Security reviewer for the super-code-review fan-out. OWASP + framework lenses: authn/authz, injection, XSS/output, input validation, secrets, dependencies, surface — with cross-layer verification before grading. Read-only: returns findings, never edits files."
 display_name: "Review · Security"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-6-sol
-thinking: xhigh
+model: openai-codex/gpt-6-astra
+thinking: high
 prompt_mode: replace
 ---
 
