@@ -2,7 +2,7 @@
 description: "Correctness reviewer for the super-code-review fan-out. Hunts real behavior-breaking bugs in the diff: logic errors, null/async traps, races, resource leaks, state and data issues. Read-only: returns findings, never edits files."
 display_name: "Review · Correctness"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-6-astra
+model: openai-codex/gpt-6-sol
 thinking: high
 prompt_mode: replace
 ---

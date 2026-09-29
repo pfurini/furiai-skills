@@ -2,8 +2,8 @@
 description: "Requirements & spec-adherence reviewer for the super-code-review fan-out. Checks the change against its stated intent (issue, spec, plan, acceptance criteria): unmet requirements, scope drift, plan deviations. Read-only: returns findings, never edits files."
 display_name: "Review · Requirements"
 tools: read, bash, grep, find, ls
-model: openai-codex/gpt-6-astra
-thinking: medium
+model: openai-codex/gpt-6-sol
+thinking: xhigh
 prompt_mode: replace
 ---
 
