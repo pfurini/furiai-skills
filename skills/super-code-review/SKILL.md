@@ -106,7 +106,7 @@ Run the selected lenses yourself, in one context. For each: read its agent file 
    If subagents lack repo access, bundle the diff text into the prompt.
 
    **Fallbacks:**
-   - `scr-*` agent types not registered (the harness doesn't load this skill's `agents/` folder — e.g. Claude Code): dispatch generic subagents (`general-purpose` / Task) instead, prefixing each prompt with the full body of the lens's `agents/<file>` (everything below the frontmatter).
+   - `scr-*` agent types not registered (the harness doesn't load this skill's `agents/` folder — e.g. Claude Code): dispatch generic subagents (`general-purpose` / Task) instead, prefixing each prompt with the full body of the lens's `agents/<file>` (everything below the frontmatter). The body drops the frontmatter's `model` and `thinking`, so pass both on each dispatch (`model: <frontmatter model>`, `thinking: <frontmatter thinking>`); otherwise the stand-in silently runs on the orchestrator's model. If a pinned model is unreachable, pick another explicitly and name the substitution in the report.
    - No subagent mechanism at all: fall back to Step 3A inline.
    - Use the Workflow tool only if the user explicitly opted into orchestration.
 3. Completion notifications arrive as each agent finishes — do not poll. Wait for ALL, then go to Step 4.
